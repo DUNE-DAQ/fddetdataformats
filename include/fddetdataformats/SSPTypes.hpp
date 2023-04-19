@@ -8,7 +8,7 @@
 
 #include <cstdlib>
 
-namespace dunedaq::fddetdataformats {
+namespace dunedaq::fddetdataformats::ssp {
 
 // Readable names for interface types
 enum Comm_t
@@ -115,9 +115,9 @@ struct CtrlHeader
 struct CtrlPacket
 {
   CtrlHeader header;
-  unsigned int data[ssp::max_control_data];
+  unsigned int data[max_control_data];
 };
 
-} // namespace dunedaq::fddetdataformats
+} // namespace dunedaq::fddetdataformats::ssp
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_SSPTYPES_HPP_
