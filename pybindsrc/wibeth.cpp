@@ -13,7 +13,7 @@
 
 namespace py = pybind11;
 
-namespace dunedaq::fddetdataformats::wibeth::python {
+namespace dunedaq::fddetdataformats::python {
 
 void
 register_wibeth(py::module& m)
@@ -110,4 +110,4 @@ register_wibeth(py::module& m)
   ;
 }
 
-} // namespace dunedaq::fddetdataformats::wibeth::python
+} // namespace dunedaq::fddetdataformats::python
