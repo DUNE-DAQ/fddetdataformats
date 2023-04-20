@@ -14,7 +14,7 @@
 
 namespace py = pybind11;
 
-namespace dunedaq::fddetdataformats::daphne::python {
+namespace dunedaq::fddetdataformats::python {
 
 void
 register_daphne(py::module& m)
@@ -99,4 +99,4 @@ register_daphne(py::module& m)
   ;
 }
 
-} // namespace dunedaq::fddetdataformats::daphne::python
+} // namespace dunedaq::fddetdataformats::python

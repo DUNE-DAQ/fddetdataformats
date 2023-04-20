@@ -13,7 +13,7 @@
 
 namespace py = pybind11;
 
-namespace dunedaq::fddetdataformats::tde::python {
+namespace dunedaq::fddetdataformats::python {
 
 void
 register_tde(py::module& m)
@@ -53,4 +53,4 @@ register_tde(py::module& m)
   ;
 }
 
-} // namespace dunedaq::fddetdataformats::tde::python
+} // namespace dunedaq::fddetdataformats::python
