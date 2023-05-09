@@ -16,6 +16,7 @@ namespace dunedaq::fddetdataformats::python {
   //  extern void register_wib(py::module&);
   extern void register_wib2(py::module&);
   extern void register_wibeth(py::module&);
+  extern void register_wib(py::module&);
   extern void register_daphne(py::module&);
   extern void register_ssp(py::module&);
   extern void register_tde(py::module&);
@@ -25,7 +26,7 @@ PYBIND11_MODULE(_daq_fddetdataformats_py, m)
 
   m.doc() = "C++ implementation of the fddetdataformats modules";
 
-  //  register_wib(m);
+  register_wib(m);
   register_wib2(m);
   register_wibeth(m);
   register_daphne(m);
