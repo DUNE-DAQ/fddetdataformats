@@ -50,7 +50,7 @@ public:
   static constexpr int s_num_adc_words = s_time_samples_per_frame * s_num_channels * s_bits_per_adc / s_bits_per_word;
   
 
-  struct WIBHeader
+  struct WIBEthHeader
   {	  
     word_t colddata_timestamp_0 : 15;
     word_t pad_0: 1;
@@ -75,7 +75,7 @@ public:
   // Data members
   // ===============================================================
   detdataformats::DAQEthHeader daq_header;
-  WIBHeader header;
+  WIBEthHeader header;
   // word_t adc_words[s_num_adc_words_per_ts][s_time_samples_per_frame]; // NOLINT
   word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
 

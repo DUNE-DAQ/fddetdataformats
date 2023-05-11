@@ -6,9 +6,10 @@
  * received with this code.
  */
 
+#include "registrators.hpp"
+
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
-#include "submodules.hpp"
 
 namespace py = pybind11;
 
@@ -19,20 +20,12 @@ PYBIND11_MODULE(_daq_fddetdataformats_py, m)
 
   m.doc() = "C++ implementation of the fddetdataformats modules";
 
-  py::module_ wib_module = m.def_submodule("wib");
-  register_wib(wib_module);
-
-  py::module_ daphne_module = m.def_submodule("daphne");
-  register_daphne(daphne_module);
-
-  py::module_ ssp_module = m.def_submodule("ssp");
-  register_ssp(ssp_module);
-
-  py::module_ wibeth_module = m.def_submodule("wibeth");
-  register_wibeth(wibeth_module);
-
-  py::module_ tde_module = m.def_submodule("tde");
-  register_tde(tde_module);
+  register_wib(m);
+  register_wib2(m);
+  register_wibeth(m);
+  register_daphne(m);
+  register_ssp(m);
+  register_tde(m);
 }
 
 } // namespace dunedaq::fddetdataformats::python
