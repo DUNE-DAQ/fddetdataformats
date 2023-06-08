@@ -33,7 +33,8 @@ register_tde(py::module& m)
     .def("get_timestamp", &TDE16Frame::get_timestamp)
     .def("set_timestamp", &TDE16Frame::set_timestamp)
     .def("get_channel", &TDE16Frame::get_channel)
-    .def("get_tde_header", [](TDE16Frame& self) -> TDE16Header* {return self.get_tde_header();}, py::return_value_policy::reference_internal)
+    .def("get_daq_header", [](TDE16Frame& self) -> detdataformats::DAQEthHeader* {return self.get_daq_header();}, py::return_value_policy::reference_internal)
+    .def("get_tde_header", [](TDE16Frame& self) -> TDEHeader* {return self.get_tde_header();}, py::return_value_policy::reference_internal)
     .def_static("sizeof", [](){ return sizeof(TDE16Frame); })
     .def("get_bytes",
          [](TDE16Frame* fr) -> py::bytes {
@@ -42,14 +43,12 @@ register_tde(py::module& m)
     )
   ;
 
-  py::class_<TDE16Header>(m, "TDE16Header")
-    .def_property_readonly("version", [](TDE16Header& self) -> uint32_t {return self.version;})
-    .def_property_readonly("det_id", [](TDE16Header& self) -> uint32_t {return self.det_id;})
-    .def_property_readonly("crate", [](TDE16Header& self) -> uint32_t {return self.crate;})
-    .def_property_readonly("slot", [](TDE16Header& self) -> uint32_t {return self.slot;})
-    .def_property_readonly("link", [](TDE16Header& self) -> uint32_t {return self.link;})
-    .def_property_readonly("timestamp_1", [](TDE16Header& self) -> uint32_t {return self.timestamp_1;})
-    .def_property_readonly("timestamp_2", [](TDE16Header& self) -> uint32_t {return self.timestamp_2;})
+  py::class_<TDEHeader>(m, "TDEHeader")
+    .def_property_readonly("channel", [](TDEHeader& self) -> uint16_t {return self.channel;})
+    .def_property_readonly("version", [](TDEHeader& self) -> uint16_t {return self.version;})
+    .def_property_readonly("tde_header", [](TDEHeader& self) -> uint16_t {return self.tde_header;})
+    .def_property_readonly("tde_errors", [](TDEHeader& self) -> uint16_t {return self.tde_errors;})
+    .def_property_readonly("TAItime", [](TDEHeader& self) -> uint64_t {return self.TAItime;})
   ;
 }
 

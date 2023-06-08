@@ -18,6 +18,8 @@
 #include <fstream>
 #include <iterator>
 
+#include "detdataformats/DAQEthHeader.hpp"
+
 namespace dunedaq::fddetdataformats {
 
 static constexpr int ticks_between_adc_samples = 32;
@@ -25,63 +27,15 @@ static constexpr int tot_adc16_samples = 4474;
 static constexpr int n_channels_per_amc = 64;
 static constexpr int payload16 = 8972;
 
-struct TDE16Header
+struct TDEHeader
 {
-  uint32_t version : 6, det_id : 6, crate : 10, slot : 4, link : 6;
-  uint32_t timestamp_1 : 32;
-  uint32_t timestamp_2 : 32;
-  uint32_t TAItime_1 : 32;
-  uint32_t TAItime_2 : 32;
-  uint32_t tde_header : 10, tde_errors : 22;
-
-  uint64_t get_timestamp() const { return (uint64_t)(timestamp_1) | ((uint64_t)(timestamp_2) << 32); }
-  uint16_t get_channel() const { return link; }
-
-  uint64_t get_TAItime() const { return (uint64_t)(TAItime_1) | ((uint64_t)(TAItime_2) << 32); }
-  void set_timestamp(const uint64_t new_timestamp) 
-  {
-    timestamp_1 = new_timestamp;
-    timestamp_2 = new_timestamp >> 32;
-  }
-  void set_TAItime(const uint64_t new_TAItime) 
-  {
-    TAItime_1 = new_TAItime;
-    TAItime_2 = new_TAItime >> 32;
-  }
-
-  // Print functions for debugging.
-  std::ostream& print_hex(std::ostream& o) const
-  {
-    return o << std::hex << "version: " << version << " det_id: " << det_id << " crate: " << crate << " slot: " << slot << " link: " << link 
-                         << "timestamp: " << get_timestamp() 
-                         << "TAItime: " << get_TAItime() 
-                         << "tde_header: " << tde_header << " tde_errors: " << tde_errors << std::dec << '\n';
-  }
-
-  std::ostream& print_bits(std::ostream& o) const
-  {
-    return o << "version: " << std::bitset<6>(version) << " det_id: " << std::bitset<6>(det_id) << " crate: " << std::bitset<10>(crate) << " slot: " << std::bitset<4>(slot) << " link: " << std::bitset<6>(link) 
-             << "timestamp: " << get_timestamp() 
-             << "TAItime: " << get_TAItime() 
-             << "tde_header: " << std::bitset<10>(tde_header) << " tde_errors: " << std::bitset<16>(tde_errors) << '\n';
-  }
-
+  uint64_t channel : 8, version : 4, tde_header : 10, tde_errors : 16, reserved : 26;
+  uint64_t TAItime : 64;
 };
 
 struct Sample 
 {
   uint16_t sample : 12, reserved : 4;
-
-  // Print functions for debugging.
-  std::ostream& print_hex(std::ostream& o) const
-  {
-    return o << std::hex << "sample: " << sample << " reserved: " << reserved << std::dec << '\n';
-  }
-
-  std::ostream& print_bits(std::ostream& o) const
-  {
-    return o << "sample: " << std::bitset<12>(sample) << " reserved: " << std::bitset<4>(reserved) << '\n';
-  }
 };
 
 struct ADC16Data
@@ -99,35 +53,39 @@ struct ADC16Data
 class TDE16Frame
 {
 public:
-  const TDE16Header* get_tde_header() const { return &tde16header; }
-  TDE16Header* get_tde_header() { return &tde16header; }
+  const detdataformats::DAQEthHeader* get_daq_header() const { return &m_daq_header; }
+  detdataformats::DAQEthHeader* get_daq_header() { return &m_daq_header; }
+  const TDEHeader* get_tde_header() const { return &m_tde16_header; }
+  TDEHeader* get_tde_header() { return &m_tde16_header; }
 
-  // TDE16Header mutators
-  void set_tde_errors(const uint16_t new_tde_errors) { tde16header.tde_errors = new_tde_errors; } 
-  void set_timestamp(const uint64_t new_timestamp) { tde16header.set_timestamp(new_timestamp); } 
-  void set_channel(const uint16_t new_channel) { tde16header.link=new_channel; } 
-  void set_TAItime(const uint64_t new_TAItime) { tde16header.set_TAItime(new_TAItime); } 
-  uint64_t get_timestamp() const { return tde16header.get_timestamp(); } 
-  uint16_t get_channel() const { return tde16header.get_channel(); } 
+  // TDEHeader mutators
+  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); } 
+  void set_timestamp(const uint64_t new_timestamp) { m_daq_header.timestamp = new_timestamp; } 
+  uint16_t get_channel() const { return m_tde16_header.channel; } 
+  void set_channel(const uint16_t new_channel) { m_tde16_header.channel=new_channel; } 
+  uint16_t get_tde_errors() { return m_tde16_header.tde_errors; } 
+  void set_tde_errors(const uint16_t new_tde_errors) { m_tde16_header.tde_errors = new_tde_errors; } 
+  uint64_t get_TAItime() { return m_tde16_header.TAItime; } 
+  void set_TAItime(const uint64_t new_TAItime) { m_tde16_header.TAItime = new_TAItime; } 
 
   // ADC16Data mutators
-  void set_adc_sample(const uint16_t new_adc_val, int sample_no) { adc16data.samples_info[sample_no].sample = new_adc_val; } 
-  uint16_t get_adc_sample(int sample_no) const { return adc16data.get_adc_sample(sample_no); } 
+  void set_adc_sample(const uint16_t new_adc_val, int sample_no) { m_adc16_data.samples_info[sample_no].sample = new_adc_val; } 
+  uint16_t get_adc_sample(int sample_no) const { return m_adc16_data.get_adc_sample(sample_no); } 
 
-  friend std::ostream& operator<<(std::ostream& o, TDE16Frame const& tde16frame);
+  friend std::ostream& operator<<(std::ostream& o, TDE16Frame const& tde16_frame);
 
 private:
-  TDE16Header tde16header;
-  ADC16Data adc16data;
+  detdataformats::DAQEthHeader m_daq_header;
+  TDEHeader m_tde16_header;
+  ADC16Data m_adc16_data;
 };
 
 inline std::ostream&
-operator<<(std::ostream& o, TDE16Header const& tde16header)
+operator<<(std::ostream& o, TDEHeader const& tde_header)
 {
-  return o << "version: " << unsigned(tde16header.version) << " det_id: " << unsigned(tde16header.det_id) << " crate: " << unsigned(tde16header.crate) << " slot: " << unsigned(tde16header.slot) << " link: " << unsigned(tde16header.link) 
-           << "timestamp: " << tde16header.get_timestamp() 
-           << "TAItime: " << tde16header.get_TAItime() 
-           << "tde_header: " << unsigned(tde16header.tde_header) << " tde_errors: " << unsigned(tde16header.tde_errors) << '\n';
+    return o << std::hex << "channel: " << tde_header.channel << "version: " << tde_header.version 
+	    << "TAItime: " << tde_header.TAItime
+	    << " tde_header: " <<  tde_header.tde_header<< " tde_errors: " << tde_header.tde_errors << std::dec << '\n';
 }
 
 inline std::ostream&
@@ -140,11 +98,10 @@ inline std::ostream&
 operator<<(std::ostream& o, TDE16Frame const& tde16frame)
 {
   o << "Printing frame:" << '\n';
-  o << tde16frame.tde16header << '\n';
+  o << tde16frame.m_daq_header << '\n';
+  o << tde16frame.m_tde16_header << '\n';
   return o;
 }
-
-
 
 } // namespace dunedaq::fddetdataformats
 
