@@ -10,7 +10,7 @@ find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 ##############################################################################
 
-daq_add_library( LINK_LIBRARIES detdataformats::detdataformats) 
+daq_add_library( WIBEthFrame.cpp LINK_LIBRARIES detdataformats::detdataformats) 
 
 ##############################################################################
 

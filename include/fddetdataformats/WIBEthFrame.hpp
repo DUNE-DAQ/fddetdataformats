@@ -37,6 +37,9 @@ public:
   // Preliminaries
   // ===============================================================
 
+  // hashcode that will be used for this data type as fragment_type in fragment headers
+  static const uint32_t s_hashcode_for_wibeth_datatype;
+
   // The definition of the format is in terms of 64-bit words
   typedef uint64_t word_t; // NOLINT
 
@@ -170,6 +173,13 @@ public:
     header.channel = new_channel;
   }
 
+private:
+  static uint32_t generate_datatype_hashcode() {
+    WIBEthFrame dummy_instance;
+    std::string data_type_name = typeid(dummy_instance).name();
+    std::hash<std::string> string_hasher;
+    return 0xffffffff & string_hasher(data_type_name);
+  }
 };
 
 } // namespace dunedaq::fddetdataformats
