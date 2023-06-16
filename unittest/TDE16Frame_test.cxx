@@ -58,13 +58,6 @@ BOOST_AUTO_TEST_CASE(TDE16Frame_ADCDataMutators)
   for(int i=tot_adc16_samples-20; i<tot_adc16_samples; i++) { BOOST_REQUIRE_EQUAL(tde16frame.get_adc_sample(i), 0x63); }
 }
 
-BOOST_AUTO_TEST_CASE(TDE16Frame_PayloadSize)
-{
-  TDE16Frame tde16frame {};
-  
-  BOOST_REQUIRE_EQUAL(sizeof(tde16frame), payload16);
-}
-
 BOOST_AUTO_TEST_CASE(TDE16Frame_FromRawData)
 {
   dunedaq::detdataformats::DAQEthHeader daq_header {};

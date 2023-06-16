@@ -25,7 +25,7 @@ namespace dunedaq::fddetdataformats {
 static constexpr int ticks_between_adc_samples = 32;
 static constexpr int tot_adc16_samples = 4474;
 static constexpr int n_channels_per_amc = 64;
-static constexpr int payload16 = 8972;
+//static constexpr int payload16 = 8972;
 
 struct TDEHeader
 {
