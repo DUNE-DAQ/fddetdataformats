@@ -11,8 +11,10 @@
  * received with this code.
  */
 
-#ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
-#define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
+#ifndef FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
+#define FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
+
+#include "detdataformats/DAQHeader.hpp"
 
 #include <algorithm> // For std::min
 #include <cassert>   // For assert()
@@ -21,7 +23,8 @@
 #include <stdexcept> // For std::out_of_range
 #include <cstdint>  // For uint32_t etc
 
-namespace dunedaq::fddetdataformats {
+namespace dunedaq {
+namespace fddetdataformats {
 
 class DAPHNEFrame
 {
@@ -35,39 +38,28 @@ public:
 
   static constexpr int s_bits_per_adc = 14;
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);
-  static constexpr int s_t_channels_per_daphne = 320;
-  static constexpr int s_channels_per_daphne = s_t_channels_per_daphne;
-  static constexpr int s_daphnes_per_frame = 1;
-  static constexpr int s_num_channels = s_daphnes_per_frame * s_channels_per_daphne;
-  static constexpr int s_num_adc_words = s_num_channels * s_bits_per_adc / s_bits_per_word;
+  static constexpr int s_num_adcs = 1024;
+  static constexpr int s_num_adc_words = s_num_adcs * s_bits_per_adc / s_bits_per_word;
 
   struct Header
   {
-    word_t start_frame;
-    word_t data_version : 4, daphne : 8, channel : 6, trigger_peak_height : 14;
-    word_t wf_length_in_words : 12, pds_reserved_bits : 20;
-    word_t packet_counter : 32;
-    word_t timestamp_wf_1 : 32;
-    word_t timestamp_wf_2 : 32;
+    word_t channel : 6, pds_reserved_1 : 10, trigger_sample_value : 16;
+    word_t threshold : 16, baseline : 16;
   };
 
   struct Trailer
   {
-    word_t crc20 : 20;
-    word_t flex_word_12 : 12;
-    word_t eof : 8;
-    word_t flex_word_24 : 24;
+    word_t trailer;
   };
 
   // ===============================================================
   // Data members
   // ===============================================================
+  detdataformats::DAQHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT
+  Trailer trailer;
   
-  // THIS DATA IS STRIPPED DURING TRANSMISSION
-  // Trailer trailer;
-
   // ===============================================================
   // Accessors
   // ===============================================================
@@ -77,11 +69,11 @@ public:
    *
    * The ADC words are 14 bits long, stored packed in the data structure. The order is:
    *
-   * - 320 values from DAPHNE T channels
+   * - 1024 adc values from one daphne channels
    */
   uint16_t get_adc(int i) const // NOLINT
   {
-    if (i < 0 || i >= s_num_channels)
+    if (i < 0 || i >= s_num_adcs)
       throw std::out_of_range("ADC index out of range");
 
     // The index of the first (and sometimes only) word containing the required ADC value
@@ -106,7 +98,7 @@ public:
    */
   void set_adc(int i, uint16_t val) // NOLINT
   {
-    if (i < 0 || i >= s_num_channels)
+    if (i < 0 || i >=  s_num_adcs)
       throw std::out_of_range("ADC index out of range");
     if (val >= (1 << s_bits_per_adc))
       throw std::out_of_range("ADC value out of range");
@@ -128,25 +120,26 @@ public:
     }
   }
 
-  /** @brief Get the ith T ADC in the given DAPHNE
+  /** @brief Get the channel from the DAPHNE frame
    */
-  uint16_t get_t(int i) const { return get_adc(i); } // NOLINT(build/unsigned)
+  uint8_t get_channel() const { return header.channel; } // NOLINT(build/unsigned)
 
-  /** @brief Set the ith U-channel ADC in the given femb to val
+  /** @brief Set the channel of the DAPHNE frame
    */
-  void set_t(int i, uint16_t val) { return set_adc(i, val); } // NOLINT(build/unsigned)
+  void set_channel( uint8_t val) { header.channel = val& 0x3Fu; } // NOLINT(build/unsigned)
 
   /** @brief Get the 64-bit timestamp of the frame
    */
   uint64_t get_timestamp() const // NOLINT(build/unsigned)
   {
-    return (uint64_t)header.timestamp_wf_1 | ((uint64_t)header.timestamp_wf_2 << 32); // NOLINT(build/unsigned)
+    return daq_header.get_timestamp();
   }
 };
 
-} // namespace dunedaq::fddetdataformats
+} // namespace detdataformats
+} // namespace dunedaq
 
-#endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
+#endif // FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
 
 // Local Variables:
 // c-basic-offset: 2

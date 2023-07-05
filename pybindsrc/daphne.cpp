@@ -32,13 +32,14 @@ register_daphne(py::module& m)
       return wfp;
     }))
     .def("get_adc", static_cast<uint16_t (DAPHNEFrame::*)(const int) const>(&DAPHNEFrame::get_adc))
-    .def("get_t", static_cast<uint16_t (DAPHNEFrame::*)(const int) const>(&DAPHNEFrame::get_t))
     .def("get_timestamp", &DAPHNEFrame::get_timestamp)
+    .def("get_channel", &DAPHNEFrame::get_channel)
     .def_static("sizeof", [](){ return sizeof(DAPHNEFrame); })
   ;
 
+  /*
   py::class_<DAPHNEFrame::Header>(m, "DAPHNEHeader")
-    .def_property_readonly("start_frame", [](DAPHNEFrame::Header& self) -> uint32_t {return self.start_frame;})
+    .def_property_readonly("trigger_sample_value", [](DAPHNEFrame::Header& self) -> uint32_t {return self.start_frame;})
     .def_property_readonly("data_version", [](DAPHNEFrame::Header& self) -> uint32_t {return self.data_version;})
     .def_property_readonly("daphne", [](DAPHNEFrame::Header& self) -> uint32_t {return self.daphne;})
     .def_property_readonly("channel", [](DAPHNEFrame::Header& self) -> uint32_t {return self.channel;})
@@ -55,7 +56,7 @@ register_daphne(py::module& m)
     .def_property_readonly("eof", [](DAPHNEFrame::Trailer& self) -> uint32_t {return self.eof;})
     .def_property_readonly("flex_word_24", [](DAPHNEFrame::Trailer& self) -> uint32_t {return self.flex_word_24;})
   ;
-
+  */
 
   py::class_<DAPHNEStreamFrame::Header>(m, "DAPHNEStreamHeader")
     .def_property("channel_0", 
