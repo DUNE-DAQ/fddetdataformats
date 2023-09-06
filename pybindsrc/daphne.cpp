@@ -31,10 +31,31 @@ register_daphne(py::module& m)
       auto wfp = *static_cast<DAPHNEFrame*>(info.ptr);
       return wfp;
     }))
+    .def("get_daqheader", [](DAPHNEFrame& self) -> const detdataformats::DAQHeader& {return self.daq_header;}, py::return_value_policy::reference_internal)
+    .def("get_header", [](DAPHNEFrame& self) -> const DAPHNEFrame::Header& {return self.header;}, py::return_value_policy::reference_internal)
     .def("get_adc", static_cast<uint16_t (DAPHNEFrame::*)(const int) const>(&DAPHNEFrame::get_adc))
     .def("get_timestamp", &DAPHNEFrame::get_timestamp)
     .def("get_channel", &DAPHNEFrame::get_channel)
     .def_static("sizeof", [](){ return sizeof(DAPHNEFrame); })
+  ;
+  
+  py::class_<DAPHNEFrame::Header>(m, "DAPHNEHeader")
+    .def_property("channel", 
+      [](DAPHNEFrame::Header& self) -> uint8_t { return self.channel; }, 
+      [](DAPHNEFrame::Header& self, uint8_t channel) { self.channel = channel; } 
+      )
+    .def_property("trigger_sample_value", 
+      [](DAPHNEFrame::Header& self) -> uint16_t { return self.trigger_sample_value; }, 
+      [](DAPHNEFrame::Header& self, uint16_t tsv) { self.trigger_sample_value = tsv; } 
+      )
+    .def_property("threshold", 
+      [](DAPHNEFrame::Header& self) -> uint16_t { return self.threshold; }, 
+      [](DAPHNEFrame::Header& self, uint16_t threshold) { self.threshold = threshold; } 
+      )
+    .def_property("baseline", 
+      [](DAPHNEFrame::Header& self) -> uint16_t { return self.baseline; }, 
+      [](DAPHNEFrame::Header& self, uint16_t baseline) { self.baseline = baseline; } 
+      )
   ;
 
   /*
