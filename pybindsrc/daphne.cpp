@@ -34,6 +34,8 @@ register_daphne(py::module& m)
     .def("get_adc", static_cast<uint16_t (DAPHNEFrame::*)(const int) const>(&DAPHNEFrame::get_adc))
     .def("get_timestamp", &DAPHNEFrame::get_timestamp)
     .def("get_channel", &DAPHNEFrame::get_channel)
+    .def("get_daqheader", [](DAPHNEFrame& self) -> const detdataformats::DAQHeader& {return self.daq_header;}, py::return_value_policy::reference_internal)
+
     .def_static("sizeof", [](){ return sizeof(DAPHNEFrame); })
   ;
 
