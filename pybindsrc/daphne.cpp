@@ -60,14 +60,6 @@ register_daphne(py::module& m)
       )
   ;
 
-  
-  py::class_<DAPHNEFrame::Header>(m, "DAPHNEHeader")
-    .def_property_readonly("channel", [](DAPHNEFrame::Header& self) -> uint32_t {return self.channel;})
-    .def_property_readonly("trigger_sample_value", [](DAPHNEFrame::Header& self) -> uint32_t {return self.trigger_sample_value;})
-    .def_property_readonly("threshold", [](DAPHNEFrame::Header& self) -> uint32_t {return self.threshold;})
-    .def_property_readonly("baseline", [](DAPHNEFrame::Header& self) -> uint32_t {return self.baseline;})
-  ;
-
   py::class_<DAPHNEStreamFrame::Header>(m, "DAPHNEStreamHeader")
     .def_property("channel_0", 
       [](DAPHNEStreamFrame::Header& self) -> uint32_t { return self.channel_0; }, 
