@@ -146,7 +146,23 @@ public:
     }
 
   }
+   /** @brief Get the channel 0 from the DAPHNE Stream frame header                                                                                                           
+   */
+  uint8_t get_channel0() const { return header.channel_0; } // NOLINT(build/unsigned)                                                                                        
+
+  /** @brief Get the channel 1 from the DAPHNE Stream frame header                                                                                                           
+   */
+  uint8_t get_channel1() const { return header.channel_1; } // NOLINT(build/unsigned)                                                                                        
+
+  /** @brief Get the channel 2 from the DAPHNE Stream frame header                                                                                                           
+   */
+  uint8_t get_channel2() const { return header.channel_2; } // NOLINT(build/unsigned)                                                                                        
+
+  /** @brief Get the channel 3 from the DAPHNE Stream frame header                                                                                                           
+   */
+  uint8_t get_channel3() const { return header.channel_3; } // NOLINT(build/unsigned)        
 };
+
 
 } // namespace dunedaq::fddetdataformats
 
