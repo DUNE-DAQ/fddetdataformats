@@ -33,6 +33,10 @@ register_wibeth(py::module& m)
       // [](WIBEthFrame::WIBEthHeader& self) -> uint32_t {return self.reserved;},
       // [](WIBEthFrame::WIBEthHeader& self, uint32_t reserved) {self.reserved = reserved;}
       // )
+    .def_property("cd",
+      [](WIBEthFrame::WIBEthHeader& self) -> uint32_t {return self.cd;},
+      [](WIBEthFrame::WIBEthHeader& self, uint32_t cd) {self.version = cd;}
+      )
     .def_property("context",
       [](WIBEthFrame::WIBEthHeader& self) -> uint32_t {return self.context;},
       [](WIBEthFrame::WIBEthHeader& self, uint32_t context) {self.version = context;}
