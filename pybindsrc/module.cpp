@@ -26,6 +26,7 @@ PYBIND11_MODULE(_daq_fddetdataformats_py, m)
   register_daphne(m);
   register_ssp(m);
   register_tde(m);
+  register_tdeeth(m);
 }
 
 } // namespace dunedaq::fddetdataformats::python
