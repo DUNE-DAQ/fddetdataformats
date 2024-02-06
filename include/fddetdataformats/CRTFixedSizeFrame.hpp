@@ -45,12 +45,17 @@ public:
     word_t sixteen_ns_counter_timestamp;
   };
 
+  struct HitWord
+  {
+    word_t hit_magic_number : 8, hit_channel : 8, hit_adc : 16;
+  };
+
   // ===============================================================
   // Data members
   // ===============================================================
   detdataformats::DAQEthHeader daq_header;
   Header header;
-  word_t adc_words[s_num_adcs]; // NOLINT
+  HitWord adc_words[s_num_adcs]; // NOLINT
   
   // ===============================================================
   // Accessors
@@ -72,14 +77,10 @@ public:
     if (i < 0 || i >= s_num_adcs)
       throw std::out_of_range("ADC index out of range");
 
-    // The index of the word containing the required ADC value
-    int word_index = i;
-    // The ADC value always starts at the 16th bit
-    int first_bit_position = 15;
+    if(i > header.hit_count)
+      throw std::out_of_range("Hit is (expected to be) empty");
 
-    int16_t adc = adc_words[word_index] >> first_bit_position; // NOLINT
-    // Mask to 16 bits (may be redundant)
-    return adc & 0xFFFF;
+    return static_cast<int16_t>(adc_words[i].hit_adc);
   }
 
   /**
@@ -92,12 +93,29 @@ public:
     if (val >= (1 << s_bits_per_adc))
       throw std::out_of_range("ADC value out of range");
 
-    // The index of the word containing the required ADC value
-    int word_index = i;
-    // The ADC value always starts at the 16th bit
-    int first_bit_position = 15;
-    uint32_t mask = (1 << (first_bit_position)) - 1;
-    adc_words[word_index] = ((val << first_bit_position) & ~mask) | (adc_words[word_index] & mask);
+    adc_words[i].hit_adc = val;
+  }
+
+  /**
+   * @brief Get the channel of the ith hit in the frame
+   */
+  uint8_t get_channel(int i)
+  {
+    if (i < 0 || i >=  s_num_adcs)
+      throw std::out_of_range("ADC index out of range");
+  
+    return static_cast<uint8_t>(adc_words[i].hit_channel); 
+  }
+
+  /**
+   * @brief Set the channel of the ith hit in the frame to @p val
+   */
+  void set_channel(int i, uint8_t val)
+  {
+    if (i < 0 || i >=  s_num_adcs)
+      throw std::out_of_range("ADC index out of range");
+   
+    adc_words[i].hit_channel = val; 
   }
 
   /** @brief Get the module from the CRT frame
