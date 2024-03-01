@@ -77,9 +77,6 @@ public:
     if (i < 0 || i >= s_num_adcs)
       throw std::out_of_range("ADC index out of range");
 
-    if(i > header.hit_count)
-      throw std::out_of_range("Hit is (expected to be) empty");
-
     return static_cast<int16_t>(adc_words[i].hit_adc);
   }
 
