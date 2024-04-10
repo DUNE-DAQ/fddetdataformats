@@ -49,6 +49,30 @@ public:
 
   struct Trailer
   {
+    // Trailer word 1
+    word_t num_peak_ub_0 : 4, num_peak_ob_0 : 4, charge_0 : 23, da_0 : 1;
+    // Trailer word 2
+    word_t max_peak_0 : 14, time_peak_0 : 9, time_pulse_0 : 9;
+    // Trailer word 2
+    word_t num_peak_ub_1 : 4, num_peak_ob_1 : 4, charge_1 : 23, da_1 : 1;
+    // Trailer word 3
+    word_t max_peak_1 : 14, time_peak_1 : 9, time_pulse_1 : 9;
+    // Trailer word 4
+    word_t num_peak_ub_2 : 4, num_peak_ob_2 : 4, charge_2 : 23, da_2 : 1;
+    // Trailer word 5
+    word_t max_peak_2 : 14, time_peak_2 : 9, time_pulse_2 : 9;
+    // Trailer word 6
+    word_t num_peak_ub_3 : 4, num_peak_ob_3 : 4, charge_3 : 23, da_3 : 1;
+    // Trailer word 7
+    word_t max_peak_3 : 14, time_peak_3 : 9, time_pulse_3 : 9;
+    // Trailer word 7
+    word_t num_peak_ub_4 : 4, num_peak_ob_4 : 4, charge_4 : 23, da_4 : 1;
+    // Trailer word 8
+    word_t max_peak_4 : 14, time_peak_4 : 9, time_pulse_4 : 9;
+    // Trailer word 9
+    word_t padding_0 : 2, time_pulse_ob_2 : 10, time_pulse_ob_1 : 10, time_pulse_ob_0 : 10;
+    word_t padding_1 : 12, time_pulse_ob_4 : 10, time_pulse_ob_3 : 10;
+
     word_t trailer;
   };
 
