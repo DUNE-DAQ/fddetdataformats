@@ -36,6 +36,9 @@ public:
   // The definition of the format is in terms of 32-bit words
   typedef uint32_t word_t; // NOLINT
 
+  // Dataframe format versoon
+  static constexpr uint8_t version = 5;
+
   static constexpr int s_bits_per_adc = 14;
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);
   static constexpr int s_num_adcs = 1024;
@@ -43,7 +46,7 @@ public:
 
   struct Header
   {
-    word_t channel : 6, pds_reserved_1 : 10, trigger_sample_value : 16;
+    word_t channel : 6, algorithm_id : 4, reserved_1 : 5, r1: 1, trigger_sample_value : 16;
     word_t threshold : 16, baseline : 16;
   };
 
@@ -70,8 +73,8 @@ public:
     // Trailer word 8
     word_t max_peak_4 : 14, time_peak_4 : 9, time_pulse_4 : 9;
     // Trailer word 9
-    word_t padding_0 : 2, time_pulse_ob_2 : 10, time_pulse_ob_1 : 10, time_pulse_ob_0 : 10;
-    word_t padding_1 : 12, time_pulse_ob_4 : 10, time_pulse_ob_3 : 10;
+    word_t reserved_2 : 2, time_pulse_ob_2 : 10, time_pulse_ob_1 : 10, time_pulse_ob_0 : 10;
+    word_t reserved_3 : 12, time_pulse_ob_4 : 10, time_pulse_ob_3 : 10;
 
     word_t trailer;
   };
