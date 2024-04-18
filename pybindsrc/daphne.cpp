@@ -45,6 +45,14 @@ register_daphne(py::module& m)
       [](DAPHNEFrame::Header& self) -> uint8_t { return self.channel; }, 
       [](DAPHNEFrame::Header& self, uint8_t channel) { self.channel = channel; } 
       )
+    .def_property("algorithm_id", 
+      [](DAPHNEFrame::Header& self) -> uint8_t { return self.algorithm_id; }, 
+      [](DAPHNEFrame::Header& self, uint8_t algorithm_id) { self.algorithm_id = algorithm_id; } 
+      )
+    .def_property("r1", 
+      [](DAPHNEFrame::Header& self) -> uint8_t { return self.r1; }, 
+      [](DAPHNEFrame::Header& self, uint8_t r1) { self.r1 = r1; } 
+      )
     .def_property("trigger_sample_value", 
       [](DAPHNEFrame::Header& self) -> uint16_t { return self.trigger_sample_value; }, 
       [](DAPHNEFrame::Header& self, uint16_t tsv) { self.trigger_sample_value = tsv; } 
