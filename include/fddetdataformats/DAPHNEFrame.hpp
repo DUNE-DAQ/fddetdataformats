@@ -36,8 +36,8 @@ public:
   // The definition of the format is in terms of 32-bit words
   typedef uint32_t word_t; // NOLINT
 
-  // Dataframe format versoon
-  static constexpr uint8_t version = 5;
+  // Dataframe format version
+  static constexpr uint8_t version = 2;
 
   static constexpr int s_bits_per_adc = 14;
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);
@@ -161,6 +161,7 @@ public:
   {
     return daq_header.get_timestamp();
   }
+
 };
 
 } // namespace detdataformats
