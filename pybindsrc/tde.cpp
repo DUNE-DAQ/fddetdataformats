@@ -35,6 +35,7 @@ register_tde(py::module& m)
     .def("get_channel", &TDE16Frame::get_channel)
     .def("get_daq_header", [](TDE16Frame& self) -> detdataformats::DAQEthHeader* {return self.get_daq_header();}, py::return_value_policy::reference_internal)
     .def("get_tde_header", [](TDE16Frame& self) -> TDEHeader* {return self.get_tde_header();}, py::return_value_policy::reference_internal)
+    .def("get_adc_sample", &TDE16Frame::get_adc_sample)
     .def_static("sizeof", [](){ return sizeof(TDE16Frame); })
     .def("get_bytes",
          [](TDE16Frame* fr) -> py::bytes {

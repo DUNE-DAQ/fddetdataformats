@@ -22,6 +22,7 @@ namespace dunedaq::fddetdataformats::python {
   void register_daphne(pybind11::module&);
   void register_ssp(pybind11::module&);
   void register_tde(pybind11::module&);
+  void register_tdeeth(pybind11::module&);
 }
 
 #endif // FDDETDATAFORMATS_PYBINDSRC_REGISTRATORS_HPP_
