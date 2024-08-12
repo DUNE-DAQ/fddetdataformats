@@ -20,7 +20,6 @@ namespace dunedaq::fddetdataformats::python {
   void register_wibeth(pybind11::module&);
   void register_wib(pybind11::module&);
   void register_daphne(pybind11::module&);
-  void register_ssp(pybind11::module&);
   void register_tde(pybind11::module&);
   void register_tdeeth(pybind11::module&);
 }
