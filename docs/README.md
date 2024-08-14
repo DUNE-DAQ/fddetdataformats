@@ -20,8 +20,3 @@ A `WIB2Frame` instance contains as members instances of the `WIB2Frame::Header` 
 [`DAPHNEFrame.hpp`](https://github.com/DUNE-DAQ/fddetdataformats/blob/develop/include/fddetdataformats/DAPHNEFrame.hpp)
 
 `DAPHNEFrame` is used for working with data produced by DAPHNE front end boards (DAPHNE = Detector electronics for Acquiring PHotons from Neutrinos). Technical details on DAPHNE can be found in https://edms.cern.ch/document/2088726/3. The structure of `DAPHNEFrame` is similar in some ways to the structure of `WIB2Frame`: it consists of an instance of a `DAPHNEFrame::Header` and `DAPHNEFrame::Trailer` struct, as well as an array of ADCs. It also contains a `get_timestamp` function as well as getters and setters for ADC values. 
-
-## SSP
-[`SSPTypes.hpp`](https://github.com/DUNE-DAQ/fddetdataformats/blob/develop/include/fddetdataformats/SSPTypes.hpp)
-
-This header contains `enum`s describing commands to control SSPs as well as statuses returned by SSPs. It also contains a set of structs, including `EventHeader` (overlay class for the header of SSP data), `CtrlHeader` (overlay class for the header of command data sent to SSPs), `CtrlPacket` (a `CtrlHeader` instance plus a data payload), and `MillisliceHeader` (describing the time window and trigger info of SSP data). 
