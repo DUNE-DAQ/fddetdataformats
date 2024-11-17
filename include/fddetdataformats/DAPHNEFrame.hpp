@@ -15,13 +15,14 @@
 #define FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
 
 #include "detdataformats/DAQHeader.hpp"
-
+#include "trgdataformats/TriggerPrimitivePDS.hpp"
 #include <algorithm> // For std::min
 #include <cassert>   // For assert()
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept> // For std::out_of_range
 #include <cstdint>  // For uint32_t etc
+
 
 namespace dunedaq {
 namespace fddetdataformats {
@@ -48,6 +49,7 @@ public:
   {
     word_t channel : 6, algorithm_id : 4, reserved_1 : 5, r1: 1, trigger_sample_value : 16;
     word_t threshold : 16, baseline : 16;
+    word_t get_baseline(){return baseline;}
   };
 
   struct Trailer
@@ -164,12 +166,12 @@ public:
   uint8_t get_num_peak_ub(int TP) const // NOLINT(build/unsigned)    
   {
     switch (TP) {
-    case 0: return trailer.num_peak_ub_0;
-    case 1: return trailer.num_peak_ub_1;
-    case 2: return trailer.num_peak_ub_2;
-    case 3: return trailer.num_peak_ub_3;
-    case 4: return trailer.num_peak_ub_4;
-    default: throw std::out_of_range("Trigger primitive index out of range (must be 0-4)");
+      case 0: return trailer.num_peak_ub_0;
+      case 1: return trailer.num_peak_ub_1;
+      case 2: return trailer.num_peak_ub_2;
+      case 3: return trailer.num_peak_ub_3;
+      case 4: return trailer.num_peak_ub_4;
+      default: throw std::out_of_range("Trigger primitive index out of range (must be 0-4)");
     }
   }
   /**
@@ -210,6 +212,18 @@ public:
     }
   }
   
+  void Print(int j)
+  {
+    std::cout << "TP-PDS using getters - ch: " << unsigned(get_channel()) //usigned to be displayed properly
+     << ", DA: " << unsigned(get_da(j))
+     << ", charge: " << unsigned(get_charge(j))
+     << ", max_peak: " << unsigned(get_max_peak(j))
+     << ", time_peak: " << unsigned(get_time_peak(j))
+     << ", time_pulse: " << unsigned(get_time_pulse(j))
+     << ", time_pulse_ob: " << unsigned(get_time_pulse_ob(j))
+     << ", num_peak_ub: " << unsigned(get_num_peak_ub(j))
+     << ", num_peak_oo: " << unsigned(get_num_peak_ob(j)) << std::endl;
+  }  
   /**
    * @brief Set the num_peak_ob value for a specific trigger primitive in the trailer
    * @param val The number of peaks over baseline (0-15)
@@ -313,11 +327,11 @@ public:
   uint16_t get_max_peak(int TP) const // NOLINT(build/unsigned)                 
   {
     switch (TP) {
-    case 0: return trailer.max_peak_0;
-    case 1: return trailer.max_peak_1;
-    case 2: return trailer.max_peak_2;
-    case 3: return trailer.max_peak_3;
-    case 4: return trailer.max_peak_4;
+    case 0: return static_cast<uint16_t>(trailer.max_peak_0);
+    case 1: return static_cast<uint16_t>(trailer.max_peak_1);
+    case 2: return static_cast<uint16_t>(trailer.max_peak_2);
+    case 3: return static_cast<uint16_t>(trailer.max_peak_3);
+    case 4: return static_cast<uint16_t>(trailer.max_peak_4);
     default: throw std::out_of_range("Trigger primitive index out of range (must be 0-4)");
     }
   }
@@ -461,7 +475,19 @@ public:
   {
     return daq_header.get_timestamp();
   }
-  
+  trgdataformats::TriggerPrimitivePDS get_TP(int i)
+  {
+    trgdataformats::TriggerPrimitivePDS tp;
+    tp.set_channel(daq_header.slot_id*100+get_channel());
+    tp.set_num_peak_ub(get_num_peak_ub(i));
+    tp.set_num_peak_ob(get_num_peak_ob(i));
+    tp.set_adc_integral(get_charge(i));
+    tp.set_adc_peak(get_max_peak(i));
+    tp.set_time_peak(get_timestamp()+64+get_time_peak(i)); //This times need to to be verified!
+    tp.set_time_start(get_timestamp()+64); //This times need to to be verified!
+    tp.set_time_over_threshold(get_time_pulse_ob(i)); //This times need to to be verified!
+    return tp;
+  }
 };
   
 } // namespace detdataformats
