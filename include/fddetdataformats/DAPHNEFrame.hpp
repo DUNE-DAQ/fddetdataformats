@@ -389,9 +389,9 @@ public:
     tp.set_num_peak_ob(get_num_peak_ob(i));
     tp.set_adc_integral(get_charge(i));
     tp.set_adc_peak(get_max_peak(i));
-    tp.set_time_peak(get_timestamp()+64+get_time_peak(i)); //This times need to to be verified!
-    tp.set_time_start(get_timestamp()+64); //This times need to to be verified!
-    tp.set_time_over_threshold(get_time_pulse_ob(i)); //This times need to to be verified!
+    tp.set_time_peak(get_timestamp()+64+get_time_peak(i)); //This time need to to be verified!
+    tp.set_time_start(get_timestamp()+64); //This time need to to be verified!
+    tp.set_time_over_threshold(get_time_peak(i)+get_time_pulse_ob(i)); //This time need to to be verified!
     return tp;
   }
 };
