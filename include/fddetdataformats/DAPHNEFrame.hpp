@@ -156,8 +156,6 @@ public:
   /** @brief Set the channel of the DAPHNE frame
    */
   void set_channel( uint8_t val) { header.channel = val& 0x3Fu; } // NOLINT(build/unsigned)
-<<<<<<< HEAD
-=======
   
   /**
    * @brief Get the num_peak_ub value for a specific trigger primitive
@@ -212,19 +210,7 @@ public:
     default: throw std::out_of_range("Trigger primitive index out of range (must be 0-4)");
     }
   }
-  
-  void Print(int j)
-  {
-    std::cout << "TP-PDS using getters - ch: " << unsigned(get_channel()) //usigned to be displayed properly
-     << ", DA: " << unsigned(get_da(j))
-     << ", charge: " << unsigned(get_charge(j))
-     << ", max_peak: " << unsigned(get_max_peak(j))
-     << ", time_peak: " << unsigned(get_time_peak(j))
-     << ", time_pulse: " << unsigned(get_time_pulse(j))
-     << ", time_pulse_ob: " << unsigned(get_time_pulse_ob(j))
-     << ", num_peak_ub: " << unsigned(get_num_peak_ub(j))
-     << ", num_peak_oo: " << unsigned(get_num_peak_ob(j)) << std::endl;
-  }  
+
   /**
    * @brief Set the num_peak_ob value for a specific trigger primitive in the trailer
    * @param val The number of peaks over baseline (0-15)
@@ -375,6 +361,79 @@ public:
     }
   }
 
+
+  /**
+   * @brief Get the time_pulse value for a specific trigger primitive
+   * @param TP The trigger primitive index (0-4)
+   * @return The time_pulse value for the specified trigger primitive
+   */
+  uint16_t get_time_pulse(int TP) const // NOLINT(build/unsigned)
+  {
+    switch (TP) {
+    case 0: return trailer.time_pulse_0;
+    case 1: return trailer.time_pulse_1;
+    case 2: return trailer.time_pulse_2;
+    case 3: return trailer.time_pulse_3;
+    case 4: return trailer.time_pulse_4;
+    default: throw std::out_of_range("Trigger primitive index out of range (must be 0-4)");
+    }
+  }
+
+  /**
+   * @brief Set the time_pulse value for a specific trigger primitive in the trailer
+   * @param val The time_pulse value (0 - 511)
+   * @param TP The trigger primitive index (0-4) as a word_t type
+   */
+  void set_time_pulse(uint16_t val, int TP) // NOLINT(build/unsigned)
+  {
+    if (val > 0x1FF) {
+      throw std::out_of_range("time_pulse value out of range (must be 0-511)");
+    }
+    switch (TP) {
+    case 0: trailer.time_pulse_0 = val & 0x1FF; break;
+    case 1: trailer.time_pulse_1 = val & 0x1FF; break;
+    case 2: trailer.time_pulse_2 = val & 0x1FF; break;
+    case 3: trailer.time_pulse_3 = val & 0x1FF; break;
+    case 4: trailer.time_pulse_4 = val & 0x1FF; break;
+    default: throw std::out_of_range("Trigger primitive index out of range (must be 0-4)");
+    }
+  }
+
+  /**
+   * @brief Get the time_pulse_ob value for a specific trigger primitive
+   * @param TP The trigger primitive index (0-4)
+   * @return The time_pulse_ob value for the specified trigger primitive
+   */
+  uint16_t get_time_pulse_ob(int TP) const // NOLINT(build/unsigned)
+  {
+    switch (TP) {
+    case 0: return trailer.time_pulse_ob_0;
+    case 1: return trailer.time_pulse_ob_1;
+    case 2: return trailer.time_pulse_ob_2;
+    case 3: return trailer.time_pulse_ob_3;
+    case 4: return trailer.time_pulse_ob_4;
+    default: throw std::out_of_range("Trigger primitive index out of range (must be 0-2)");
+    }
+  }
+  /**
+   * @brief Set the time_pulse_ob value for a specific trigger primitive in the trailer
+   * @param val The time_pulse_ob value (0 - 1023)
+   * @param TP The trigger primitive index (0-4)
+   */
+  void set_time_pulse_ob(uint16_t val, int TP) // NOLINT(build/unsigned)
+  {
+    if (val > 0x3FF) {
+      throw std::out_of_range("time_pulse_ob value out of range (must be 0-1023)");
+    }
+    switch (TP) {
+    case 0: trailer.time_pulse_ob_0 = val & 0x3FF; break;
+    case 1: trailer.time_pulse_ob_1 = val & 0x3FF; break;
+    case 2: trailer.time_pulse_ob_2 = val & 0x3FF; break;
+    case 3: trailer.time_pulse_ob_3 = val & 0x3FF; break;
+    case 4: trailer.time_pulse_ob_4 = val & 0x3FF; break;
+    default: throw std::out_of_range("Trigger primitive index out of range (must be 0-4)");
+    }
+  }
   /** @brief Get the 64-bit timestamp of the frame
    */
   uint64_t get_timestamp() const // NOLINT(build/unsigned)
