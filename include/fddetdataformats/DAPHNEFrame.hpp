@@ -354,6 +354,13 @@ public:
       int shift = (idx - 3) * 10;
       tw[11] = (tw[11] & ~(0x3FFu << shift)) | ((val & 0x3FF) << shift);
     }
+   }
+ 
+   /** @brief Get the 64-bit timestamp of the frame
+   */
+   uint64_t get_timestamp() const // NOLINT(build/unsigned)
+   {
+     return daq_header.get_timestamp();
   }
  };
  
