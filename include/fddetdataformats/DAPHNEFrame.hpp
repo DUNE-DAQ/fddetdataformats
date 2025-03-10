@@ -63,15 +63,15 @@ public:
       // Trailer word 5
       word_t num_peak_2 : 4, tbd_2 : 4, adc_integral_2 : 23, da_2 : 1;
       // Trailer word 6
-      word_t adc_peak_2 : 14, time_peak_2 : 9, time_over_baseline_1 : 9;
+      word_t adc_peak_2 : 14, time_peak_2 : 9, time_over_baseline_2 : 9;
       // Trailer word 7
       word_t num_peak_3 : 4, tbd_3 : 4, adc_integral_3 : 23, da_3 : 1;
       // Trailer word 8
-      word_t time_over_baseline_3 : 9, time_peak_4 : 9, adc_peak_3 : 14;
+      word_t adc_peak_3 : 14, time_peak_3 : 9, time_over_baseline_3 : 9;
       // Trailer word 9
       word_t num_peak_4 : 4, tbd_4 : 4, adc_integral_4 : 23, da_4 : 1;
       // Trailer word 10
-      word_t time_over_baseline_4 : 9, time_peak_4 : 9, adc_peak_4 : 14;
+      word_t adc_peak_4 : 14, time_peak_4 : 9, time_over_baseline_4 : 9;
       // Trailer word 11
       word_t tbd_5 : 2, time_start_2 : 10, time_start_1 : 10, time_start_0 : 10;
       // Trailer word 12

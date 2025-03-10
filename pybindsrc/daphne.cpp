@@ -68,169 +68,129 @@ register_daphne(py::module& m)
   ;
 
   py::class_<DAPHNEFrame::Trailer>(m, "DAPHNETrailer")
-    .def_property("num_peak_ub_0", 
-      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_ub_0; }, 
-      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_ub_0 = val; } 
+    .def_property("num_peak_0", 
+      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_0; }, 
+      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_0 = val; } 
       )
-    .def_property("num_peak_ob_0", 
-      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_ob_0; }, 
-      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_ob_0 = val; } 
-      )
-    .def_property("charge_0", 
-      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.charge_0; }, 
-      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.charge_0 = val; } 
+    .def_property("adc_integral_0", 
+      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.adc_integral_0; }, 
+      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.adc_integral_0 = val; } 
       )
     .def_property("da_0", 
       [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.da_0; }, 
       [](DAPHNEFrame::Trailer& self, uint8_t val) { self.da_0 = val; } 
       )
-    .def_property("max_peak_0", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.max_peak_0; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.max_peak_0 = val; } 
+    .def_property("adc_peak_0", 
+      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.adc_peak_0; }, 
+      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.adc_peak_0 = val; } 
       )
     .def_property("time_peak_0", 
       [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_peak_0; }, 
       [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_peak_0 = val; } 
       )
-    .def_property("time_pulse_0", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_pulse_0; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_pulse_0 = val; } 
+    .def_property("time_over_baseline_0", 
+      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_over_baseline_0; }, 
+      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_over_baseline_0 = val; } 
       )
-    .def_property("num_peak_ub_1", 
-      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_ub_1; }, 
-      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_ub_1 = val; } 
+
+    .def_property("num_peak_1", 
+      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_1; }, 
+      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_1 = val; } 
       )
-    .def_property("num_peak_ob_1", 
-      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_ob_1; }, 
-      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_ob_1 = val; } 
-      )
-    .def_property("charge_1", 
-      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.charge_1; }, 
-      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.charge_1 = val; } 
+    .def_property("adc_integral_1", 
+      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.adc_integral_1; }, 
+      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.adc_integral_1 = val; } 
       )
     .def_property("da_1", 
       [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.da_1; }, 
       [](DAPHNEFrame::Trailer& self, uint8_t val) { self.da_1 = val; } 
       )
-    .def_property("max_peak_1", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.max_peak_1; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.max_peak_1 = val; } 
+    .def_property("adc_peak_1", 
+      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.adc_peak_1; }, 
+      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.adc_peak_1 = val; } 
       )
     .def_property("time_peak_1", 
       [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_peak_1; }, 
       [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_peak_1 = val; } 
       )
-    .def_property("time_pulse_1", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_pulse_1; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_pulse_1 = val; } 
+    .def_property("time_over_baseline_1", 
+      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_over_baseline_1; }, 
+      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_over_baseline_1 = val; } 
       )
-    .def_property("num_peak_ub_2", 
-      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_ub_2; }, 
-      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_ub_2 = val; } 
+
+    .def_property("num_peak_2", 
+      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_2; }, 
+      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_2 = val; } 
       )
-    .def_property("num_peak_ob_2", 
-      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_ob_2; }, 
-      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_ob_2 = val; } 
-      )
-    .def_property("charge_2", 
-      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.charge_2; }, 
-      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.charge_2 = val; } 
+    .def_property("adc_integral_2", 
+      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.adc_integral_2; }, 
+      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.adc_integral_2 = val; } 
       )
     .def_property("da_2", 
       [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.da_2; }, 
       [](DAPHNEFrame::Trailer& self, uint8_t val) { self.da_2 = val; } 
       )
-    .def_property("max_peak_2", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.max_peak_2; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.max_peak_2 = val; } 
+    .def_property("adc_peak_2", 
+      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.adc_peak_2; }, 
+      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.adc_peak_2 = val; } 
       )
     .def_property("time_peak_2", 
       [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_peak_2; }, 
       [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_peak_2 = val; } 
       )
-    .def_property("time_pulse_2", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_pulse_2; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_pulse_2 = val; } 
+    .def_property("time_over_baseline_2", 
+      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_over_baseline_2; }, 
+      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_over_baseline_2 = val; } 
       )
-    .def_property("num_peak_ub_3", 
-      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_ub_3; }, 
-      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_ub_3 = val; } 
+
+    .def_property("num_peak_3", 
+      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_3; }, 
+      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_3 = val; } 
       )
-    .def_property("num_peak_ob_3", 
-      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_ob_3; }, 
-      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_ob_3 = val; } 
-      )
-    .def_property("charge_3", 
-      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.charge_3; }, 
-      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.charge_3 = val; } 
+    .def_property("adc_integral_3", 
+      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.adc_integral_3; }, 
+      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.adc_integral_3 = val; } 
       )
     .def_property("da_3", 
       [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.da_3; }, 
       [](DAPHNEFrame::Trailer& self, uint8_t val) { self.da_3 = val; } 
       )
-    .def_property("max_peak_3", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.max_peak_3; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.max_peak_3 = val; } 
+    .def_property("adc_peak_3", 
+      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.adc_peak_3; }, 
+      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.adc_peak_3 = val; } 
       )
     .def_property("time_peak_3", 
       [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_peak_3; }, 
       [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_peak_3 = val; } 
       )
-    .def_property("time_pulse_3", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_pulse_3; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_pulse_3 = val; } 
+    .def_property("time_over_baseline_3", 
+      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_over_baseline_3; }, 
+      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_over_baseline_3 = val; } 
       )
-    .def_property("num_peak_ub_4", 
-      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_ub_4; }, 
-      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_ub_4 = val; } 
+
+    .def_property("num_peak_4", 
+      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_4; }, 
+      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_4 = val; } 
       )
-    .def_property("num_peak_ob_4", 
-      [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.num_peak_ob_4; }, 
-      [](DAPHNEFrame::Trailer& self, uint8_t val) { self.num_peak_ob_4 = val; } 
-      )
-    .def_property("charge_4", 
-      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.charge_4; }, 
-      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.charge_4 = val; } 
+    .def_property("adc_integral_4", 
+      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.adc_integral_4; }, 
+      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.adc_integral_4 = val; } 
       )
     .def_property("da_4", 
       [](DAPHNEFrame::Trailer& self) -> uint8_t { return self.da_4; }, 
       [](DAPHNEFrame::Trailer& self, uint8_t val) { self.da_4 = val; } 
       )
-    .def_property("max_peak_4", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.max_peak_4; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.max_peak_4 = val; } 
+    .def_property("adc_peak_4", 
+      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.adc_peak_4; }, 
+      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.adc_peak_4 = val; } 
       )
     .def_property("time_peak_4", 
       [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_peak_4; }, 
       [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_peak_4 = val; } 
       )
-    .def_property("time_pulse_4", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_pulse_4; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_pulse_4 = val; } 
-      )
-    .def_property("time_pulse_ob_0", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_pulse_ob_0; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_pulse_ob_0 = val; } 
-      )
-    .def_property("time_pulse_ob_1", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_pulse_ob_1; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_pulse_ob_1 = val; } 
-      )
-    .def_property("time_pulse_ob_2", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_pulse_ob_2; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_pulse_ob_2 = val; } 
-      )
-    .def_property("time_pulse_ob_3", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_pulse_ob_3; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_pulse_ob_3 = val; } 
-      )
-    .def_property("time_pulse_ob_4", 
-      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_pulse_ob_4; }, 
-      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_pulse_ob_4 = val; } 
-      )
-    .def_property("trailer", 
-      [](DAPHNEFrame::Trailer& self) -> uint32_t { return self.trailer; }, 
-      [](DAPHNEFrame::Trailer& self, uint32_t val) { self.trailer = val; } 
+    .def_property("time_over_baseline_4", 
+      [](DAPHNEFrame::Trailer& self) -> uint16_t { return self.time_over_baseline_4; }, 
+      [](DAPHNEFrame::Trailer& self, uint16_t val) { self.time_over_baseline_4 = val; } 
       )
   ;
   
