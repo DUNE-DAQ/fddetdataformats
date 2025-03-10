@@ -134,35 +134,35 @@ public:
   /**
    * @brief Set the ith ADC value in the frame to @p val
    */
-   void set_adc(int i, uint16_t val) // NOLINT
-   {
-     if (i < 0 || i >= s_num_adcs)
-       throw std::out_of_range("ADC index out of range");
-     if (val >= (1 << s_bits_per_adc))
-       throw std::out_of_range("ADC value out of range");
-   
-     // The index of the first (and sometimes only) word containing the required ADC value
-     int word_index = s_bits_per_adc * i / s_bits_per_word;
-     assert(word_index < s_num_adc_words);
-     // Where in the word the lowest bit of our ADC value is located
-     int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
-     // How many bits of our desired ADC are located in the `word_index`th word
-     int bits_in_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-     uint32_t mask = (1 << (first_bit_position)) - 1;
-     adc_words[word_index] = ((val << first_bit_position) & ~mask) | (adc_words[word_index] & mask);
-     // If we didn't put the full 14 bits in this word, we need to put the rest in the next word
-     if (bits_in_first_word < s_bits_per_adc) {
-       assert(word_index + 1 < s_num_adc_words);
-       mask = (1 << (s_bits_per_adc - bits_in_first_word)) - 1;
-       adc_words[word_index + 1] = ((val >> bits_in_first_word) & mask) | (adc_words[word_index + 1] & ~mask);
-     }
-   }
- 
-   /** @brief Get the channel from the DAPHNE frame
+  void set_adc(int i, uint16_t val) // NOLINT
+  {
+    if (i < 0 || i >= s_num_adcs)
+      throw std::out_of_range("ADC index out of range");
+    if (val >= (1 << s_bits_per_adc))
+      throw std::out_of_range("ADC value out of range");
+  
+    // The index of the first (and sometimes only) word containing the required ADC value
+    int word_index = s_bits_per_adc * i / s_bits_per_word;
+    assert(word_index < s_num_adc_words);
+    // Where in the word the lowest bit of our ADC value is located
+    int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
+    // How many bits of our desired ADC are located in the `word_index`th word
+    int bits_in_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
+    uint32_t mask = (1 << (first_bit_position)) - 1;
+    adc_words[word_index] = ((val << first_bit_position) & ~mask) | (adc_words[word_index] & mask);
+    // If we didn't put the full 14 bits in this word, we need to put the rest in the next word
+    if (bits_in_first_word < s_bits_per_adc) {
+      assert(word_index + 1 < s_num_adc_words);
+      mask = (1 << (s_bits_per_adc - bits_in_first_word)) - 1;
+      adc_words[word_index + 1] = ((val >> bits_in_first_word) & mask) | (adc_words[word_index + 1] & ~mask);
+    }
+  }
+
+  /** @brief Get the channel from the DAPHNE frame
    */
-   uint8_t get_channel() const { return header.channel; } // NOLINT(build/unsigned)
- 
-   /** @brief Set the channel of the DAPHNE frame
+  uint8_t get_channel() const { return header.channel; } // NOLINT(build/unsigned)
+
+  /** @brief Set the channel of the DAPHNE frame
    */
    void set_channel( uint8_t val) { header.channel = val & 0x3Fu; } // NOLINT(build/unsigned)
  
