@@ -1,15 +1,15 @@
 /**
- * @file DAPHNEFrame.hpp
- *
- *  Contains declaration of DAPHNEFrame, a class for accessing raw DAPHNE frames, as produced by the DAPHNE boards
- *
- *  The canonical definition of the PDS DAPHNE format is given in EDMS document 2088726:
- *  https://edms.cern.ch/document/2088726/3
- *
- * This is part of the DUNE DAQ Application Framework, copyright 2020.
- * Licensing/copyright details are in the COPYING file that you should have
- * received with this code.
- */
+* @file DAPHNEFrame.hpp
+*
+*  Contains declaration of DAPHNEFrame, a class for accessing raw DAPHNE frames, as produced by the DAPHNE boards
+*
+*  The canonical definition of the PDS DAPHNE format is given in EDMS document 2088726:
+*  https://edms.cern.ch/document/2088726/3
+*
+* This is part of the DUNE DAQ Application Framework, copyright 2020.
+* Licensing/copyright details are in the COPYING file that you should have
+* received with this code.
+*/
  
  #ifndef FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
  #define FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
