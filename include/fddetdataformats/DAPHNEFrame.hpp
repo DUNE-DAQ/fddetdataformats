@@ -109,29 +109,29 @@ public:
    *
    * - 1024 adc values from one daphne channel
    */
-   uint16_t get_adc(int i) const // NOLINT
-   {
-     if (i < 0 || i >= s_num_adcs)
-       throw std::out_of_range("ADC index out of range");
- 
-     // The index of the first (and sometimes only) word containing the required ADC value
-     int word_index = s_bits_per_adc * i / s_bits_per_word;
-     assert(word_index < s_num_adc_words);
-     // Where in the word the lowest bit of our ADC value is located
-     int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
-     // How many bits of our desired ADC are located in the `word_index`th word
-     int bits_from_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-     uint16_t adc = adc_words[word_index] >> first_bit_position; // NOLINT
-     // If we didn't get the full 14 bits from this word, we need the rest from the next word
-     if (bits_from_first_word < s_bits_per_adc) {
-       assert(word_index + 1 < s_num_adc_words);
-       adc |= adc_words[word_index + 1] << bits_from_first_word;
-     }
-     // Mask out all but the lowest 14 bits;
-     return adc & 0x3FFFu;
-   }
- 
-   /**
+  uint16_t get_adc(int i) const // NOLINT
+  {
+    if (i < 0 || i >= s_num_adcs)
+      throw std::out_of_range("ADC index out of range");
+
+    // The index of the first (and sometimes only) word containing the required ADC value
+    int word_index = s_bits_per_adc * i / s_bits_per_word;
+    assert(word_index < s_num_adc_words);
+    // Where in the word the lowest bit of our ADC value is located
+    int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
+    // How many bits of our desired ADC are located in the `word_index`th word
+    int bits_from_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
+    uint16_t adc = adc_words[word_index] >> first_bit_position; // NOLINT
+    // If we didn't get the full 14 bits from this word, we need the rest from the next word
+    if (bits_from_first_word < s_bits_per_adc) {
+      assert(word_index + 1 < s_num_adc_words);
+      adc |= adc_words[word_index + 1] << bits_from_first_word;
+    }
+    // Mask out all but the lowest 14 bits;
+    return adc & 0x3FFFu;
+  }
+
+  /**
    * @brief Set the ith ADC value in the frame to @p val
    */
    void set_adc(int i, uint16_t val) // NOLINT
