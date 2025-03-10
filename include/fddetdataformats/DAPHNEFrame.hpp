@@ -28,81 +28,81 @@ namespace fddetdataformats {
 class DAPHNEFrame
 {
 public:
-   // ===============================================================
-   // Preliminaries
-   // ===============================================================
- 
-   // The definition of the format is in terms of 32-bit words
-   typedef uint32_t word_t; // NOLINT
- 
-   // Dataframe format version
-   static constexpr uint8_t version = 2;
- 
-   static constexpr int s_bits_per_adc = 14;
-   static constexpr int s_bits_per_word = 8 * sizeof(word_t);
-   static constexpr int s_num_adcs = 1024;
-   static constexpr int s_num_adc_words = s_num_adcs * s_bits_per_adc / s_bits_per_word;
- 
-   struct Header
-   {
-     word_t channel : 6, algorithm_id : 4, reserved_1 : 5, r1 : 1, trigger_sample_value : 16;
-     word_t threshold : 16, baseline : 16;
-     word_t get_baseline() { return baseline; }
-   };
- 
-   struct Trailer
-   {
-     // Trailer word 1
-     word_t num_peak_ub_0 : 4, num_peak_ob_0 : 4, charge_0 : 23, da_0 : 1;
-     // Trailer word 2
-     word_t max_peak_0 : 14, time_peak_0 : 9, time_pulse_0 : 9;
-     // Trailer word 3
-     word_t num_peak_ub_1 : 4, num_peak_ob_1 : 4, charge_1 : 23, da_1 : 1;
-     // Trailer word 4
-     word_t max_peak_1 : 14, time_peak_1 : 9, time_pulse_1 : 9;
-     // Trailer word 5
-     word_t num_peak_ub_2 : 4, num_peak_ob_2 : 4, charge_2 : 23, da_2 : 1;
-     // Trailer word 6
-     word_t max_peak_2 : 14, time_peak_2 : 9, time_pulse_2 : 9;
-     // Trailer word 7
-     word_t num_peak_ub_3 : 4, num_peak_ob_3 : 4, charge_3 : 23, da_3 : 1;
-     // Trailer word 8
-     word_t max_peak_3 : 14, time_peak_3 : 9, time_pulse_3 : 9;
-     // Trailer word 9
-     word_t num_peak_ub_4 : 4, num_peak_ob_4 : 4, charge_4 : 23, da_4 : 1;
-     // Trailer word 10
-     word_t max_peak_4 : 14, time_peak_4 : 9, time_pulse_4 : 9;
-     // Trailer word 11
-     word_t reserved_2 : 2, time_pulse_ob_2 : 10, time_pulse_ob_1 : 10, time_pulse_ob_0 : 10;
-     // Trailer word 12
-     word_t reserved_3 : 12, time_pulse_ob_4 : 10, time_pulse_ob_3 : 10;
-     // Trailer word 13
-     word_t trailer;
-   };
- 
-   // ===============================================================
-   // Data members
-   // ===============================================================
-   detdataformats::DAQHeader daq_header;
-   Header header;
-   word_t adc_words[s_num_adc_words]; // NOLINT
-   Trailer trailer;
- 
-   // ===============================================================
-   // Private Helper: Reinterpret Trailer as an array of word_t
-   // ===============================================================
-   inline const word_t* get_trailer_words() const {
-     return reinterpret_cast<const word_t*>(&trailer);
-   }
-   inline word_t* get_trailer_words() {
-     return reinterpret_cast<word_t*>(&trailer);
-   }
- 
-   // ===============================================================
-   // Accessors
-   // ===============================================================
- 
-   /**
+  // ===============================================================
+  // Preliminaries
+  // ===============================================================
+
+  // The definition of the format is in terms of 32-bit words
+  typedef uint32_t word_t; // NOLINT
+
+  // Dataframe format version
+  static constexpr uint8_t version = 2;
+
+  static constexpr int s_bits_per_adc = 14;
+  static constexpr int s_bits_per_word = 8 * sizeof(word_t);
+  static constexpr int s_num_adcs = 1024;
+  static constexpr int s_num_adc_words = s_num_adcs * s_bits_per_adc / s_bits_per_word;
+
+  struct Header
+  {
+    word_t channel : 6, algorithm_id : 4, reserved_1 : 5, r1 : 1, trigger_sample_value : 16;
+    word_t threshold : 16, baseline : 16;
+    word_t get_baseline() { return baseline; }
+  };
+
+  struct Trailer
+  {
+    // Trailer word 1
+    word_t num_peak_ub_0 : 4, num_peak_ob_0 : 4, charge_0 : 23, da_0 : 1;
+    // Trailer word 2
+    word_t max_peak_0 : 14, time_peak_0 : 9, time_pulse_0 : 9;
+    // Trailer word 3
+    word_t num_peak_ub_1 : 4, num_peak_ob_1 : 4, charge_1 : 23, da_1 : 1;
+    // Trailer word 4
+    word_t max_peak_1 : 14, time_peak_1 : 9, time_pulse_1 : 9;
+    // Trailer word 5
+    word_t num_peak_ub_2 : 4, num_peak_ob_2 : 4, charge_2 : 23, da_2 : 1;
+    // Trailer word 6
+    word_t max_peak_2 : 14, time_peak_2 : 9, time_pulse_2 : 9;
+    // Trailer word 7
+    word_t num_peak_ub_3 : 4, num_peak_ob_3 : 4, charge_3 : 23, da_3 : 1;
+    // Trailer word 8
+    word_t max_peak_3 : 14, time_peak_3 : 9, time_pulse_3 : 9;
+    // Trailer word 9
+    word_t num_peak_ub_4 : 4, num_peak_ob_4 : 4, charge_4 : 23, da_4 : 1;
+    // Trailer word 10
+    word_t max_peak_4 : 14, time_peak_4 : 9, time_pulse_4 : 9;
+    // Trailer word 11
+    word_t reserved_2 : 2, time_pulse_ob_2 : 10, time_pulse_ob_1 : 10, time_pulse_ob_0 : 10;
+    // Trailer word 12
+    word_t reserved_3 : 12, time_pulse_ob_4 : 10, time_pulse_ob_3 : 10;
+    // Trailer word 13
+    word_t trailer;
+  };
+
+  // ===============================================================
+  // Data members
+  // ===============================================================
+  detdataformats::DAQHeader daq_header;
+  Header header;
+  word_t adc_words[s_num_adc_words]; // NOLINT
+  Trailer trailer;
+
+  // ===============================================================
+  // Private Helper: Reinterpret Trailer as an array of word_t
+  // ===============================================================
+  inline const word_t* get_trailer_words() const {
+    return reinterpret_cast<const word_t*>(&trailer);
+  }
+  inline word_t* get_trailer_words() {
+    return reinterpret_cast<word_t*>(&trailer);
+  }
+
+  // ===============================================================
+  // Accessors
+  // ===============================================================
+
+  /**
    * @brief Get the ith ADC value in the frame
    *
    * The ADC words are 14 bits long, stored packed in the data structure. The order is:
