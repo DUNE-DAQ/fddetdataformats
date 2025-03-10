@@ -52,25 +52,32 @@ public:
 
   struct Trailer
   {
-      word_t num_peak_0 : 4, adc_integral_0 : 23, da_0 : 1, tbd_0 : 4;
-      word_t time_over_baseline_0 : 9, time_peak_1 : 9, adc_peak_0 : 14;
-      
-      word_t num_peak_1 : 4, adc_integral_1 : 23, da_1 : 1, tbd_1 : 4;
-      word_t time_over_baseline_1 : 9, time_peak_2 : 9, adc_peak_1 : 14;
-  
-      word_t num_peak_2 : 4, adc_integral_2 : 23, da_2 : 1, tbd_2 : 4;
-      word_t time_over_baseline_2 : 9, time_peak_3 : 9, adc_peak_2 : 14;
-  
-      word_t num_peak_3 : 4, adc_integral_3 : 23, da_3 : 1, tbd_3 : 4;
+      // Trailer word 1
+      word_t num_peak_0 : 4, tbd_0 : 4, adc_integral_0 : 23, da_0 : 1;
+      // Trailer word 2
+      word_t adc_peak_0 : 14, time_peak_0 : 9,  time_over_baseline_0 : 9;
+      // Trailer word 3
+      word_t num_peak_1 : 4, tbd_1 : 4, adc_integral_1 : 23, da_1 : 1;
+      // Trailer word 4
+      word_t adc_peak_1 : 14, time_peak_1 : 9, time_over_baseline_1 : 9;
+      // Trailer word 5
+      word_t num_peak_2 : 4, tbd_2 : 4, adc_integral_2 : 23, da_2 : 1;
+      // Trailer word 6
+      word_t adc_peak_2 : 14, time_peak_2 : 9, time_over_baseline_1 : 9;
+      // Trailer word 7
+      word_t num_peak_3 : 4, tbd_3 : 4, adc_integral_3 : 23, da_3 : 1;
+      // Trailer word 8
       word_t time_over_baseline_3 : 9, time_peak_4 : 9, adc_peak_3 : 14;
-  
-      word_t num_peak_4 : 4, adc_integral_4 : 23, da_4 : 1, tbd_4 : 4;
-      word_t time_over_baseline_4 : 9, time_peak_5 : 9, adc_peak_4 : 14;
-  
-      word_t time_start_0 : 10, time_start_1 : 10, time_start_2 : 10, tbd_5 : 2;
-      word_t time_start_3 : 10, time_start_4 : 10, tbd_6 : 12;
-  
-      word_t trailer;  // Trailer 13 (all 1s = 0xFFFFFFFF)
+      // Trailer word 9
+      word_t num_peak_4 : 4, tbd_4 : 4, adc_integral_4 : 23, da_4 : 1;
+      // Trailer word 10
+      word_t time_over_baseline_4 : 9, time_peak_4 : 9, adc_peak_4 : 14;
+      // Trailer word 11
+      word_t tbd_5 : 2, time_start_2 : 10, time_start_1 : 10, time_start_0 : 10;
+      // Trailer word 12
+      word_t tbd_6 : 12, time_start_4 : 10, time_start_3 : 10;
+      // Trailer word 13 (all 1s = 0xFFFFFFFF)
+      word_t trailer; 
   };
 
   // ===============================================================
