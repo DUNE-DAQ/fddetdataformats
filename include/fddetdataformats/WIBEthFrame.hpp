@@ -1,9 +1,10 @@
 /**
  * @file WIBEthFrame.hpp
  *
- * Contains declaration of WIBEthFrame, a class for accessing raw WIB v2 frames, as used in ProtoDUNE-SP-II
+ * Contains declaration of WIBEthFrame, a class for accessing raw WIB eth frames, as used in ProtoDUNE-SP-II
  * 
- * The canonical definition of the WIB format is given in EDMS document 2088713: *  https://edms.cern.ch/document/2088713/XXX
+ * The canonical definition of the WIB format is given in EDMS document 2088713: 
+ * https://edms.cern.ch/document/2088713
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -28,7 +29,7 @@ namespace dunedaq::fddetdataformats {
  *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
  *
  *  The canonical definition of the WIB format is given in EDMS document 2088713:
- *  https://edms.cern.ch/document/2088713/XXX
+ *  https://edms.cern.ch/document/2088713
  */
 class WIBEthFrame
 {
