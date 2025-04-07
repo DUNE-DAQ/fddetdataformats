@@ -393,93 +393,67 @@ public:
   *   - index 3: bits [9:0]
   *   - index 4: bits [19:10]
   */
-  inline uint16_t get_time_start_0() const
+  inline uint16_t get_time_start(int idx) const
   {
-    const word_t* tw = get_trailer_words();
-    return static_cast<uint16_t>((tw[10] >> 22) & 0x3FF);
-  }
+    if (idx < 0 || idx > 4)
+      throw std::out_of_range("Time_Start index out of range (must be 0-4)");
 
-  inline uint16_t get_time_start_1() const
-  {
     const word_t* tw = get_trailer_words();
-    return static_cast<uint16_t>((tw[10] >> 12) & 0x3FF);
+    if (idx < 3) {
+      int shift = 22 - 10 * idx;
+      return static_cast<uint16_t>((tw[10] >> shift) & 0x3FF);
+    } else {
+      int shift = 22 - 10 * (idx - 3);
+      return static_cast<uint16_t>((tw[11] >> shift) & 0x3FF);
+    }
   }
-
-  inline uint16_t get_time_start_2() const
-  {
-    const word_t* tw = get_trailer_words();
-    return static_cast<uint16_t>((tw[10] >> 2) & 0x3FF);
-  }
-
-  inline uint16_t get_time_start_3() const
-  {
-    const word_t* tw = get_trailer_words();
-    return static_cast<uint16_t>((tw[11] >> 22) & 0x3FF);
-  }
-
-  inline uint16_t get_time_start_4() const
-  {
-    const word_t* tw = get_trailer_words();
-    return static_cast<uint16_t>((tw[11] >> 12) & 0x3FF);
-  }
-
 
   /**
-  * @brief Set the Time_Start value for a given index (0-4).
+  * @brief Set the time_start field for TP index 0–4 using bit shifts.
+  * 
+  * Trailer word 11 (index 10):
+  *   - idx 0: bits [31:22]
+  *   - idx 1: bits [21:12]
+  *   - idx 2: bits [11:2]
+  * Trailer word 12 (index 11):
+  *   - idx 3: bits [31:22]
+  *   - idx 4: bits [21:12]
   */
-  inline void set_time_start_0(uint16_t val)
+  inline void set_time_start(int idx, uint16_t val)
   {
-    if(val > 0x3FF)
-      throw std::out_of_range("Time_Start(0) value out of range (must be 0-1023)");
+    if (idx < 0 || idx > 4)
+      throw std::out_of_range("Time_Start index out of range (must be 0–4)");
+    if (val > 0x3FF)
+      throw std::out_of_range("Time_Start value out of range (must be 0–1023)");
+
     word_t* tw = get_trailer_words();
-    tw[10] = (tw[10] & ~(0x3FFu << 22)) | ((val & 0x3FF) << 22);
+    word_t mask = 0x3FFu;
+
+    if (idx < 3) {
+      int shift = 22 - 10 * idx;
+      tw[10] = (tw[10] & ~(mask << shift)) | ((val & mask) << shift);
+    } else {
+      int shift = 22 - 10 * (idx - 3);
+      tw[11] = (tw[11] & ~(mask << shift)) | ((val & mask) << shift);
+    }
   }
 
-  inline void set_time_start_1(uint16_t val)
+  /** @brief Get the 64-bit timestamp of the frame
+  */
+  uint64_t get_timestamp() const // NOLINT(build/unsigned)
   {
-    if(val > 0x3FF)
-      throw std::out_of_range("Time_Start(1) value out of range (must be 0-1023)");
-    word_t* tw = get_trailer_words();
-    tw[10] = (tw[10] & ~(0x3FFu << 12)) | ((val & 0x3FF) << 12);
+    return daq_header.get_timestamp();
   }
 
-  inline void set_time_start_2(uint16_t val)
-  {
-    if(val > 0x3FF)
-      throw std::out_of_range("Time_Start(2) value out of range (must be 0-1023)");
-    word_t* tw = get_trailer_words();
-    tw[10] = (tw[10] & ~(0x3FFu << 2)) | ((val & 0x3FF) << 2);
-  }
 
-  inline void set_time_start_3(uint16_t val)
-  {
-    if(val > 0x3FF)
-      throw std::out_of_range("Time_Start(3) value out of range (must be 0-1023)");
-    word_t* tw = get_trailer_words();
-    tw[11] = (tw[11] & ~(0x3FFu << 22)) | ((val & 0x3FF) << 22);
-  }
 
-  inline void set_time_start_4(uint16_t val)
-  {
-    if(val > 0x3FF)
-      throw std::out_of_range("Time_Start(4) value out of range (must be 0-1023)");
-    word_t* tw = get_trailer_words();
-    tw[11] = (tw[11] & ~(0x3FFu << 12)) | ((val & 0x3FF) << 12);
-  }
- 
-   /** @brief Get the 64-bit timestamp of the frame
-   */
-   uint64_t get_timestamp() const // NOLINT(build/unsigned)
-   {
-     return daq_header.get_timestamp();
-  }
- };
- 
+};
+
  } // namespace fddetdataformats
  } // namespace dunedaq
- 
+
  #endif // FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
- 
+
  // Local Variables:
  // c-basic-offset: 2
  // End:
