@@ -52,32 +52,92 @@ public:
 
   struct Trailer
   {
-      // Trailer word 1
-      word_t num_peak_0 : 4, tbd_0 : 4, adc_integral_0 : 23, da_0 : 1;
-      // Trailer word 2
-      word_t adc_peak_0 : 14, time_peak_0 : 9,  time_over_baseline_0 : 9;
-      // Trailer word 3
-      word_t num_peak_1 : 4, tbd_1 : 4, adc_integral_1 : 23, da_1 : 1;
-      // Trailer word 4
-      word_t adc_peak_1 : 14, time_peak_1 : 9, time_over_baseline_1 : 9;
-      // Trailer word 5
-      word_t num_peak_2 : 4, tbd_2 : 4, adc_integral_2 : 23, da_2 : 1;
-      // Trailer word 6
-      word_t adc_peak_2 : 14, time_peak_2 : 9, time_over_baseline_2 : 9;
-      // Trailer word 7
-      word_t num_peak_3 : 4, tbd_3 : 4, adc_integral_3 : 23, da_3 : 1;
-      // Trailer word 8
-      word_t adc_peak_3 : 14, time_peak_3 : 9, time_over_baseline_3 : 9;
-      // Trailer word 9
-      word_t num_peak_4 : 4, tbd_4 : 4, adc_integral_4 : 23, da_4 : 1;
-      // Trailer word 10
-      word_t adc_peak_4 : 14, time_peak_4 : 9, time_over_baseline_4 : 9;
-      // Trailer word 11
-      word_t tbd_5 : 2, time_start_2 : 10, time_start_1 : 10, time_start_0 : 10;
-      // Trailer word 12
-      word_t tbd_6 : 12, time_start_4 : 10, time_start_3 : 10;
-      // Trailer word 13 (all 1s = 0xFFFFFFFF)
-      word_t trailer; 
+    // Word 1: TP0 odd
+    // Declared in reverse order (LSB first) so that:
+    //   - num_peak_0 occupies bits [3:0]
+    //   - tbd_0 occupies bits [7:4]
+    //   - adc_integral_0 occupies bits [30:8]
+    //   - da_0 occupies bit [31]
+    word_t num_peak_0       : 4;   // Num_Peak [3:0]
+    word_t tbd_0            : 4;   // TBD      [7:4]
+    word_t adc_integral_0   : 23;  // ADC_Integral [30:8]
+    word_t da_0             : 1;   // DA       [31]
+
+    // Word 2: TP0 even
+    // Declared (LSB first) so that:
+    //   - adc_peak_0 occupies bits [13:0]
+    //   - time_peak_0 occupies bits [22:14]
+    //   - time_over_baseline_0 occupies bits [31:23]
+    word_t adc_peak_0         : 14;  // ADC_Peak         [13:0]
+    word_t time_peak_0        : 9;   // Time_Peak        [22:14]
+    word_t time_over_baseline_0 : 9; // Time_Over_Baseline [31:23]
+
+    // Word 3: TP1 odd
+    word_t num_peak_1       : 4;   // Num_Peak [3:0]
+    word_t tbd_1            : 4;   // TBD      [7:4]
+    word_t adc_integral_1   : 23;  // ADC_Integral [30:8]
+    word_t da_1             : 1;   // DA       [31]
+
+    // Word 4: TP1 even
+    word_t adc_peak_1         : 14; // ADC_Peak         [13:0]
+    word_t time_peak_1        : 9;  // Time_Peak        [22:14]
+    word_t time_over_baseline_1 : 9;// Time_Over_Baseline [31:23]
+
+    // Word 5: TP2 odd
+    word_t num_peak_2       : 4;   // Num_Peak [3:0]
+    word_t tbd_2            : 4;   // TBD      [7:4]
+    word_t adc_integral_2   : 23;  // ADC_Integral [30:8]
+    word_t da_2             : 1;   // DA       [31]
+
+    // Word 6: TP2 even
+    word_t adc_peak_2         : 14; // ADC_Peak         [13:0]
+    word_t time_peak_2        : 9;  // Time_Peak        [22:14]
+    word_t time_over_baseline_2 : 9;// Time_Over_Baseline [31:23]
+
+    // Word 7: TP3 odd
+    word_t num_peak_3       : 4;   // Num_Peak [3:0]
+    word_t tbd_3            : 4;   // TBD      [7:4]
+    word_t adc_integral_3   : 23;  // ADC_Integral [30:8]
+    word_t da_3             : 1;   // DA       [31]
+
+    // Word 8: TP3 even
+    word_t adc_peak_3         : 14; // ADC_Peak         [13:0]
+    word_t time_peak_3        : 9;  // Time_Peak        [22:14]
+    word_t time_over_baseline_3 : 9;// Time_Over_Baseline [31:23]
+
+    // Word 9: TP4 odd
+    word_t num_peak_4       : 4;   // Num_Peak [3:0]
+    word_t tbd_4            : 4;   // TBD      [7:4]
+    word_t adc_integral_4   : 23;  // ADC_Integral [30:8]
+    word_t da_4             : 1;   // DA       [31]
+
+    // Word 10: TP4 even
+    word_t adc_peak_4         : 14; // ADC_Peak         [13:0]
+    word_t time_peak_4        : 9;  // Time_Peak        [22:14]
+    word_t time_over_baseline_4 : 9;// Time_Over_Baseline [31:23]
+
+    // Word 11: Time_Start fields for indices 0,1,2 and TBD
+    // Declared in LSB-first order:
+    //   - time_start_2 occupies bits [11:2]
+    //   - time_start_1 occupies bits [21:12]
+    //   - time_start_0 occupies bits [31:22]
+    //   - tbd_5 occupies bits [1:0]
+    word_t time_start_2     : 10;  // Time_Start(2) [11:2]
+    word_t time_start_1     : 10;  // Time_Start(1) [21:12]
+    word_t time_start_0     : 10;  // Time_Start(0) [31:22]
+    word_t tbd_5            : 2;   // TBD         [1:0]
+
+    // Word 12: Time_Start fields for indices 3,4 and TBD
+    // Declared in LSB-first order:
+    //   - tbd_6 occupies bits [11:0]
+    //   - time_start_4 occupies bits [21:12]
+    //   - time_start_3 occupies bits [31:22]
+    word_t tbd_6            : 12;  // TBD         [11:0]
+    word_t time_start_4     : 10;  // Time_Start(4) [21:12]
+    word_t time_start_3     : 10;  // Time_Start(3) [31:22]
+
+    // Word 13: Trailer word (all 32 bits), typically 0xFFFFFFFF.
+    word_t trailer;
   };
 
   // ===============================================================
@@ -172,22 +232,23 @@ public:
   * @brief Get the DA value for a specific TP (channel) from the trailer.
   *        (Word 2*TP, bit 31)
   */
-  inline uint8_t get_da(int TP) const // NOLINT(build/unsigned)
+  inline uint8_t get_da(int TP) const // TP index 0 to 4
   {
     if (TP < 0 || TP > 4)
-      throw std::out_of_range("Trigger primitive index out of range (must be 0-4)");
+      throw std::out_of_range("TP index out of range (must be 0-4)");
     const word_t* tw = get_trailer_words();
+    // In odd word, DA is in bit 31.
     return static_cast<uint8_t>((tw[2*TP] >> 31) & 0x1);
   }
 
   /**
   * @brief Set the DA value for a specific TP (channel) in the trailer.
   */
-  inline void set_da(uint8_t val, int TP) // NOLINT(build/unsigned)
+  inline void set_da(uint8_t val, int TP)
   {
     if (TP < 0 || TP > 4)
-      throw std::out_of_range("Trigger primitive index out of range (must be 0-4)");
-    if (val > 0x1)
+      throw std::out_of_range("TP index out of range (must be 0-4)");
+    if (val > 1)
       throw std::out_of_range("DA value out of range (must be 0-1)");
     word_t* tw = get_trailer_words();
     tw[2*TP] = (tw[2*TP] & ~(1u << 31)) | ((val & 0x1) << 31);
@@ -202,7 +263,7 @@ public:
     if (TP < 0 || TP > 4)
       throw std::out_of_range("TP index out of range (must be 0-4)");
     const word_t* tw = get_trailer_words();
-    return (tw[2*TP] >> 8) & 0x7FFFFF; // 23 bits
+    return (tw[2*TP] >> 8) & 0x7FFFFF; // Mask 23 bits
   }
 
   /**
@@ -215,14 +276,14 @@ public:
     if (val > 0x7FFFFF)
       throw std::out_of_range("ADC_Integral value out of range (must be 0-8388607)");
     word_t* tw = get_trailer_words();
-    tw[2*TP] = (tw[2*TP] & ~(((word_t)0x7FFFFF) << 8)) | ((val & 0x7FFFFF) << 8);
+    tw[2*TP] = (tw[2*TP] & ~(0x7FFFFFu << 8)) | ((val & 0x7FFFFF) << 8);
   }
 
   /**
   * @brief Get the Num_Peak value for a specific TP.
   *        (Word 2*TP, bits [3:0])
   */
-  inline uint8_t get_num_peak(int TP) const // NOLINT(build/unsigned)
+  inline uint8_t get_num_peak(int TP) const
   {
     if (TP < 0 || TP > 4)
       throw std::out_of_range("TP index out of range (must be 0-4)");
@@ -233,7 +294,7 @@ public:
   /**
   * @brief Set the Num_Peak value for a specific TP.
   */
-  inline void set_num_peak(uint8_t val, int TP) // NOLINT(build/unsigned)
+  inline void set_num_peak(uint8_t val, int TP)
   {
     if (TP < 0 || TP > 4)
       throw std::out_of_range("TP index out of range (must be 0-4)");
@@ -247,75 +308,77 @@ public:
   * @brief Get the Time_Over_Baseline value for a specific TP.
   *        (Word 2*TP+1, bits [8:0])
   */
-  inline uint16_t get_time_over_baseline(int TP) const // NOLINT(build/unsigned)
+  inline uint16_t get_time_over_baseline(int TP) const
   {
     if (TP < 0 || TP > 4)
       throw std::out_of_range("TP index out of range (must be 0-4)");
     const word_t* tw = get_trailer_words();
-    return static_cast<uint16_t>(tw[2*TP+1] & 0x1FF); // 9 bits
+    return static_cast<uint16_t>((tw[2*TP+1] >> 23) & 0x1FF);
   }
 
   /**
   * @brief Set the Time_Over_Baseline value for a specific TP.
   */
-  inline void set_time_over_baseline(uint16_t val, int TP) // NOLINT(build/unsigned)
+  inline void set_time_over_baseline(uint16_t val, int TP)
   {
     if (TP < 0 || TP > 4)
       throw std::out_of_range("TP index out of range (must be 0-4)");
     if (val > 0x1FF)
       throw std::out_of_range("Time_Over_Baseline value out of range (must be 0-511)");
     word_t* tw = get_trailer_words();
-    tw[2*TP+1] = (tw[2*TP+1] & ~0x1FFu) | (val & 0x1FF);
+    tw[2*TP+1] = (tw[2*TP+1] & ~(0x1FFu << 23)) | ((val & 0x1FF) << 23);
   }
 
   /**
   * @brief Get the Time_Peak value for a specific TP.
   *        (Word 2*TP+1, bits [17:9])
   */
-  inline uint16_t get_time_peak(int TP) const // NOLINT(build/unsigned)
+  inline uint16_t get_time_peak(int TP) const
   {
     if (TP < 0 || TP > 4)
       throw std::out_of_range("TP index out of range (must be 0-4)");
     const word_t* tw = get_trailer_words();
-    return static_cast<uint16_t>((tw[2*TP+1] >> 9) & 0x1FF); // 9 bits
+    return static_cast<uint16_t>((tw[2*TP+1] >> 14) & 0x1FF);
   }
+
 
   /**
   * @brief Set the Time_Peak value for a specific TP.
   */
-  inline void set_time_peak(uint16_t val, int TP) // NOLINT(build/unsigned)
+  inline void set_time_peak(uint16_t val, int TP)
   {
     if (TP < 0 || TP > 4)
       throw std::out_of_range("TP index out of range (must be 0-4)");
     if (val > 0x1FF)
       throw std::out_of_range("Time_Peak value out of range (must be 0-511)");
     word_t* tw = get_trailer_words();
-    tw[2*TP+1] = (tw[2*TP+1] & ~(0x1FFu << 9)) | ((val & 0x1FF) << 9);
+    tw[2*TP+1] = (tw[2*TP+1] & ~(0x1FFu << 14)) | ((val & 0x1FF) << 14);
   }
 
   /**
   * @brief Get the ADC_Peak value for a specific TP.
   *        (Word 2*TP+1, bits [31:18])
   */
-  inline uint16_t get_adc_peak(int TP) const // NOLINT(build/unsigned)
+  inline uint16_t get_adc_peak(int TP) const
   {
     if (TP < 0 || TP > 4)
       throw std::out_of_range("TP index out of range (must be 0-4)");
     const word_t* tw = get_trailer_words();
-    return static_cast<uint16_t>((tw[2*TP+1] >> 18) & 0x3FFF); // 14 bits
+    // Even word for TP is at index 2*TP+1; ADC_Peak is in bits 13:0.
+    return static_cast<uint16_t>(tw[2*TP+1] & 0x3FFF);
   }
 
   /**
   * @brief Set the ADC_Peak value for a specific TP.
   */
-  inline void set_adc_peak(uint16_t val, int TP) // NOLINT(build/unsigned)
+  inline void set_adc_peak(uint16_t val, int TP)
   {
     if (TP < 0 || TP > 4)
       throw std::out_of_range("TP index out of range (must be 0-4)");
     if (val > 0x3FFF)
       throw std::out_of_range("ADC_Peak value out of range (must be 0-16383)");
     word_t* tw = get_trailer_words();
-    tw[2*TP+1] = (tw[2*TP+1] & ~(0x3FFFu << 18)) | ((val & 0x3FFF) << 18);
+    tw[2*TP+1] = (tw[2*TP+1] & ~0x3FFFu) | (val & 0x3FFF);
   }
 
   /**
@@ -330,38 +393,79 @@ public:
   *   - index 3: bits [9:0]
   *   - index 4: bits [19:10]
   */
-  inline uint16_t get_time_start(int idx) const // NOLINT(build/unsigned)
+  inline uint16_t get_time_start_0() const
   {
-    if (idx < 0 || idx > 4)
-      throw std::out_of_range("Time_Start index out of range (must be 0-4)");
     const word_t* tw = get_trailer_words();
-    if (idx < 3) {
-      int shift = idx * 10;
-      return static_cast<uint16_t>((tw[10] >> shift) & 0x3FF); // 10 bits
-    } else {
-      int shift = (idx - 3) * 10;
-      return static_cast<uint16_t>((tw[11] >> shift) & 0x3FF); // 10 bits
-    }
+    return static_cast<uint16_t>((tw[10] >> 22) & 0x3FF);
   }
+
+  inline uint16_t get_time_start_1() const
+  {
+    const word_t* tw = get_trailer_words();
+    return static_cast<uint16_t>((tw[10] >> 12) & 0x3FF);
+  }
+
+  inline uint16_t get_time_start_2() const
+  {
+    const word_t* tw = get_trailer_words();
+    return static_cast<uint16_t>((tw[10] >> 2) & 0x3FF);
+  }
+
+  inline uint16_t get_time_start_3() const
+  {
+    const word_t* tw = get_trailer_words();
+    return static_cast<uint16_t>((tw[11] >> 22) & 0x3FF);
+  }
+
+  inline uint16_t get_time_start_4() const
+  {
+    const word_t* tw = get_trailer_words();
+    return static_cast<uint16_t>((tw[11] >> 12) & 0x3FF);
+  }
+
 
   /**
   * @brief Set the Time_Start value for a given index (0-4).
   */
-  inline void set_time_start(uint16_t val, int idx) // NOLINT(build/unsigned)
+  inline void set_time_start_0(uint16_t val)
   {
-    if (idx < 0 || idx > 4)
-      throw std::out_of_range("Time_Start index out of range (must be 0-4)");
-    if (val > 0x3FF)
-      throw std::out_of_range("Time_Start value out of range (must be 0-1023)");
+    if(val > 0x3FF)
+      throw std::out_of_range("Time_Start(0) value out of range (must be 0-1023)");
     word_t* tw = get_trailer_words();
-    if (idx < 3) {
-      int shift = idx * 10;
-      tw[10] = (tw[10] & ~(0x3FFu << shift)) | ((val & 0x3FF) << shift);
-    } else {
-      int shift = (idx - 3) * 10;
-      tw[11] = (tw[11] & ~(0x3FFu << shift)) | ((val & 0x3FF) << shift);
-    }
-   }
+    tw[10] = (tw[10] & ~(0x3FFu << 22)) | ((val & 0x3FF) << 22);
+  }
+
+  inline void set_time_start_1(uint16_t val)
+  {
+    if(val > 0x3FF)
+      throw std::out_of_range("Time_Start(1) value out of range (must be 0-1023)");
+    word_t* tw = get_trailer_words();
+    tw[10] = (tw[10] & ~(0x3FFu << 12)) | ((val & 0x3FF) << 12);
+  }
+
+  inline void set_time_start_2(uint16_t val)
+  {
+    if(val > 0x3FF)
+      throw std::out_of_range("Time_Start(2) value out of range (must be 0-1023)");
+    word_t* tw = get_trailer_words();
+    tw[10] = (tw[10] & ~(0x3FFu << 2)) | ((val & 0x3FF) << 2);
+  }
+
+  inline void set_time_start_3(uint16_t val)
+  {
+    if(val > 0x3FF)
+      throw std::out_of_range("Time_Start(3) value out of range (must be 0-1023)");
+    word_t* tw = get_trailer_words();
+    tw[11] = (tw[11] & ~(0x3FFu << 22)) | ((val & 0x3FF) << 22);
+  }
+
+  inline void set_time_start_4(uint16_t val)
+  {
+    if(val > 0x3FF)
+      throw std::out_of_range("Time_Start(4) value out of range (must be 0-1023)");
+    word_t* tw = get_trailer_words();
+    tw[11] = (tw[11] & ~(0x3FFu << 12)) | ((val & 0x3FF) << 12);
+  }
  
    /** @brief Get the 64-bit timestamp of the frame
    */
