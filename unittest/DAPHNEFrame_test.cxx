@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_SUITE(DAPHNEFrame_test)
 BOOST_AUTO_TEST_CASE(DAPHNEFrame_AllFieldsTest)
 {
   constexpr int n_adcs = 320;
-  constexpr int n_tps = 5;
+  constexpr int n_peaks = 5;
 
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -55,30 +55,30 @@ BOOST_AUTO_TEST_CASE(DAPHNEFrame_AllFieldsTest)
   BOOST_CHECK_EQUAL(frame.header.get_baseline(), 0xABCD);
 
   // ─── Test Trailer ─────────────────────────────────────────────────
-  for (int tp = 0; tp < n_tps; ++tp) {
-    uint8_t num_peak = u4bit(gen);
-    uint8_t da = u1bit(gen);
+  for (int peak = 0; peak < n_peaks; ++peak) {
+    uint8_t num_subpeaks = u4bit(gen);
+    uint8_t found = u1bit(gen);
     uint32_t adc_integral = u23bit(gen);
-    uint16_t adc_peak = u14bit(gen);
-    uint16_t time_peak = u9bit(gen);
+    uint16_t adc_max = u14bit(gen);
+    uint16_t sample_peak = u9bit(gen);
     uint16_t tob = u9bit(gen);
-    uint16_t tstart = u10bit(gen);
+    uint16_t sob = u10bit(gen);
 
-    frame.set_num_peak(num_peak, tp);
-    frame.set_da(da, tp);
-    frame.set_adc_integral(adc_integral, tp);
-    frame.set_adc_peak(adc_peak, tp);
-    frame.set_time_peak(time_peak, tp);
-    frame.set_time_over_baseline(tob, tp);
-    frame.set_time_start(tstart, tp);
+    frame.peaks_data.set_num_subpeaks(num_subpeaks, peak);
+    frame.peaks_data.set_found(found, peak);
+    frame.peaks_data.set_adc_integral(adc_integral, peak);
+    frame.peaks_data.set_adc_max(adc_max, peak);
+    frame.peaks_data.set_sample_max(sample_peak, peak);
+    frame.peaks_data.set_samples_over_baseline(tob, peak);
+    frame.peaks_data.set_sample_start(sob, peak);
 
-    BOOST_CHECK_EQUAL(frame.get_num_peak(tp), num_peak);
-    BOOST_CHECK_EQUAL(frame.get_da(tp), da);
-    BOOST_CHECK_EQUAL(frame.get_adc_integral(tp), adc_integral);
-    BOOST_CHECK_EQUAL(frame.get_adc_peak(tp), adc_peak);
-    BOOST_CHECK_EQUAL(frame.get_time_peak(tp), time_peak);
-    BOOST_CHECK_EQUAL(frame.get_time_over_baseline(tp), tob);
-    BOOST_CHECK_EQUAL(frame.get_time_start(tp), tstart);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_num_subpeaks(peak), num_subpeaks);
+    BOOST_CHECK_EQUAL(frame.peaks_data.is_found(peak), found);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_adc_integral(peak), adc_integral);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_adc_max(peak), adc_max);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_sample_max(peak), sample_peak);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_samples_over_baseline(peak), tob);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_sample_start(peak), sob);
   }
 }
 
