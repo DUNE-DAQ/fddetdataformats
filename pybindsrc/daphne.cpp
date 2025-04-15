@@ -71,6 +71,21 @@ register_daphne(py::module& m)
     .def("is_found", &DAPHNEFrame::PeakDescriptorData::is_found)
     .def("set_found", &DAPHNEFrame::PeakDescriptorData::set_found)
 
+    .def("get_adc_integral", &DAPHNEFrame::PeakDescriptorData::get_adc_integral)
+    .def("set_adc_integral", &DAPHNEFrame::PeakDescriptorData::set_adc_integral)
+
+    .def("get_num_subpeaks", &DAPHNEFrame::PeakDescriptorData::get_num_subpeaks)
+    .def("set_num_subpeaks", &DAPHNEFrame::PeakDescriptorData::set_num_subpeaks)
+
+    .def("get_samples_over_baseline", &DAPHNEFrame::PeakDescriptorData::get_samples_over_baseline)
+    .def("set_samples_over_baseline", &DAPHNEFrame::PeakDescriptorData::set_samples_over_baseline)
+
+    .def("get_adc_max", &DAPHNEFrame::PeakDescriptorData::get_adc_max)
+    .def("set_adc_max", &DAPHNEFrame::PeakDescriptorData::set_adc_max)
+
+    .def("get_sample_start", &DAPHNEFrame::PeakDescriptorData::get_sample_start)
+    .def("set_sample_start", &DAPHNEFrame::PeakDescriptorData::set_sample_start)
+
     .def_property("num_subpeaks_0", 
       [](DAPHNEFrame::PeakDescriptorData& self) -> uint8_t { return self.num_subpeaks_0; }, 
       [](DAPHNEFrame::PeakDescriptorData& self, uint8_t val) { self.num_subpeaks_0 = val; } 
