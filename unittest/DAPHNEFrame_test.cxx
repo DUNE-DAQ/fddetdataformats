@@ -1,10 +1,5 @@
-
 /**
- * @file DAPHNEFrame_test.cxx DAPHNEFrame class Unit Tests
- *
- * This is part of the DUNE DAQ Application Framework, copyright 2022.
- * Licensing/copyright details are in the COPYING file that you should have
- * received with this code.
+ * @file DAPHNEFrame_test.cxx - Comprehensive unit tests for DAPHNEFrame
  */
 
 #include "fddetdataformats/DAPHNEFrame.hpp"
@@ -13,32 +8,78 @@
 
 #include "boost/test/unit_test.hpp"
 
-#include <string>
 #include <vector>
 #include <random>
+#include <algorithm>
 
 BOOST_AUTO_TEST_SUITE(DAPHNEFrame_test)
 
-BOOST_AUTO_TEST_CASE(WIBEthFrame_ADCDataMutators)
+BOOST_AUTO_TEST_CASE(DAPHNEFrame_AllFieldsTest)
 {
-  std::random_device dev;
-  std::mt19937 rng(dev());
-  std::uniform_int_distribution<std::mt19937::result_type> dist(1,(1<<14)-1);
-  std::vector<int> v;
+  constexpr int n_adcs = 320;
+  constexpr int n_peaks = 5;
 
-  for(int i=0; i<320; i++) {
-    v.push_back(dist(rng));
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<uint16_t> adc_dist(1, (1 << 14) - 1);
+  std::uniform_int_distribution<uint16_t> u10bit(0, 0x3FF);
+  std::uniform_int_distribution<uint16_t> u9bit(0, 0x1FF);
+  std::uniform_int_distribution<uint16_t> u4bit(0, 0xF);
+  std::uniform_int_distribution<uint32_t> u23bit(0, 0x7FFFFF);
+  std::uniform_int_distribution<uint16_t> u14bit(0, 0x3FFF);
+  std::uniform_int_distribution<uint8_t> u1bit(0, 1);
+
+  dunedaq::fddetdataformats::DAPHNEFrame frame{};
+
+  // ─── Test ADC Values ──────────────────────────────────────────────
+  std::vector<uint16_t> adcs(n_adcs);
+  std::generate(adcs.begin(), adcs.end(), [&]() { return adc_dist(gen); });
+
+  for (int i = 0; i < n_adcs; ++i)
+    frame.set_adc(i, adcs[i]);
+
+  for (int i = 0; i < n_adcs; ++i)
+    BOOST_CHECK_EQUAL(frame.get_adc(i), adcs[i]);
+
+  // ─── Test Header ──────────────────────────────────────────────────
+  frame.set_channel(17);
+  frame.header.algorithm_id = 9;
+  frame.header.trigger_sample_value = 0xFACE;
+  frame.header.threshold = 0xBEEF;
+  frame.header.baseline = 0xABCD;
+
+  BOOST_CHECK_EQUAL(frame.get_channel(), 17);
+  BOOST_CHECK_EQUAL(frame.header.algorithm_id, 9);
+  BOOST_CHECK_EQUAL(frame.header.trigger_sample_value, 0xFACE);
+  BOOST_CHECK_EQUAL(frame.header.threshold, 0xBEEF);
+  BOOST_CHECK_EQUAL(frame.header.get_baseline(), 0xABCD);
+
+  // ─── Test Trailer ─────────────────────────────────────────────────
+  for (int peak = 0; peak < n_peaks; ++peak) {
+    uint8_t num_subpeaks = u4bit(gen);
+    uint8_t found = u1bit(gen);
+    uint32_t adc_integral = u23bit(gen);
+    uint16_t adc_max = u14bit(gen);
+    uint16_t sample_peak = u9bit(gen);
+    uint16_t tob = u9bit(gen);
+    uint16_t sob = u10bit(gen);
+
+    frame.peaks_data.set_num_subpeaks(num_subpeaks, peak);
+    frame.peaks_data.set_found(found, peak);
+    frame.peaks_data.set_adc_integral(adc_integral, peak);
+    frame.peaks_data.set_adc_max(adc_max, peak);
+    frame.peaks_data.set_sample_max(sample_peak, peak);
+    frame.peaks_data.set_samples_over_baseline(tob, peak);
+    frame.peaks_data.set_sample_start(sob, peak);
+
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_num_subpeaks(peak), num_subpeaks);
+    BOOST_CHECK_EQUAL(frame.peaks_data.is_found(peak), found);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_adc_integral(peak), adc_integral);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_adc_max(peak), adc_max);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_sample_max(peak), sample_peak);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_samples_over_baseline(peak), tob);
+    BOOST_CHECK_EQUAL(frame.peaks_data.get_sample_start(peak), sob);
   }
-
-  dunedaq::fddetdataformats::DAPHNEFrame daphneframe {};
-  for(int i=0; i<320; i++) {
-    daphneframe.set_adc(i, v[i]);
-  }
-
-  for(int i=0; i<320; i++) {
-    BOOST_REQUIRE_EQUAL(daphneframe.get_adc(i), v[i]);
-  }
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()
