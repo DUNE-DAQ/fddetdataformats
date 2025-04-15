@@ -67,7 +67,7 @@ register_daphne(py::module& m)
       )
   ;
 
-  py::class_<DAPHNEFrame::PeakDescriptorData>(m, "DAPHNEFranePeakDescriptorData")
+  py::class_<DAPHNEFrame::PeakDescriptorData>(m, "DAPHNEFramePeakDescriptorData")
     .def("is_found", &DAPHNEFrame::PeakDescriptorData::is_found)
     .def("set_found", &DAPHNEFrame::PeakDescriptorData::set_found)
 
