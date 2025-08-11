@@ -39,10 +39,6 @@ namespace dunedaq::fddetdataformats {
         static constexpr uint64_t s_DTS_ticks_per_second = 62'500'000;
         static constexpr uint64_t s_ns_per_DTS_tick = 16;
 
-        static constexpr int s_bits_per_adc = 16;
-        static constexpr int s_bits_per_word = 8 * sizeof(word_t);
-        static constexpr int s_num_adcs = 64;
-
         struct CRTBernData
         {
             uint16_t flags     = 0;
@@ -50,7 +46,7 @@ namespace dunedaq::fddetdataformats {
             uint16_t lostfpga  = 0;
             uint32_t ts0       = 0;
             uint32_t ts1       = 0;
-            uint16_t adc[32]   = {0};
+            uint16_t adc[s_num_channels] = {0};
             uint32_t coinc      = 0;
         };
 

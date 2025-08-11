@@ -39,10 +39,6 @@ namespace dunedaq::fddetdataformats {
         static constexpr uint64_t s_DTS_ticks_per_second = 62'500'000;
         static constexpr uint64_t s_ns_per_DTS_tick = 16;
 
-        static constexpr int s_bits_per_adc = 16;
-        static constexpr int s_bits_per_word = 8 * sizeof(word_t);
-        static constexpr int s_num_adcs = 64;
-
         struct TGpsDateStruct{
             unsigned int seconds        : 8;
             unsigned int minutes        : 8;
@@ -70,7 +66,7 @@ namespace dunedaq::fddetdataformats {
             unsigned int   pps_interval=0;       ///< IRIG-B subdivision in a second, expressed in 100 ns clock ticks.
             unsigned int   FIFO_AF_duration=0;  ///< FIFO AF duration (4 ns) -> integration of Almost full fifo since last accepted trigger
 
-            struct STChannel channels[32];
+            struct STChannel channels[s_num_channels];
         };
 
         // ===============================================================
