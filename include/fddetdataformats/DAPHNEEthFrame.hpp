@@ -51,7 +51,16 @@ public:
 
   struct Header
   {	  
-    word_t w0;
+    // word_t w0;
+    word_t trig_sample : 14;
+    word_t rsv_0       : 2;
+    word_t threshold   : 14;
+    word_t rsv_1       : 2;
+    word_t baseline    : 14;
+    word_t rsv_2       : 6;
+    word_t version     : 4;
+    word_t channel     : 8;
+
     word_t w1;
     word_t w2;
     word_t w3;
@@ -147,15 +156,14 @@ set_adc(int i, uint16_t val) // NOLINT
    */
   uint8_t get_channel() const // NOLINT(build/unsigned)
   {
-    // return header.channel ; // NOLINT(build/unsigned)
-    return 0;
+    return header.channel ; // NOLINT(build/unsigned)
   }
 
   /** @brief Set the channel identifier of the frame
    */
   void set_channel(const uint8_t new_channel) // NOLINT(build/unsigned)
   {
-    // header.channel = new_channel;
+    header.channel = new_channel;
   }
 
 };

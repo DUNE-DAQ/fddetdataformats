@@ -21,10 +21,10 @@ register_daphneeth(py::module& m)
 
 
   py::class_<DAPHNEEthFrame::Header>(m, "DAPHNEEthHeader")
-    .def_property("w0",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w0;},
-      [](DAPHNEEthFrame::Header& self, uint32_t w0) {self.w0 = w0;}
-      )      
+    // .def_property("w0",
+    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w0;},
+    //   [](DAPHNEEthFrame::Header& self, uint32_t w0) {self.w0 = w0;}
+    //   )      
     .def_property("w1",
       [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w1;},
       [](DAPHNEEthFrame::Header& self, uint32_t w1) {self.w1 = w1;}
@@ -53,14 +53,14 @@ register_daphneeth(py::module& m)
 
       
 
-    // .def_property("channel",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.channel;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t channel) {self.channel = channel;}
-    //   )
-    // .def_property("version",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.version;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t version) {self.version = version;}
-    //   )
+    .def_property("channel",
+      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.channel;},
+      [](DAPHNEEthFrame::Header& self, uint32_t channel) {self.channel = channel;}
+      )
+    .def_property("version",
+      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.version;},
+      [](DAPHNEEthFrame::Header& self, uint32_t version) {self.version = version;}
+      )
     // // .def_property("reserved",
     //   // [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.reserved;},
     //   // [](DAPHNEEthFrame::Header& self, uint32_t reserved) {self.reserved = reserved;}
