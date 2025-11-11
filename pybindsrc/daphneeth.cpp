@@ -49,10 +49,6 @@ register_daphneeth(py::module& m)
       [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w6;},
       [](DAPHNEEthFrame::Header& self, uint32_t w6) {self.w6 = w6;}
       )
-
-
-      
-
     .def_property("channel",
       [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.channel;},
       [](DAPHNEEthFrame::Header& self, uint32_t channel) {self.channel = channel;}
@@ -61,62 +57,18 @@ register_daphneeth(py::module& m)
       [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.version;},
       [](DAPHNEEthFrame::Header& self, uint32_t version) {self.version = version;}
       )
-    // // .def_property("reserved",
-    //   // [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.reserved;},
-    //   // [](DAPHNEEthFrame::Header& self, uint32_t reserved) {self.reserved = reserved;}
-    //   // )
-    // .def_property("cd",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.cd;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t cd) {self.version = cd;}
-    //   )
-    // .def_property("context",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.context;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t context) {self.version = context;}
-    //   )
-    // .def_property("ready",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.ready;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t ready) {self.ready = ready;}
-    //   )
-    // .def_property("calibration",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.calibration;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t calibration) {self.calibration = calibration;}
-    //   )
-    // .def_property("pulser",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.pulser;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t pulser) {self.pulser = pulser;}
-    //   )
-    // .def_property("femb_sync",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.femb_sync;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t femb_sync) {self.femb_sync = femb_sync;}
-    //   )
-    // .def_property("wib_sync",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.wib_sync;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t wib_sync) {self.wib_sync = wib_sync;}
-    //   )
-    // .def_property("lol",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.lol;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t lol) {self.lol = lol;}
-    //   )
-    // .def_property("link_valid",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.link_valid;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t link_valid) {self.link_valid = link_valid;}
-    //   )
-    // .def_property("crc_err",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.crc_err;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t crc_err) {self.crc_err = crc_err;}
-    //   )
-    // .def_property("colddata_timestamp_1",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.colddata_timestamp_1;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t colddata_timestamp_1) {self.lol = colddata_timestamp_1;}
-    //   )
-    // .def_property("colddata_timestamp_0",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.colddata_timestamp_0;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t colddata_timestamp_0) {self.colddata_timestamp_0 = colddata_timestamp_0;}
-    //   )
-    // .def_property("extra_data",
-    //   [](DAPHNEEthFrame::Header& self) -> uint64_t {return self.extra_data;},
-    //   [](DAPHNEEthFrame::Header& self, uint64_t extra_data) {self.extra_data = extra_data;}
-    //   )
+    .def_property("trigger_sample_value",
+      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.trig_sample;},
+      [](DAPHNEEthFrame::Header& self, uint32_t trig_sample) {self.trig_sample = trig_sample;}
+      )
+    .def_property("threshold",
+      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.threshold;},
+      [](DAPHNEEthFrame::Header& self, uint32_t threshold) {self.threshold = threshold;}
+      )
+    .def_property("baseline",
+      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.baseline;},
+      [](DAPHNEEthFrame::Header& self, uint32_t baseline) {self.baseline = baseline;}
+      )
     ;
 
   py::class_<DAPHNEEthFrame>(m, "DAPHNEEthFrame", py::buffer_protocol())
@@ -132,6 +84,7 @@ register_daphneeth(py::module& m)
     }))
     .def("get_daqheader", [](DAPHNEEthFrame& self) -> const detdataformats::DAQEthHeader& {return self.daq_header;}, py::return_value_policy::reference_internal)
     .def("get_daphneheader", [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& {return self.header;}, py::return_value_policy::reference_internal)
+    .def("get_header", [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& {return self.header;}, py::return_value_policy::reference_internal)
     .def("get_adc", &DAPHNEEthFrame::get_adc)
     .def("set_adc", &DAPHNEEthFrame::set_adc)
     .def("get_timestamp", &DAPHNEEthFrame::get_timestamp)
