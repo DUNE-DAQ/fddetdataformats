@@ -35,7 +35,7 @@ public:
   // ===============================================================
 
   // The definition of the format is in terms of 32-bit words
-  typedef uint32_t word_t; // NOLINT
+  using word_t = uint32_t; // NOLINT
 
   static constexpr int s_bits_per_adc = 14;
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);

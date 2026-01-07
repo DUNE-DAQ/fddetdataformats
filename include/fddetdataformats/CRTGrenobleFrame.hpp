@@ -33,7 +33,7 @@ namespace dunedaq::fddetdataformats {
         // ===============================================================
 
         // The definition of the format is in terms of 64-bit words
-        typedef uint64_t word_t; // NOLINT
+        using word_t = uint64_t; // NOLINT
 
         static constexpr int      s_num_channels = 32;
         static constexpr uint64_t s_DTS_ticks_per_second = 62'500'000;

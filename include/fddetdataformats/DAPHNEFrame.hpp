@@ -22,8 +22,7 @@
 #include <stdexcept> // For std::out_of_range
 #include <cstdint>   // For uint32_t etc
 
-namespace dunedaq {
-namespace fddetdataformats {
+namespace dunedaq::fddetdataformats {
 
 class DAPHNEFrame
 {
@@ -33,7 +32,7 @@ public:
   // ===============================================================
 
   // The definition of the format is in terms of 32-bit words
-  typedef uint32_t word_t; // NOLINT
+  using word_t = uint32_t; // NOLINT
 
   // Dataframe format version
   static constexpr uint8_t version = 2;
@@ -501,7 +500,6 @@ DAPHNEFrame::PeakDescriptorData::set_sample_start(uint16_t val, int idx)
 }
 
 
-} // namespace fddetdataformats
-} // namespace dunedaq
+} // namespace dunedaq::fddetdataformats
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_

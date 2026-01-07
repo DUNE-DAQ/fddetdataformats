@@ -62,7 +62,7 @@ public:
   uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); } 
   void set_timestamp(const uint64_t new_timestamp) { m_daq_header.timestamp = new_timestamp; } 
   uint16_t get_channel() const { return m_tde16_header.channel; } 
-  void set_channel(const uint16_t new_channel) { m_tde16_header.channel=new_channel; } 
+  void set_channel(const uint16_t new_channel) { m_tde16_header.channel = new_channel; } 
   uint16_t get_tde_errors() { return m_tde16_header.tde_errors; } 
   void set_tde_errors(const uint16_t new_tde_errors) { m_tde16_header.tde_errors = new_tde_errors; } 
   uint64_t get_TAItime() { return m_tde16_header.TAItime; } 
@@ -84,8 +84,8 @@ inline std::ostream&
 operator<<(std::ostream& o, TDEHeader const& tde_header)
 {
     return o << std::hex << "channel: " << tde_header.channel << "version: " << tde_header.version 
-	    << "TAItime: " << tde_header.TAItime
-	    << " tde_header: " <<  tde_header.tde_header<< " tde_errors: " << tde_header.tde_errors << std::dec << '\n';
+            << "TAItime: " << tde_header.TAItime
+            << " tde_header: " <<  tde_header.tde_header<< " tde_errors: " << tde_header.tde_errors << std::dec << '\n';
 }
 
 inline std::ostream&
