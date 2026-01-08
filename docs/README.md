@@ -11,6 +11,7 @@ This package now includes C++20 concepts that define common interfaces for frame
 - **`HasADC<T>`**: Types with `get_adc(int)` and `set_adc(int, uint16_t)` methods
 - **`HasADCSample<T>`**: Types with `get_adc_sample(int)` and `set_adc_sample(uint16_t, int)` methods
 - **`HasChannelData<T>`**: Types with `get_channel(uint8_t)` and `set_channel(uint8_t, uint16_t)` methods for data access
+- **`HasMultiSampleADC<T>`**: Types with `get_adc(int, int)` and `set_adc(int, int, uint16_t)` methods for multi-sample data
 - **`HasChannel<T>`**: Types with `get_channel()` method for channel identifier access
 - **`IsFrame<T>`**: Types that have both timestamp and data access (satisfies `HasTimestamp` and at least one data access concept)
 - **`IsCompleteFrame<T>`**: Types with timestamp, data access, and channel identifier
@@ -38,7 +39,12 @@ uint16_t read_adc_value(const F& frame, int channel) {
 }
 ```
 
-All frame types in this package (`WIBFrame`, `WIB2Frame`, `WIBEthFrame`, `DAPHNEFrame`, `TDE16Frame`) satisfy the `IsFrame` concept with their respective data access interfaces.
+All frame types in this package satisfy the `IsFrame` concept with their respective data access interfaces:
+- `WIBFrame`: Uses `HasChannelData` (channel-based access)
+- `WIB2Frame`: Uses `HasADC` (single-sample ADC access)
+- `WIBEthFrame`: Uses `HasMultiSampleADC` (multi-sample ADC access)
+- `DAPHNEFrame`: Uses `HasADC` (single-sample ADC access)
+- `TDE16Frame`: Uses `HasADCSample` (ADC sample interface)
 
 ## WIB
 [`WIBFrame.hpp`](https://github.com/DUNE-DAQ/fddetdataformats/blob/develop/include/fddetdataformats/WIBFrame.hpp)

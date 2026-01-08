@@ -79,25 +79,42 @@ concept HasChannelData = requires(T t, const T ct, uint8_t ch, uint16_t val) {
 };
 
 /**
+ * @brief Concept for types that have multi-sample ADC access
+ * 
+ * A type satisfies HasMultiSampleADC if it provides:
+ * - get_adc(int, int) const -> uint16_t  (channel, sample)
+ * - set_adc(int, int, uint16_t)
+ * 
+ * This is used by WIBEthFrame which stores multiple time samples per frame.
+ */
+template<typename T>
+concept HasMultiSampleADC = requires(T t, const T ct, int ch, int sample, uint16_t val) {
+  { ct.get_adc(ch, sample) } -> std::same_as<uint16_t>;
+  { t.set_adc(ch, sample, val) } -> std::same_as<void>;
+};
+
+/**
  * @brief Concept for types that have channel access
  * 
  * A type satisfies HasChannel if it provides:
- * - get_channel() const -> uint8_t or uint16_t
+ * - get_channel() const -> convertible to uint16_t
+ * 
+ * This checks for channel identifier access, not channel data access.
  */
 template<typename T>
 concept HasChannel = requires(const T ct) {
-  { ct.get_channel() } -> std::convertible_to<uint64_t>;
+  { ct.get_channel() } -> std::convertible_to<uint16_t>;
 };
 
 /**
  * @brief Concept for types that can be considered frame data structures
  * 
  * A type satisfies IsFrame if it has both timestamp and some form of data access
- * (ADC, ADC sample, or channel-based).
+ * (ADC, ADC sample, channel-based, or multi-sample).
  * This represents the core interface expected of detector frame types.
  */
 template<typename T>
-concept IsFrame = HasTimestamp<T> && (HasADC<T> || HasADCSample<T> || HasChannelData<T>);
+concept IsFrame = HasTimestamp<T> && (HasADC<T> || HasADCSample<T> || HasChannelData<T> || HasMultiSampleADC<T>);
 
 /**
  * @brief Concept for complete frame types with all common accessors
@@ -105,7 +122,7 @@ concept IsFrame = HasTimestamp<T> && (HasADC<T> || HasADCSample<T> || HasChannel
  * A type satisfies IsCompleteFrame if it has timestamp, data access, and channel access.
  */
 template<typename T>
-concept IsCompleteFrame = HasTimestamp<T> && (HasADC<T> || HasADCSample<T> || HasChannelData<T>) && HasChannel<T>;
+concept IsCompleteFrame = HasTimestamp<T> && (HasADC<T> || HasADCSample<T> || HasChannelData<T> || HasMultiSampleADC<T>) && HasChannel<T>;
 
 /**
  * @brief Concept for types that have a header
