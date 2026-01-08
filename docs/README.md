@@ -2,6 +2,44 @@
 
 This repository contains bitfields of far detector raw data and utilities used to decode them. For more on this concept, see also [the detdataformats documentation](https://dune-daq-sw.readthedocs.io/en/latest/packages/detdataformats/). Each section below describes the utilities available for different parts of the far detector. Links are provided to the code; be aware, however, that the code you're linked to is taken from the head of this package's `develop` branch and consequently may differ from the code you may be using. 
 
+## C++20 Concepts
+[`Concepts.hpp`](https://github.com/DUNE-DAQ/fddetdataformats/blob/develop/include/fddetdataformats/Concepts.hpp)
+
+This package now includes C++20 concepts that define common interfaces for frame types and data structures. These concepts enable compile-time checking of type requirements and can be used to constrain template parameters. The following concepts are available:
+
+- **`HasTimestamp<T>`**: Types with `get_timestamp()` and `set_timestamp()` methods
+- **`HasADC<T>`**: Types with `get_adc(int)` and `set_adc(int, uint16_t)` methods
+- **`HasADCSample<T>`**: Types with `get_adc_sample(int)` and `set_adc_sample(uint16_t, int)` methods
+- **`HasChannelData<T>`**: Types with `get_channel(uint8_t)` and `set_channel(uint8_t, uint16_t)` methods for data access
+- **`HasChannel<T>`**: Types with `get_channel()` method for channel identifier access
+- **`IsFrame<T>`**: Types that have both timestamp and data access (satisfies `HasTimestamp` and at least one data access concept)
+- **`IsCompleteFrame<T>`**: Types with timestamp, data access, and channel identifier
+- **`HasHeader<T>`**: Types with a nested `Header` type
+- **`WordBased<T>`**: Types that define a `word_t` type alias
+- **`BinaryCompatible<T>`**: Types that are standard layout and trivially copyable
+- **`FrameHeader<T>`**: Binary compatible header types
+- **`ADCData<T>`**: Binary compatible types with ADC data access
+
+Example usage:
+```cpp
+#include "fddetdataformats/Concepts.hpp"
+
+// Generic function that works with any frame type
+template<IsFrame F>
+void process_frame(const F& frame) {
+  auto timestamp = frame.get_timestamp();
+  // ... process frame ...
+}
+
+// Function constrained to frames with ADC access
+template<HasADC F>
+uint16_t read_adc_value(const F& frame, int channel) {
+  return frame.get_adc(channel);
+}
+```
+
+All frame types in this package (`WIBFrame`, `WIB2Frame`, `WIBEthFrame`, `DAPHNEFrame`, `TDE16Frame`) satisfy the `IsFrame` concept with their respective data access interfaces.
+
 ## WIB
 [`WIBFrame.hpp`](https://github.com/DUNE-DAQ/fddetdataformats/blob/develop/include/fddetdataformats/WIBFrame.hpp)
 
