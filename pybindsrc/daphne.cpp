@@ -245,6 +245,10 @@ register_daphne(py::module& m)
     .def("set_timestamp", &DAPHNEStreamFrame::set_timestamp)
     .def("get_adc", &DAPHNEStreamFrame::get_adc)
     .def("set_adc", &DAPHNEStreamFrame::set_adc)
+    .def("get_channel0", &DAPHNEStreamFrame::get_channel0)
+    .def("get_channel1", &DAPHNEStreamFrame::get_channel1)
+    .def("get_channel2", &DAPHNEStreamFrame::get_channel2)
+    .def("get_channel3", &DAPHNEStreamFrame::get_channel3)
     .def_static("sizeof", [](){ return sizeof(DAPHNEStreamFrame); })
     .def("get_bytes",
          [](DAPHNEStreamFrame* fr) -> py::bytes {
