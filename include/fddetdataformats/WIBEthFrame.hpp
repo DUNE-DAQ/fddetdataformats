@@ -133,13 +133,15 @@ public:
     int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
     // How many bits of our desired ADC are located in the `word_index`th word
     int bits_in_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-    uint64_t mask = (static_cast<uint64_t>(1) << first_bit_position) - 1;
-    adc_words[sample][word_index] = ((static_cast<uint64_t>(val) << first_bit_position) & ~mask) | (adc_words[sample][word_index] & mask);
+    // Create a mask that covers exactly the bits we want to modify (bits_in_first_word bits starting at first_bit_position)
+    uint64_t adc_mask = ((static_cast<uint64_t>(1) << bits_in_first_word) - 1) << first_bit_position;
+    adc_words[sample][word_index] = (adc_words[sample][word_index] & ~adc_mask) | ((static_cast<uint64_t>(val) << first_bit_position) & adc_mask);
     // If we didn't put the full 14 bits in this word, we need to put the rest in the next word
     if (bits_in_first_word < s_bits_per_adc) {
       assert(word_index + 1 < s_num_adc_words);
-      mask = (1 << (s_bits_per_adc - bits_in_first_word)) - 1;
-      adc_words[sample][word_index + 1] = ((val >> bits_in_first_word) & mask) | (adc_words[sample][word_index + 1] & ~mask);
+      int bits_in_second_word = s_bits_per_adc - bits_in_first_word;
+      uint64_t mask2 = (static_cast<uint64_t>(1) << bits_in_second_word) - 1;
+      adc_words[sample][word_index + 1] = (adc_words[sample][word_index + 1] & ~mask2) | ((val >> bits_in_first_word) & mask2);
     }
   }
 
