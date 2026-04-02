@@ -14,6 +14,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_
 
+#include "fddetdataformats/FrameConcepts.hpp"
+
 #include "detdataformats/DAQEthHeader.hpp"
 
 #include <algorithm> // For std::min
@@ -21,6 +23,8 @@
 #include <cstdint>   // For uint32_t etc
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
+#include <tuple>
 #include <stdexcept> // For std::out_of_range
 
 namespace dunedaq::fddetdataformats {
@@ -50,8 +54,10 @@ public:
   static constexpr int s_num_adc_words = s_num_adcs * s_bits_per_adc / s_bits_per_word;
 
   struct Header
-  {	  
-    // word_t w0;
+  { 
+
+    static constexpr size_t s_expected_bytes {56};
+
     word_t trig_sample : 14;
     word_t rsv_0       : 2;
     word_t threshold   : 14;
@@ -68,6 +74,9 @@ public:
     word_t w5;
     word_t w6;
   };
+  static_assert(Header::s_expected_bytes == sizeof(Header));
+
+  static constexpr size_t s_expected_bytes = detdataformats::DAQEthHeader::s_expected_bytes + Header::s_expected_bytes + s_num_adc_words * sizeof(word_t);
 
   // ===============================================================
   // Data members
@@ -165,8 +174,14 @@ set_adc(int i, uint16_t val) // NOLINT
   {
     header.channel = new_channel;
   }
-
+  
+  bool operator<(const DAPHNEEthFrame& other) const {
+    return std::tuple(this->get_timestamp(), this->get_channel()) < std::tuple(other.get_timestamp(), other.get_channel());
+  }
 };
+
+  static_assert(AdaptableFrameConcept<DAPHNEEthFrame>, "DAPHNEEthFrame does not satisfy the AdaptableFrameConcept");
+  static_assert(DAPHNEEthFrame::s_expected_bytes == sizeof(DAPHNEEthFrame));
 
 } // namespace dunedaq::fddetdataformats
 

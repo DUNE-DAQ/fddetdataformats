@@ -13,6 +13,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_TDEETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_TDEETHFRAME_HPP_
 
+#include "fddetdataformats/FrameConcepts.hpp"
+
 #include "detdataformats/DAQEthHeader.hpp"
 
 #include <algorithm> // For std::min
@@ -48,10 +50,11 @@ public:
   static constexpr int s_num_channels = s_channels_per_half_femb * s_half_fembs_per_frame;
   static constexpr int s_num_adc_words_per_ts = s_num_channels * s_bits_per_adc / s_bits_per_word;
   static constexpr int s_num_adc_words = s_time_samples_per_frame * s_num_channels * s_bits_per_adc / s_bits_per_word;
-  
 
   struct TDEEthHeader
   {
+    static constexpr size_t s_expected_bytes { 16 };
+
     uint64_t reserved : 26;
     uint64_t tde_errors : 16;
     uint64_t tde_header : 10;
@@ -59,7 +62,10 @@ public:
     uint64_t channel : 8;
     uint64_t TAItime : 64;
   };
+  static_assert(TDEEthHeader::s_expected_bytes == sizeof(TDEEthHeader));
 
+  static constexpr size_t s_expected_bytes = detdataformats::DAQEthHeader::s_expected_bytes + TDEEthHeader::s_expected_bytes + s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t);
+  
   // ===============================================================
   // Data members
   // ===============================================================
@@ -159,7 +165,14 @@ public:
     header.channel = new_channel;
   }
 
+  bool operator<(const TDEEthFrame& other) const {
+    return this->get_timestamp() < other.get_timestamp();
+  }
+
 };
+
+  static_assert(AdaptableFrameConcept<TDEEthFrame>, "TDEEthFrame does not satisfy the AdaptableFrameConcept");
+  static_assert(TDEEthFrame::s_expected_bytes == sizeof(TDEEthFrame));
 
 } // namespace dunedaq::fddetdataformats
 
