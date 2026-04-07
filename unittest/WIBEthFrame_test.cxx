@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 #include <random>
-#include <TRACE/trace.h>  // For TLOG_DEBUG
+#include <logging/Logging.hpp>  // For TLOG_DEBUG
 
 BOOST_AUTO_TEST_SUITE(WIBEthFrame_test)
 
