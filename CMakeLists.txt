@@ -7,7 +7,7 @@ daq_setup_environment()
 
 find_package(detdataformats REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-find_package(TRACE REQUIRED)
+find_package(logging REQUIRED)
 
 ##############################################################################
 
@@ -19,7 +19,7 @@ daq_add_python_bindings(*.cpp )
 
 ##############################################################################
 
-daq_add_unit_test(WIBEthFrame_test LINK_LIBRARIES TRACE::TRACE fddetdataformats) 
+daq_add_unit_test(WIBEthFrame_test LINK_LIBRARIES fddetdataformats logging) 
 daq_add_unit_test(WIB2Frame_test   LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(WIBFrame_test    LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(TDE16Frame_test  LINK_LIBRARIES fddetdataformats)
