@@ -12,6 +12,7 @@
 #define BOOST_TEST_MODULE WIBEthFrame_test
 
 #include "boost/test/unit_test.hpp"
+#include "logging/Logging.hpp"  // For TLOG_DEBUG
 
 #include <string>
 #include <vector>
@@ -44,10 +45,12 @@ BOOST_AUTO_TEST_CASE(WIBEthFrame_ADCDataMutators)
       wibethframe.set_adc(i, j, v[i][j]);
     }
   }
+  wibethframe.set_adc(0, 0, v[0][0]); // Set the first ADC again to check that we can overwrite existing values without affecting other values
 
   // Get ADCs and compare
   for(std::size_t i=0; i<v.size(); ++i) {
     for(std::size_t j=0; j<v[i].size(); ++j) {
+      TLOG_DEBUG(1) << "Comparing ADC value for channel " << i << ", sample " << j << ": " << wibethframe.get_adc(i, j) << " vs " << v[i][j];
       BOOST_REQUIRE_EQUAL(wibethframe.get_adc(i, j), v[i][j]);
     }
   }
