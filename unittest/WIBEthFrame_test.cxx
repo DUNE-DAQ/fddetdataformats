@@ -12,11 +12,11 @@
 #define BOOST_TEST_MODULE WIBEthFrame_test
 
 #include "boost/test/unit_test.hpp"
+#include "logging/Logging.hpp"  // For TLOG_DEBUG
 
 #include <string>
 #include <vector>
 #include <random>
-#include <logging/Logging.hpp>  // For TLOG_DEBUG
 
 BOOST_AUTO_TEST_SUITE(WIBEthFrame_test)
 
