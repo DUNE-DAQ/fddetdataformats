@@ -15,7 +15,7 @@ daq_add_library( LINK_LIBRARIES detdataformats::detdataformats)
 
 ##############################################################################
 
-daq_add_python_bindings(*.cpp ) 
+daq_add_python_bindings(*.cpp LINK_LIBRARIES ${PROJECT_NAME}) 
 
 ##############################################################################
 
