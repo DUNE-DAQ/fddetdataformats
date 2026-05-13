@@ -15,6 +15,9 @@ Through these classes and structs it's possible to access the value of any chann
 Other useful functions in `WIBFrame` include setters for the timestamp and WIB errors in its `WIBHeader` instance, as well as a streamer which allows developers to easily print the contents of the `WIBFrame` instance using the `<<` operator on the instance. 
 
 ## WIB2
+
+_May 13, 2026: this frame has been obsolete for a while_
+
 [`WIB2Frame.hpp`](https://github.com/DUNE-DAQ/fddetdataformats/blob/develop/include/fddetdataformats/WIB2Frame.hpp)
 
 A `WIB2Frame` instance contains as members instances of the `WIB2Frame::Header` and `WIB2Frame::Trailer` structs as well as an array of ADC values. This reflects the definition of the WIB format given in https://edms.cern.ch/document/2088713/4. It also has getters and setters for ADC values, including options to select among U-channel, V-channel and X-channel ADCs when doing so. It's also possible to easily obtain the timestamp of the frame via `get_timestamp`. 

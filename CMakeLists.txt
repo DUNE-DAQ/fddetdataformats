@@ -20,7 +20,6 @@ daq_add_python_bindings(*.cpp )
 ##############################################################################
 
 daq_add_unit_test(WIBEthFrame_test LINK_LIBRARIES fddetdataformats logging::logging) 
-daq_add_unit_test(WIB2Frame_test   LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(DAPHNEFrame_test LINK_LIBRARIES fddetdataformats)
 
 ##############################################################################
