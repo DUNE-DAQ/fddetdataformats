@@ -3,6 +3,9 @@
 This repository contains bitfields of far detector raw data and utilities used to decode them. For more on this concept, see also [the detdataformats documentation](https://dune-daq-sw.readthedocs.io/en/latest/packages/detdataformats/). Each section below describes the utilities available for different parts of the far detector. Links are provided to the code; be aware, however, that the code you're linked to is taken from the head of this package's `develop` branch and consequently may differ from the code you may be using. 
 
 ## WIB
+
+_May 13, 2026: this frame has been obsolete for a while_
+
 [`WIBFrame.hpp`](https://github.com/DUNE-DAQ/fddetdataformats/blob/develop/include/fddetdataformats/WIBFrame.hpp)
 
 The `WIBFrame` class contains a nested set of overlay classes and structs. `WIBFrame` includes [private instances](https://dune-daq-sw.readthedocs.io/en/latest/packages/styleguide/#58-access-control) of `WIBHeader` and an array of `ColdataBlock` structs, accessible via getter functions. Each `ColdataBlock` struct contains a [public instance](https://dune-daq-sw.readthedocs.io/en/latest/packages/styleguide/#58-access-control) of a `ColdataHeader` and a public array of `ColdataSegments`. 
