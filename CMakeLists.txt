@@ -23,8 +23,12 @@ daq_add_unit_test(WIBEthFrame_test LINK_LIBRARIES fddetdataformats logging::logg
 daq_add_unit_test(WIB2Frame_test   LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(WIBFrame_test    LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(TDE16Frame_test  LINK_LIBRARIES fddetdataformats)
+daq_add_unit_test(TDEEthFrame_test LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(DAPHNEFrame_test LINK_LIBRARIES fddetdataformats)
+daq_add_unit_test(DAPHNEStreamFrame_test LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(DAPHNEEthFrame_test LINK_LIBRARIES fddetdataformats)
+daq_add_unit_test(DAPHNEEthStreamFrame_test LINK_LIBRARIES fddetdataformats)
+daq_add_unit_test(CRTGrenobleFrame_test LINK_LIBRARIES fddetdataformats)
 
 ##############################################################################
 
