@@ -22,10 +22,10 @@ BOOST_AUTO_TEST_SUITE(WIBEthFrame_test)
 
 BOOST_AUTO_TEST_CASE(WIBEthFrame_ADCDataMutators)
 {
-  // RNG with max 14 bit values
+  // RNG with max ADC-width values
   std::random_device dev;
   std::mt19937 rng(dev());
-  int max_adc_value = (unsigned)(1<<14)-1;
+  int max_adc_value = (1 << dunedaq::fddetdataformats::WIBEthFrame::s_bits_per_adc) - 1;
   std::uniform_int_distribution<std::mt19937::result_type> dist(1, max_adc_value);
 
   // Prepare source vector with ADC samples
@@ -47,6 +47,8 @@ BOOST_AUTO_TEST_CASE(WIBEthFrame_ADCDataMutators)
   }
   wibethframe.set_adc(0, 0, v[0][0]); // Set the first ADC again to check that we can overwrite existing values without affecting other values
 
+  auto original_level = boost::unit_test::unit_test_log.set_threshold_level(boost::unit_test::log_warnings);
+  
   // Get ADCs and compare
   for(std::size_t i=0; i<v.size(); ++i) {
     for(std::size_t j=0; j<v[i].size(); ++j) {
@@ -54,7 +56,8 @@ BOOST_AUTO_TEST_CASE(WIBEthFrame_ADCDataMutators)
       BOOST_REQUIRE_EQUAL(wibethframe.get_adc(i, j), v[i][j]);
     }
   }
-
+  boost::unit_test::unit_test_log.set_threshold_level(original_level);
+  
 }
 
 BOOST_AUTO_TEST_CASE(WIBEthFrame_IndexAndValueBounds)
@@ -83,6 +86,7 @@ BOOST_AUTO_TEST_CASE(WIBEthFrame_NeighborIsolationAcrossWordBoundary)
   using dunedaq::fddetdataformats::WIBEthFrame;
 
   WIBEthFrame wibethframe {};
+  constexpr uint16_t max_adc = static_cast<uint16_t>((1u << WIBEthFrame::s_bits_per_adc) - 1u);
   constexpr int sample = 5;
   constexpr int boundary_channel = 4;
 
@@ -96,13 +100,13 @@ BOOST_AUTO_TEST_CASE(WIBEthFrame_NeighborIsolationAcrossWordBoundary)
   BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel, sample), 0x2AAAu);
   BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel + 1, sample), 0x0000u);
 
-  wibethframe.set_adc(boundary_channel - 1, sample, 0x3FFFu);
-  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel - 1, sample), 0x3FFFu);
+  wibethframe.set_adc(boundary_channel - 1, sample, max_adc);
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel - 1, sample), max_adc);
   BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel, sample), 0x2AAAu);
   BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel + 1, sample), 0x0000u);
 
   wibethframe.set_adc(boundary_channel + 1, sample, 0x1555u);
-  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel - 1, sample), 0x3FFFu);
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel - 1, sample), max_adc);
   BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel, sample), 0x2AAAu);
   BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel + 1, sample), 0x1555u);
 }
