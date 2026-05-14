@@ -57,4 +57,70 @@ BOOST_AUTO_TEST_CASE(WIBEthFrame_ADCDataMutators)
 
 }
 
+BOOST_AUTO_TEST_CASE(WIBEthFrame_IndexAndValueBounds)
+{
+  using dunedaq::fddetdataformats::WIBEthFrame;
+
+  WIBEthFrame wibethframe {};
+
+  BOOST_CHECK_THROW(wibethframe.get_adc(-1, 0), std::out_of_range);
+  BOOST_CHECK_THROW(wibethframe.get_adc(WIBEthFrame::s_num_channels, 0), std::out_of_range);
+  BOOST_CHECK_THROW(wibethframe.get_adc(0, -1), std::out_of_range);
+  BOOST_CHECK_THROW(wibethframe.get_adc(0, WIBEthFrame::s_time_samples_per_frame), std::out_of_range);
+
+  BOOST_CHECK_THROW(wibethframe.set_adc(-1, 0, 123), std::out_of_range);
+  BOOST_CHECK_THROW(wibethframe.set_adc(WIBEthFrame::s_num_channels, 0, 123), std::out_of_range);
+  BOOST_CHECK_THROW(wibethframe.set_adc(0, -1, 123), std::out_of_range);
+  BOOST_CHECK_THROW(wibethframe.set_adc(0, WIBEthFrame::s_time_samples_per_frame, 123), std::out_of_range);
+  BOOST_CHECK_THROW(wibethframe.set_adc(0, 0, 1 << WIBEthFrame::s_bits_per_adc), std::out_of_range);
+
+  BOOST_CHECK_NO_THROW(wibethframe.set_adc(0, 0, (1 << WIBEthFrame::s_bits_per_adc) - 1));
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(0, 0), (1 << WIBEthFrame::s_bits_per_adc) - 1);
+}
+
+BOOST_AUTO_TEST_CASE(WIBEthFrame_NeighborIsolationAcrossWordBoundary)
+{
+  using dunedaq::fddetdataformats::WIBEthFrame;
+
+  WIBEthFrame wibethframe {};
+  constexpr int sample = 5;
+  constexpr int boundary_channel = 4;
+
+  wibethframe.set_adc(boundary_channel - 1, sample, 0x0000u);
+  wibethframe.set_adc(boundary_channel, sample, 0x0000u);
+  wibethframe.set_adc(boundary_channel + 1, sample, 0x0000u);
+
+  wibethframe.set_adc(boundary_channel, sample, 0x2AAAu);
+
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel - 1, sample), 0x0000u);
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel, sample), 0x2AAAu);
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel + 1, sample), 0x0000u);
+
+  wibethframe.set_adc(boundary_channel - 1, sample, 0x3FFFu);
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel - 1, sample), 0x3FFFu);
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel, sample), 0x2AAAu);
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel + 1, sample), 0x0000u);
+
+  wibethframe.set_adc(boundary_channel + 1, sample, 0x1555u);
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel - 1, sample), 0x3FFFu);
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel, sample), 0x2AAAu);
+  BOOST_CHECK_EQUAL(wibethframe.get_adc(boundary_channel + 1, sample), 0x1555u);
+}
+
+BOOST_AUTO_TEST_CASE(WIBEthFrame_MetadataMutators)
+{
+  using dunedaq::fddetdataformats::WIBEthFrame;
+
+  WIBEthFrame wibethframe {};
+
+  wibethframe.set_timestamp(0x0123456789ABCDEFuLL);
+  BOOST_CHECK_EQUAL(wibethframe.get_timestamp(), 0x0123456789ABCDEFuLL);
+
+  wibethframe.set_channel(0);
+  BOOST_CHECK_EQUAL(wibethframe.get_channel(), 0);
+
+  wibethframe.set_channel(255);
+  BOOST_CHECK_EQUAL(wibethframe.get_channel(), 255);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
