@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(WIBEthFrame_ADCDataMutators)
   // RNG with max ADC-width values
   std::random_device dev;
   std::mt19937 rng(dev());
-  int max_adc_value = (1 << dunedaq::fddetdataformats::WIBEthFrame::s_bits_per_adc) - 1;
+  int max_adc_value = (unsigned)(1 << dunedaq::fddetdataformats::WIBEthFrame::s_bits_per_adc) - 1;
   std::uniform_int_distribution<std::mt19937::result_type> dist(1, max_adc_value);
 
   // Prepare source vector with ADC samples
