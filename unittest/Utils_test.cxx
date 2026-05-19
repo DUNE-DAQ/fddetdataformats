@@ -18,6 +18,23 @@ BOOST_AUTO_TEST_SUITE(Utils_test)
 
 BOOST_AUTO_TEST_CASE(Utils_ADCOperation_SanityChecks)
 {
+
+  // Start with something really low level
+  constexpr int tiny_adc_width = 3;
+  uint8_t tiny_adc_arr[2] = {0, 0}; // 0-out the array of two individual bytes
+
+  // the third (index 2) _logical_ 3-bit ADC entry of 7 (111 in binary) means
+  // the last two bits of the first byte and the first bit of the
+  // second byte should be flipped on:
+
+  // 00000011 10000000
+
+  dunedaq::fddetdataformats::set_adc<uint8_t, 2, tiny_adc_width>(2, 7, tiny_adc_arr);
+  BOOST_REQUIRE_EQUAL(tiny_adc_arr[0], 192);
+  BOOST_REQUIRE_EQUAL(tiny_adc_arr[1], 1);
+
+  BOOST_REQUIRE_EQUAL(7, (dunedaq::fddetdataformats::get_adc<uint8_t, 2, tiny_adc_width>(2, tiny_adc_arr)));
+
   using wordtype_t = uint32_t;
   constexpr int bits_per_word = std::numeric_limits<wordtype_t>::digits;
   
@@ -46,36 +63,36 @@ BOOST_AUTO_TEST_CASE(Utils_ADCOperation_SanityChecks)
       BOOST_REQUIRE_EQUAL(inputarr[i_r][i_c], (dunedaq::fddetdataformats::get_adc<wordtype_t, nrows, ncols, bits_per_word>(i_r, i_c, myarr)));
     }
   }
-
+  
   // Now let's see what happens when ADC representation doesn't align with the C++ type
 
   constexpr int bits_per_adc = 6;
   static_assert(bits_per_word % bits_per_adc != 0);
   static_assert((bits_per_word * ncols) % bits_per_adc == 0);
 
-  constexpr int nchannels = nrows;
-  constexpr int nadcs = bits_per_word * ncols / bits_per_adc;
+  constexpr int nsamples = nrows;
+  constexpr int nchannels = bits_per_word * ncols / bits_per_adc;
 
-  constexpr wordtype_t inputarr2[nchannels][nadcs] = {
+  constexpr wordtype_t inputarr2[nsamples][nchannels] = {
     {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
     {63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48}
   };
 
-  for (int i_ch = 0; i_ch < nchannels; ++i_ch) {
-    for (int i_adc = 0; i_adc < nadcs; ++i_adc) {
-      dunedaq::fddetdataformats::set_adc<wordtype_t, nrows, ncols, bits_per_adc>(i_ch, i_adc, inputarr2[i_ch][i_adc], myarr);
+  for (int i_smp = 0; i_smp < nsamples; ++i_smp) {
+    for (int i_ch = 0; i_ch < nchannels; ++i_ch) {
+      dunedaq::fddetdataformats::set_adc<wordtype_t, nrows, ncols, bits_per_adc>(i_smp, i_ch, inputarr2[i_smp][i_ch], myarr);
     }
   }
 
-  for (int i_ch = 0; i_ch < nchannels; ++i_ch) {
-    for (int i_adc = 0; i_adc < nadcs; ++i_adc) {
-      BOOST_REQUIRE_EQUAL(inputarr2[i_ch][i_adc], (dunedaq::fddetdataformats::get_adc<wordtype_t, nrows, ncols, bits_per_adc>(i_ch, i_adc, myarr)));      
+  for (int i_smp = 0; i_smp < nsamples; ++i_smp) {
+    for (int i_ch = 0; i_ch < nchannels; ++i_ch) {
+      BOOST_REQUIRE_EQUAL(inputarr2[i_smp][i_ch], (dunedaq::fddetdataformats::get_adc<wordtype_t, nrows, ncols, bits_per_adc>(i_smp, i_ch, myarr)));      
     }
   }
 
   // Note that in the range checks below, 0 is an obviously good index and -1 is an obviously bad index
   
-  constexpr int bad_adc_index = ncols * bits_per_word / bits_per_adc;
+  constexpr int bad_channel_index = ncols * bits_per_word / bits_per_adc;
   constexpr wordtype_t good_adc_val = 1;
   constexpr wordtype_t bad_adc_val = static_cast<wordtype_t>(1) << bits_per_adc;
   
@@ -85,7 +102,7 @@ BOOST_AUTO_TEST_CASE(Utils_ADCOperation_SanityChecks)
 		    std::out_of_range);
   BOOST_CHECK_THROW((dunedaq::fddetdataformats::get_adc<wordtype_t, nrows, ncols, bits_per_adc>(0, -1, myarr)),
 		    std::out_of_range);
-  BOOST_CHECK_THROW((dunedaq::fddetdataformats::get_adc<wordtype_t, nrows, ncols, bits_per_adc>(0, bad_adc_index, myarr)),
+  BOOST_CHECK_THROW((dunedaq::fddetdataformats::get_adc<wordtype_t, nrows, ncols, bits_per_adc>(0, bad_channel_index, myarr)),
 		    std::out_of_range);
 
   BOOST_CHECK_THROW((dunedaq::fddetdataformats::set_adc<wordtype_t, nrows, ncols, bits_per_adc>(-1, 0, good_adc_val, myarr)),
@@ -94,12 +111,12 @@ BOOST_AUTO_TEST_CASE(Utils_ADCOperation_SanityChecks)
 		    std::out_of_range);
   BOOST_CHECK_THROW((dunedaq::fddetdataformats::set_adc<wordtype_t, nrows, ncols, bits_per_adc>(0, -1, good_adc_val, myarr)),
 		    std::out_of_range);
-  BOOST_CHECK_THROW((dunedaq::fddetdataformats::set_adc<wordtype_t, nrows, ncols, bits_per_adc>(0, bad_adc_index, good_adc_val, myarr)),
+  BOOST_CHECK_THROW((dunedaq::fddetdataformats::set_adc<wordtype_t, nrows, ncols, bits_per_adc>(0, bad_channel_index, good_adc_val, myarr)),
 		    std::out_of_range);
 
   BOOST_CHECK_THROW((dunedaq::fddetdataformats::set_adc<wordtype_t, nrows, ncols, bits_per_adc>(0, 0, bad_adc_val, myarr)),
 		    std::out_of_range);
-
+  
 }
 
 BOOST_AUTO_TEST_SUITE_END()
