@@ -14,6 +14,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
 
+#include "Utils.hpp"
+
 #include "detdataformats/DAQHeader.hpp"
 #include <algorithm> // For std::min
 #include <cassert>   // For assert()
@@ -197,8 +199,8 @@ public:
   // }
 
 
-  inline uint16_t get_adc(int i) const; // NOLINT;
-  inline void set_adc(int i, uint16_t val); // NOLINT;
+  uint16_t get_adc(int i) const; // NOLINT;
+  void set_adc(int i, uint16_t val); // NOLINT;
 
   uint8_t get_channel() const { return header.channel; } // NOLINT(build/unsigned)
   void set_channel( uint8_t val) { header.channel = val & 0x3Fu; } // NOLINT(build/unsigned)
@@ -223,55 +225,22 @@ public:
   *
   * - 1024 adc values from one daphne channel
   */
-uint16_t
+inline uint16_t
 DAPHNEFrame::get_adc(int i) const // NOLINT
 {
-  if (i < 0 || i >= s_num_adcs)
-    throw std::out_of_range("ADC index out of range");
-
-  // The index of the first (and sometimes only) word containing the required ADC value
-  int word_index = s_bits_per_adc * i / s_bits_per_word;
-  assert(word_index < s_num_adc_words);
-  // Where in the word the lowest bit of our ADC value is located
-  int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
-  // How many bits of our desired ADC are located in the `word_index`th word
-  int bits_from_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-  uint16_t adc = adc_words[word_index] >> first_bit_position; // NOLINT
-  // If we didn't get the full 14 bits from this word, we need the rest from the next word
-  if (bits_from_first_word < s_bits_per_adc) {
-    assert(word_index + 1 < s_num_adc_words);
-    adc |= adc_words[word_index + 1] << bits_from_first_word;
-  }
-  // Mask out all but the lowest 14 bits;
-  return adc & 0x3FFFu;
+  // We can safely case from word_t to uint16_t as the ADC value can always be represented in 16 bits
+  return static_cast<uint16_t>(
+			       dunedaq::fddetdataformats::get_adc<word_t, s_num_adc_words, s_bits_per_adc>(i, adc_words)
+			       );
 }
 
 /**
   * @brief Set the ith ADC value in the frame to @p val
   */
-void
+inline void
 DAPHNEFrame::set_adc(int i, uint16_t val) // NOLINT
 {
-  if (i < 0 || i >= s_num_adcs)
-    throw std::out_of_range("ADC index out of range");
-  if (val >= (1 << s_bits_per_adc))
-    throw std::out_of_range("ADC value out of range");
-
-  // The index of the first (and sometimes only) word containing the required ADC value
-  int word_index = s_bits_per_adc * i / s_bits_per_word;
-  assert(word_index < s_num_adc_words);
-  // Where in the word the lowest bit of our ADC value is located
-  int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
-  // How many bits of our desired ADC are located in the `word_index`th word
-  int bits_in_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-  uint32_t mask = (1 << (first_bit_position)) - 1;
-  adc_words[word_index] = ((val << first_bit_position) & ~mask) | (adc_words[word_index] & mask);
-  // If we didn't put the full 14 bits in this word, we need to put the rest in the next word
-  if (bits_in_first_word < s_bits_per_adc) {
-    assert(word_index + 1 < s_num_adc_words);
-    mask = (1 << (s_bits_per_adc - bits_in_first_word)) - 1;
-    adc_words[word_index + 1] = ((val >> bits_in_first_word) & mask) | (adc_words[word_index + 1] & ~mask);
-  }
+  dunedaq::fddetdataformats::set_adc<word_t, s_num_adc_words, s_bits_per_adc>(i, val, adc_words);
 }
 
 // --- Trailer Accessors (Manual Shift–Mask Extraction) ---

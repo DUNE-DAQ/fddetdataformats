@@ -14,6 +14,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHSTREAMFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHSTREAMFRAME_HPP_
 
+#include "Utils.hpp"
+
 #include "detdataformats/DAQEthHeader.hpp"
 
 #include <algorithm> // For std::min
@@ -76,74 +78,13 @@ public:
 /**
  * @brief Get the @p i ADC value of @p chn in the frame
  */
-uint16_t get_adc(uint i, uint chn) const // NOLINT
-{
-
-    if (i >= s_adcs_per_channel)
-      throw std::out_of_range("ADC index out of range");
-
-    if (chn >= s_num_channels)
-      throw std::out_of_range("Channel index out of range");
-
-    // find absolute index in frame
-    uint j = i*s_num_channels+chn;
-    // The index of the first (and sometimes only) word containing the required ADC value
-    uint word_index = s_bits_per_adc * j / s_bits_per_word;
-    assert(word_index < s_num_adc_words);
-    // Where in the word the lowest bit of our ADC value is located
-    int first_bit_position = (s_bits_per_adc * j) % s_bits_per_word;
-    // How many bits of our desired ADC are located in the `word_index`th word
-    int bits_from_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-    uint16_t adc = adc_words[word_index] >> first_bit_position; // NOLINT(build/unsigned)
-
-    if (bits_from_first_word < s_bits_per_adc) {
-      assert(word_index + 1 < s_num_adc_words);
-      adc |= adc_words[word_index + 1] << bits_from_first_word;
-    }
-    // Mask out all but the lowest 14 bits;
-    return adc & 0x3FFFu;
-}
+  uint16_t get_adc(uint i_adc, uint i_channel) const; // NOLINT
 
 /**
  * @brief Set the @p i ADC value of @p chn in the frame to @p val
  */
-void set_adc(uint chn, uint i, uint16_t val) // NOLINT
-{
-    if (chn >= s_num_channels)
-      throw std::out_of_range("Channel index out of range");
 
-    if (i >= s_adcs_per_channel)
-      throw std::out_of_range("ADC index out of range");
-
-    if (val >= (1 << s_bits_per_adc))
-      throw std::out_of_range("ADC value out of range");
-
-
-    // find absolute index in frame
-    uint j = i*s_num_channels+chn;
-    // The index of the first (and sometimes only) word containing the required ADC value
-    int word_index = s_bits_per_adc * j / s_bits_per_word;
-    assert(word_index < s_num_adc_words);
-    // Where in the word the lowest bit of our ADC value is located
-    int first_bit_position = (s_bits_per_adc * j) % s_bits_per_word;
-    // How many bits of our desired ADC are located in the `word_index`th word
-    int bits_in_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-
-    uint64_t mask = ((static_cast<uint64_t>(1) << bits_in_first_word) - 1) << first_bit_position;
-
-    adc_words[word_index] = (adc_words[word_index] & ~mask) |
-      ((static_cast<uint64_t>(val) << first_bit_position) & mask);
-    // If we didn't put the full 14 bits in this word, we need to put the rest in the next word
-    if (bits_in_first_word < s_bits_per_adc) {
-      assert(word_index + 1 < s_num_adc_words);
-      int bits_in_second_word = s_bits_per_adc - bits_in_first_word;
-      //mask = (1 << (s_bits_per_adc - bits_in_first_word)) - 1;
-      mask = (static_cast<uint64_t>(1) << bits_in_second_word) - 1;
-      //adc_words[word_index + 1] = ((val >> bits_in_first_word) & mask) | (adc_words[word_index + 1] & ~mask);
-      adc_words[word_index + 1] = (adc_words[word_index + 1] & ~mask) | ((val >> bits_in_first_word) & mask);
-    }
-
-  }
+  void set_adc(uint i_channel, uint i_adc, uint16_t val); // NOLINT
   /** @brief Get the starting 64-bit timestamp of the frame
    */
   uint64_t get_timestamp() const // NOLINT(build/unsigned)
@@ -196,6 +137,37 @@ void set_adc(uint chn, uint i, uint16_t val) // NOLINT
 
 };
 
+inline uint16_t DAPHNEEthStreamFrame::get_adc(uint i_adc, uint i_channel) const { // NOLINT
+  return static_cast<uint16_t>(
+			       dunedaq::fddetdataformats::get_adc_daphnestream<
+			       word_t,
+			       s_num_adc_words,
+			       s_bits_per_adc,
+			       s_adcs_per_channel,
+			       s_num_channels
+			       >(
+				 static_cast<int>(i_adc),
+				 static_cast<int>(i_channel),
+				 adc_words
+				 )
+			       );
+}
+
+inline void DAPHNEEthStreamFrame::set_adc(uint i_channel, uint i_adc, uint16_t val) { // NOLINT
+  dunedaq::fddetdataformats::set_adc_daphnestream<
+    word_t,
+    s_num_adc_words,
+    s_bits_per_adc,
+    s_adcs_per_channel,
+    s_num_channels
+    >(
+      static_cast<int>(i_adc),
+      static_cast<int>(i_channel),
+      val,
+      adc_words
+      );
+}
+  
 } // namespace dunedaq::fddetdataformats
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHSTREAMFRAME_HPP_

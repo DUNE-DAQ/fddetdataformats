@@ -118,7 +118,90 @@ namespace dunedaq::fddetdataformats {
 
     set_adc<WordType, Columns, BitsPerADC>(i_ch, adc_val, adc_matrix[i_sample]);
   }
-  
+
+  template<typename WordType, int Columns, int BitsPerADC, int ADCSPerChannel, int NChannels>
+  WordType get_adc_daphnestream(const int i_adc, const int i_channel, const WordType (&adc_matrix)[Columns]) {
+    constexpr int bits_per_word = std::numeric_limits<WordType>::digits;
+
+    static_assert(ADCSPerChannel * NChannels * BitsPerADC == Columns * bits_per_word);
+    
+    if (i_channel < 0 || i_channel >= NChannels) {
+      throw std::out_of_range(std::format("Requested channel of {} is out of channel range 0-{}", i_channel, NChannels - 1));
+    }
+
+    if (i_adc < 0 || i_adc >= ADCSPerChannel) {
+      throw std::out_of_range(std::format("Requested ADC index of {} if out of range 0-{}", i_adc, ADCSPerChannel -1));
+    }
+
+    // find absolute index in frame
+    int i_abs = i_adc * NChannels + i_channel;
+
+    // The index of the first (and sometimes only) word containing the required ADC value
+    int i_word = BitsPerADC * i_abs / bits_per_word;
+    assert(i_word < Columns);
+
+    // Where in the word the lowest bit of our ADC value is located
+    int first_bit_position = (BitsPerADC * i_abs) % bits_per_word;
+
+    // How many bits of our desired ADC are located in the `i_word`th word
+    int bits_from_first_word = std::min(BitsPerADC, bits_per_word - first_bit_position);
+
+    WordType adc_val = adc_matrix[i_word] >> first_bit_position; // NOLINT(build/unsigned)
+
+    if (bits_from_first_word < BitsPerADC) {
+      assert(i_word < Columns - 1);
+      adc_val |= adc_matrix[i_word + 1] << bits_from_first_word;
+    }
+
+    // Mask out all but the lowest BitsPerADC bits;
+    return adc_val & ((static_cast<WordType>(1) << BitsPerADC) - 1);
+  }
+
+    template<typename WordType, int Columns, int BitsPerADC, int ADCSPerChannel, int NChannels>
+  void set_adc_daphnestream(const int i_adc, const int i_channel, const WordType adc_val, WordType (&adc_matrix)[Columns]) {
+    constexpr int bits_per_word = std::numeric_limits<WordType>::digits;
+
+    static_assert(ADCSPerChannel * NChannels * BitsPerADC == Columns * bits_per_word);
+    
+    if (i_channel < 0 || i_channel >= NChannels) {
+      throw std::out_of_range(std::format("Requested channel of {} is out of channel range 0-{}", i_channel, NChannels - 1));
+    }
+
+    if (i_adc < 0 || i_adc >= ADCSPerChannel) {
+      throw std::out_of_range(std::format("Requested ADC index of {} is out of range 0-{}", i_adc, ADCSPerChannel -1));
+    }
+
+    if (adc_val >= (1 << BitsPerADC)) {
+      throw std::out_of_range(std::format("Requested ADC value of {} exceeds max value of {}", adc_val, (1 << BitsPerADC) - 1));
+    }
+
+    // find absolute index in frame
+    int i_abs = i_adc * NChannels + i_channel;
+
+    // The index of the first (and sometimes only) word containing the required ADC value
+    int i_word = BitsPerADC * i_abs / bits_per_word;
+    assert(i_word < Columns);
+    
+    // Where in the word the lowest bit of our ADC value is located
+    int first_bit_position = (BitsPerADC * i_abs) % bits_per_word;
+
+    // How many bits of our desired ADC are located in the `i_word`th word
+    int bits_in_first_word = std::min(BitsPerADC, bits_per_word - first_bit_position);
+
+    WordType mask = ((static_cast<WordType>(1) << bits_in_first_word) - 1) << first_bit_position;
+
+    adc_matrix[i_word] = (adc_matrix[i_word] & ~mask) |
+      ((static_cast<WordType>(adc_val) << first_bit_position) & mask);
+
+    // If we didn't put the full 14 bits in this word, we need to put the rest in the next word
+    if (bits_in_first_word < BitsPerADC) {
+      assert(i_word < Columns - 1);
+      int bits_in_second_word = BitsPerADC - bits_in_first_word;
+      WordType mask2 = (static_cast<WordType>(1) << bits_in_second_word) - 1;
+      adc_matrix[i_word + 1] = (adc_matrix[i_word + 1] & ~mask2) | ((adc_val >> bits_in_first_word) & mask2);
+    }
+  }
+
   
 } // namespace dunedaq::fddetdataformats
 
