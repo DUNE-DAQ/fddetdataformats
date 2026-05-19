@@ -14,6 +14,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBETHFRAME_HPP_
 
+#include "Utils.hpp"
+
 #include "detdataformats/DAQEthHeader.hpp"
 
 #include <algorithm> // For std::min
@@ -92,58 +94,12 @@ public:
    * The order is: 64 channels repeated for 64 time samples
    *
    */
-  uint16_t get_adc(int i, int sample=0) const // NOLINT(build/unsigned)
-  {
-    if (i < 0 || i >= s_num_channels)
-      throw std::out_of_range("ADC index out of range");
-
-    // The index of the first (and sometimes only) word containing the required ADC value
-    int word_index = s_bits_per_adc * i / s_bits_per_word;
-    assert(word_index < s_num_adc_words_per_ts);
-    // Where in the word the lowest bit of our ADC value is located
-    int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
-    // How many bits of our desired ADC are located in the `word_index`th word
-    int bits_from_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-    // uint16_t adc = adc_words[word_index][sample] >> first_bit_position; // NOLINT(build/unsigned)
-    uint16_t adc = adc_words[sample][word_index] >> first_bit_position; // NOLINT(build/unsigned)
-    // If we didn't get the full 14 bits from this word, we need the rest from the next word
-    if (bits_from_first_word < s_bits_per_adc) {
-      assert(word_index + 1 < s_num_adc_words_per_ts);
-      // adc |= adc_words[word_index + 1][sample] << bits_from_first_word;
-      adc |= adc_words[sample][word_index + 1] << bits_from_first_word;
-    }
-    // Mask out all but the lowest 14 bits;
-    return adc & 0x3FFFu;
-  }
+  uint16_t get_adc(int i_channel, int i_sample=0) const; // NOLINT(build/unsigned)
 
   /**
    * @brief Set the ith ADC value in the frame to @p val
    */
-  void set_adc(int i, int sample, uint16_t val) // NOLINT(build/unsigned)
-  {
-    if (i < 0 || i >= s_num_channels)
-      throw std::out_of_range("ADC index out of range");
-    if (val >= (1 << s_bits_per_adc))
-      throw std::out_of_range("ADC value out of range");
-
-    // The index of the first (and sometimes only) word containing the required ADC value
-    int word_index = s_bits_per_adc * i / s_bits_per_word;
-    assert(word_index < s_num_adc_words);
-    // Where in the word the lowest bit of our ADC value is located
-    int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
-    // How many bits of our desired ADC are located in the `word_index`th word
-    int bits_in_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-    // Create a mask that covers exactly the bits we want to modify (bits_in_first_word bits starting at first_bit_position)
-    uint64_t adc_mask = ((static_cast<uint64_t>(1) << bits_in_first_word) - 1) << first_bit_position;
-    adc_words[sample][word_index] = (adc_words[sample][word_index] & ~adc_mask) | ((static_cast<uint64_t>(val) << first_bit_position) & adc_mask);
-    // If we didn't put the full 14 bits in this word, we need to put the rest in the next word
-    if (bits_in_first_word < s_bits_per_adc) {
-      assert(word_index + 1 < s_num_adc_words);
-      int bits_in_second_word = s_bits_per_adc - bits_in_first_word;
-      uint64_t mask2 = (static_cast<uint64_t>(1) << bits_in_second_word) - 1;
-      adc_words[sample][word_index + 1] = (adc_words[sample][word_index + 1] & ~mask2) | ((val >> bits_in_first_word) & mask2);
-    }
-  }
+  void set_adc(int i_channel, int i_sample, uint16_t adc_val); // NOLINT(build/unsigned)
 
   /** @brief Get the starting 64-bit timestamp of the frame
    */
@@ -175,6 +131,32 @@ public:
 
 };
 
+
+  inline uint16_t WIBEthFrame::get_adc(int i_channel, int i_sample) const { // NOLINT(build/unsigned)
+    
+    // Note the generic get_adc function takes the channel and the sample (timeslice) in reverse order
+    return dunedaq::fddetdataformats::get_adc<WIBEthFrame::word_t,
+					      WIBEthFrame::s_time_samples_per_frame,
+					      WIBEthFrame::s_num_adc_words_per_ts,
+					      WIBEthFrame::s_bits_per_adc>(
+									   i_sample, i_channel,
+									   adc_words
+									   ); 
+  }
+
+  inline void WIBEthFrame::set_adc(int i_channel, int i_sample, uint16_t adc_val) { // NOLINT(build/unsigned)
+
+    // Note the generic set_adc function takes the channel and the sample (timeslice) in reverse order
+    dunedaq::fddetdataformats::set_adc<WIBEthFrame::word_t,
+				       WIBEthFrame::s_time_samples_per_frame,
+				       WIBEthFrame::s_num_adc_words_per_ts,
+				       WIBEthFrame::s_bits_per_adc>(
+								    i_sample, i_channel,
+								    adc_val,
+								    adc_words
+								    );
+  }
+    
 } // namespace dunedaq::fddetdataformats
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBETHFRAME_HPP_
