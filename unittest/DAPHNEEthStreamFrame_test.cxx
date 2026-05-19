@@ -26,12 +26,12 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthStreamFrame_ADCDataMutators)
   std::mt19937 rng(dev());
   std::uniform_int_distribution<uint16_t> dist(0, (1 << DAPHNEEthStreamFrame::s_bits_per_adc) - 1);
 
-  std::vector<std::vector<uint16_t>> adcs(DAPHNEEthStreamFrame::s_num_channels,
-                                          std::vector<uint16_t>(DAPHNEEthStreamFrame::s_adcs_per_channel));
+  std::vector<std::vector<uint16_t>> adcs(DAPHNEEthStreamFrame::s_adcs_per_channel,
+                                          std::vector<uint16_t>(DAPHNEEthStreamFrame::s_num_channels));
 
   for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
     for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
-      adcs[channel][adc_index] = dist(rng);
+      adcs[adc_index][channel] = dist(rng);
     }
   }
 
@@ -39,13 +39,13 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthStreamFrame_ADCDataMutators)
 
   for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
     for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
-      frame.set_adc(channel, adc_index, adcs[channel][adc_index]);
+      frame.set_adc(channel, adc_index, adcs[adc_index][channel]);
     }
   }
 
   for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
     for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
-      BOOST_REQUIRE_EQUAL(frame.get_adc(adc_index, channel), adcs[channel][adc_index]);
+      BOOST_REQUIRE_EQUAL(frame.get_adc(adc_index, channel), adcs[adc_index][channel]);
     }
   }
 
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthStreamFrame_ADCDataMutators)
 
   for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
     for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
-      BOOST_REQUIRE_EQUAL(frame.get_adc(adc_index, channel), adcs[channel][adc_index]);
+      BOOST_REQUIRE_EQUAL(frame.get_adc(adc_index, channel), adcs[adc_index][channel]);
     }
   }
 }
