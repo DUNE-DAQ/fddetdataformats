@@ -16,24 +16,43 @@
 
 BOOST_AUTO_TEST_SUITE(Utils_test)
 
-BOOST_AUTO_TEST_CASE(Utils_ADCOperation_SanityChecks)
+BOOST_AUTO_TEST_CASE(Utils_ADCOperation_LowLevelChecks)
 {
+    // Start with something really low level
 
-  // Start with something really low level
   constexpr int tiny_adc_width = 3;
-  uint8_t tiny_adc_arr[2] = {0, 0}; // 0-out the array of two individual bytes
+
+  // Three bytes chosen since adc_width needs to evenly divide into the total bits of the array
+  constexpr int nbytes = 3;
+  uint8_t tiny_adc_arr[nbytes] = {0, 0, 0}; // 0-out the array of three individual bytes
 
   // the third (index 2) _logical_ 3-bit ADC entry of 7 (111 in binary) means
   // the last two bits of the first byte and the first bit of the
   // second byte should be flipped on:
 
-  // 00000011 10000000
+  // 00000011 10000000 00000000
 
-  dunedaq::fddetdataformats::set_adc<uint8_t, 2, tiny_adc_width>(2, 7, tiny_adc_arr);
+  dunedaq::fddetdataformats::set_adc<uint8_t, nbytes, tiny_adc_width>(2, 7, tiny_adc_arr);
   BOOST_REQUIRE_EQUAL(tiny_adc_arr[0], 192);
   BOOST_REQUIRE_EQUAL(tiny_adc_arr[1], 1);
+  BOOST_REQUIRE_EQUAL(tiny_adc_arr[2], 0);
 
-  BOOST_REQUIRE_EQUAL(7, (dunedaq::fddetdataformats::get_adc<uint8_t, 2, tiny_adc_width>(2, tiny_adc_arr)));
+  BOOST_REQUIRE_EQUAL(7, (dunedaq::fddetdataformats::get_adc<uint8_t, nbytes, tiny_adc_width>(2, tiny_adc_arr)));
+
+  tiny_adc_arr[0] = tiny_adc_arr[1] = tiny_adc_arr[2] = 0;
+
+  constexpr int adcs_per_channel = 4;
+  constexpr int nchannels = 2;
+  dunedaq::fddetdataformats::set_adc_daphnestream<uint8_t, nbytes, tiny_adc_width, adcs_per_channel, nchannels>(1, 0, 7, tiny_adc_arr);
+  BOOST_REQUIRE_EQUAL(tiny_adc_arr[0], 192);
+  BOOST_REQUIRE_EQUAL(tiny_adc_arr[1], 1);
+  BOOST_REQUIRE_EQUAL(tiny_adc_arr[2], 0);
+  BOOST_REQUIRE_EQUAL(7, (dunedaq::fddetdataformats::get_adc_daphnestream<uint8_t, nbytes, tiny_adc_width, adcs_per_channel, nchannels>(1, 0, tiny_adc_arr)));
+  
+}
+
+BOOST_AUTO_TEST_CASE(Utils_ADCOperation_BasicChecks)
+{
 
   using wordtype_t = uint32_t;
   constexpr int bits_per_word = std::numeric_limits<wordtype_t>::digits;
