@@ -61,7 +61,8 @@ public:
     uint64_t channel : 8;
     uint64_t TAItime : 64;
   };
-
+  static_assert(sizeof(TDEEthHeader) == 16);
+  
   // ===============================================================
   // Data members
   // ===============================================================
@@ -118,6 +119,8 @@ public:
   }
 
 };
+  static_assert(sizeof(TDEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(TDEEthFrame::TDEEthHeader) + sizeof(TDEEthFrame::word_t) * TDEEthFrame::s_time_samples_per_frame * TDEEthFrame::s_num_adc_words_per_ts);
+
 
 inline uint16_t TDEEthFrame::get_adc(int i_channel, int i_sample) const { // NOLINT(build/unsigned)  
 

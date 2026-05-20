@@ -70,7 +70,8 @@ public:
     word_t w5;
     word_t w6;
   };
-
+  static_assert(sizeof(Header) == 7*sizeof(word_t));
+  
   // ===============================================================
   // Data members
   // ===============================================================
@@ -127,7 +128,7 @@ get_adc(int i) const; // NOLINT
   }
 
 };
-
+  static_assert(sizeof(DAPHNEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(DAPHNEEthFrame::Header) + sizeof(DAPHNEEthFrame::word_t) * DAPHNEEthFrame::s_num_adc_words);
 
   inline uint16_t DAPHNEEthFrame::get_adc(int i) const {
 

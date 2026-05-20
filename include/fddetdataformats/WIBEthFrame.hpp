@@ -51,8 +51,7 @@ public:
   static constexpr int s_num_channels = s_channels_per_half_femb * s_half_fembs_per_frame;
   static constexpr int s_num_adc_words_per_ts = s_num_channels * s_bits_per_adc / s_bits_per_word;
   static constexpr int s_num_adc_words = s_time_samples_per_frame * s_num_channels * s_bits_per_adc / s_bits_per_word;
-  
-
+    
   struct WIBEthHeader
   {	  
     word_t colddata_timestamp_0 : 15;
@@ -73,7 +72,8 @@ public:
     word_t channel : 8;
     word_t extra_data; 
   };
-
+  static_assert(sizeof(WIBEthHeader) == 8 + 8); // 8 bytes for the bitfield section, 8 for the extra_data
+  
   // ===============================================================
   // Data members
   // ===============================================================
@@ -130,7 +130,9 @@ public:
   }
 
 };
-
+  static_assert(sizeof(WIBEthFrame) == sizeof(detdataformats::DAQEthHeader) +
+		sizeof(WIBEthFrame::WIBEthHeader) +
+		sizeof(WIBEthFrame::word_t) * WIBEthFrame::s_time_samples_per_frame * WIBEthFrame::s_num_adc_words_per_ts);
 
   inline uint16_t WIBEthFrame::get_adc(int i_channel, int i_sample) const { // NOLINT(build/unsigned)
     

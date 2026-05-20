@@ -50,6 +50,7 @@ namespace dunedaq::fddetdataformats {
             unsigned int irigb_dec_ver  : 3;
             unsigned int irigb_valid    : 1;
         };
+      static_assert(sizeof(TGpsDateStruct) == 8);
 
         struct STChannel{
             int qTot=0;  ///< Total charge.
@@ -57,6 +58,9 @@ namespace dunedaq::fddetdataformats {
             float cfd=0.;            ///< CFD value
             unsigned short flag=0;  ///< Flag containing trigger, trigger sum and overflow information.
         };
+
+      #warning "CRTGrenobleFrame::STChannel has padding inserted"
+      //      static_assert(sizeof(STChannel) == sizeof(int) + sizeof(unsigned short) + sizeof(float) + sizeof(unsigned short));
 
         struct STEvent{
             unsigned int   eventID=0;           ///< Event ID.
@@ -68,6 +72,9 @@ namespace dunedaq::fddetdataformats {
 
             struct STChannel channels[s_num_channels];
         };
+
+      #warning "CRTGrenobleFrame::STEvent has padding inserted"
+      // static_assert(sizeof(STEvent) == 3 * sizeof(unsigned int) + sizeof(TGpsDateStruct) + 2 * sizeof(unsigned int) + sizeof(STChannel) * s_num_channels);
 
         // ===============================================================
         // Data members
@@ -118,6 +125,8 @@ namespace dunedaq::fddetdataformats {
 
 
     }; //CRTGrenobleFrame
+   #warning "CRTGrenobleFrame has padding inserted"
+  // static_assert(sizeof(CRTGrenobleFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(CRTGrenobleFrame::STEvent));
 
 } // namespace dunedaq::fddetdataformats
 

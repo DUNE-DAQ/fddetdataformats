@@ -58,11 +58,13 @@ public:
     word_t version : 4;
     word_t channel : 8;
   };
+  static_assert(sizeof(ChannelWord) == 8);
 
   struct Header
   {    
     ChannelWord channel_words[s_num_channels];
   };
+  static_assert(sizeof(Header) == sizeof(ChannelWord) * s_num_channels);
 
   // ===============================================================
   // Data members
@@ -136,6 +138,9 @@ public:
   uint8_t get_channel3() const { return header.channel_words[3].channel; } // NOLINT(build/unsigned)  
 
 };
+  static_assert(sizeof(DAPHNEEthStreamFrame) == sizeof(detdataformats::DAQEthHeader) +
+		sizeof(DAPHNEEthStreamFrame::Header) +
+		sizeof(DAPHNEEthStreamFrame::word_t) * DAPHNEEthStreamFrame::s_num_adc_words) ;
 
 inline uint16_t DAPHNEEthStreamFrame::get_adc(uint i_adc, uint i_channel) const { // NOLINT
   return static_cast<uint16_t>(

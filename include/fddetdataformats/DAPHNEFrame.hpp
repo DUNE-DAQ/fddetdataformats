@@ -51,7 +51,7 @@ public:
     word_t threshold : 16, baseline : 16;
     word_t get_baseline() { return baseline; }
   };
-
+  static_assert(sizeof(Header) == 8);
 
   struct PeakDescriptorData {
 
@@ -179,6 +179,7 @@ public:
 
 
   };
+  static_assert(sizeof(PeakDescriptorData) == 13 * sizeof(uint32_t));
 
   // ===============================================================
   // Data members
@@ -212,7 +213,10 @@ public:
     return daq_header.get_timestamp();
   }
 };
-
+  static_assert(sizeof(DAPHNEFrame) == sizeof(detdataformats::DAQHeader) +
+		sizeof(DAPHNEFrame::Header) +
+		sizeof(DAPHNEFrame::word_t) * DAPHNEFrame::s_num_adc_words +
+		sizeof(DAPHNEFrame::PeakDescriptorData));
 
 // ===============================================================
 // Accessors

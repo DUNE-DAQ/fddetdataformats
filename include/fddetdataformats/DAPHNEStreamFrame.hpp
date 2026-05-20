@@ -50,11 +50,13 @@ public:
     word_t channel_0 : 6, channel_1 : 6, channel_2 : 6, channel_3 : 6, tbd_0 : 8;
     word_t tbd_1 : 32;
   };
+  static_assert(sizeof(Header) == 8);
 
   struct Trailer
   {
     word_t tbd : 32;
   };
+  static_assert(sizeof(Trailer) == 4);
 
   // ===============================================================
   // Data members
@@ -108,6 +110,10 @@ public:
    */
   uint8_t get_channel3() const { return header.channel_3; } // NOLINT(build/unsigned)        
 };
+  static_assert(sizeof(DAPHNEStreamFrame) == sizeof(detdataformats::DAQHeader) +
+		sizeof(DAPHNEStreamFrame::Header) +
+		sizeof(DAPHNEStreamFrame::word_t) * DAPHNEStreamFrame::s_num_adc_words +
+		sizeof(DAPHNEStreamFrame::Trailer));
 
   inline uint16_t DAPHNEStreamFrame::get_adc(uint i_adc, uint i_channel) const { // NOLINT
     return static_cast<uint16_t>(
