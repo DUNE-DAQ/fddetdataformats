@@ -19,6 +19,7 @@ void
 register_wibeth(py::module& m)
 {
 
+  // NOLINTBEGIN(build/unsigned)
 
   py::class_<WIBEthFrame::WIBEthHeader>(m, "WIBEthHeader")
     .def_property("channel",
@@ -109,9 +110,11 @@ register_wibeth(py::module& m)
     .def_static("sizeof", [](){ return sizeof(WIBEthFrame); })
     .def("get_bytes",
          [](WIBEthFrame* fr) -> py::bytes {
-           return py::bytes(reinterpret_cast<char*>(fr), sizeof(WIBEthFrame));
+           return py::bytes(reinterpret_cast<char*>(fr), sizeof(WIBEthFrame)); // NOLINT reinterpret_cast
         })
   ;
-}
+} // NOLINT function length
 
+  // NOLINTEND(build/unsigned)
+  
 } // namespace dunedaq::fddetdataformats::python

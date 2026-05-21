@@ -8,13 +8,15 @@
 
 #include "fddetdataformats/DAPHNEEthStreamFrame.hpp"
 
-#define BOOST_TEST_MODULE DAPHNEEthStreamFrame_test
+#define BOOST_TEST_MODULE DAPHNEEthStreamFrame_test // NOLINT
 
 #include "boost/test/unit_test.hpp"
 
 #include <cstdint>
 #include <random>
 #include <vector>
+
+// NOLINTBEGIN(build/unsigned)
 
 BOOST_AUTO_TEST_SUITE(DAPHNEEthStreamFrame_test)
 
@@ -84,7 +86,7 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthStreamFrame_BitPackingBoundaryIsolation)
   using dunedaq::fddetdataformats::DAPHNEEthStreamFrame;
 
   DAPHNEEthStreamFrame frame{};
-  constexpr uint16_t max_adc = static_cast<uint16_t>((1u << DAPHNEEthStreamFrame::s_bits_per_adc) - 1u);
+  constexpr auto max_adc = static_cast<uint16_t>((1u << DAPHNEEthStreamFrame::s_bits_per_adc) - 1u);
 
   constexpr uint32_t boundary_sample = 1;
   constexpr uint32_t boundary_channel = 0;
@@ -138,3 +140,5 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthStreamFrame_MetadataMutators)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+// NOLINTEND(build/unsigned)

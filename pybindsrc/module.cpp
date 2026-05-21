@@ -11,8 +11,6 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
-namespace py = pybind11;
-
 namespace dunedaq::fddetdataformats::python {
 
 PYBIND11_MODULE(_daq_fddetdataformats_py, m)

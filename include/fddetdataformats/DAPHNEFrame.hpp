@@ -11,8 +11,8 @@
  * received with this code.
  */
  
-#ifndef FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
-#define FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
+#ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
+#define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
 
 #include "Utils.hpp"
 
@@ -24,16 +24,13 @@
 #include <stdexcept> // For std::out_of_range
 #include <cstdint>   // For uint32_t etc
 
-namespace dunedaq {
-namespace fddetdataformats {
+namespace dunedaq::fddetdataformats {
 
+// NOLINTBEGIN(build/unsigned)
+  
 class DAPHNEFrame
 {
 public:
-  // ===============================================================
-  // Preliminaries
-  // ===============================================================
-
   // The definition of the format is in terms of 32-bit words
   typedef uint32_t word_t; // NOLINT
 
@@ -144,72 +141,52 @@ public:
 
     static const uint8_t max_peaks = 5;
     
-    inline bool is_found( int idx ) const;
-    inline void set_found( uint8_t val, int idx );
+    bool is_found( int idx ) const;
+    void set_found( uint8_t val, int idx );
 
-    inline uint32_t get_adc_integral(int idx) const;
-    inline void set_adc_integral(uint32_t val, int idx);
+    uint32_t get_adc_integral(int idx) const;
+    void set_adc_integral(uint32_t val, int idx);
 
-    inline uint8_t get_num_subpeaks(int idx) const;
-    inline void set_num_subpeaks(uint8_t val, int idx);
+    uint8_t get_num_subpeaks(int idx) const;
+    void set_num_subpeaks(uint8_t val, int idx);
     
-    inline uint16_t get_samples_over_baseline(int idx) const;
-    inline void set_samples_over_baseline(uint16_t val, int idx);
+    uint16_t get_samples_over_baseline(int idx) const;
+    void set_samples_over_baseline(uint16_t val, int idx);
     
-    inline uint16_t get_sample_max(int idx) const;
-    inline void set_sample_max(uint16_t val, int idx);
+    uint16_t get_sample_max(int idx) const;
+    void set_sample_max(uint16_t val, int idx);
     
-    inline uint16_t get_adc_max(int idx) const;
-    inline void set_adc_max(uint16_t val, int idx);
+    uint16_t get_adc_max(int idx) const;
+    void set_adc_max(uint16_t val, int idx);
     
-    inline uint16_t get_sample_start(int idx) const;
-    inline void set_sample_start(uint16_t val, int idx);
-
+    uint16_t get_sample_start(int idx) const;
+    void set_sample_start(uint16_t val, int idx);
 
     // ===============================================================
-    // Private Helper: Reinterpret Trailer as an array of word_t
+    // Helper: Reinterpret Trailer as an array of word_t
     // ===============================================================
-    inline const word_t* as_words() const {
-      return reinterpret_cast<const word_t*>(this);
+    const word_t* as_words() const {
+      return reinterpret_cast<const word_t*>(this); // NOLINT
     }
-    inline word_t* as_words() {
-      return reinterpret_cast<word_t*>(this);
+    word_t* as_words() {
+      return reinterpret_cast<word_t*>(this); // NOLINT
     }
-
-
-
   };
   static_assert(sizeof(PeakDescriptorData) == 13 * sizeof(uint32_t));
 
-  // ===============================================================
-  // Data members
-  // ===============================================================
   detdataformats::DAQHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT
   PeakDescriptorData peaks_data;
 
-  // ===============================================================
-  // Private Helper: Reinterpret Trailer as an array of word_t
-  // ===============================================================
-  // inline const word_t* as_words() const {
-  //   return reinterpret_cast<const word_t*>(&trailer);
-  // }
-  // inline word_t* as_words() {
-  //   return reinterpret_cast<word_t*>(&trailer);
-  // }
-
-
   uint16_t get_adc(int i) const; // NOLINT;
   void set_adc(int i, uint16_t val); // NOLINT;
 
-  uint8_t get_channel() const { return header.channel; } // NOLINT(build/unsigned)
-  void set_channel( uint8_t val) { header.channel = val & 0x3Fu; } // NOLINT(build/unsigned)
+  uint8_t get_channel() const { return header.channel; }
+  void set_channel( uint8_t val) { header.channel = val & 0x3Fu; }
 
-  /** @brief Get the 64-bit timestamp of the frame
-  */
-  uint64_t get_timestamp() const // NOLINT(build/unsigned)
-  {
+  /// @brief Get the 64-bit timestamp of the frame
+  uint64_t get_timestamp() const {
     return daq_header.get_timestamp();
   }
 };
@@ -217,10 +194,6 @@ public:
 		sizeof(DAPHNEFrame::Header) +
 		sizeof(DAPHNEFrame::word_t) * DAPHNEFrame::s_num_adc_words +
 		sizeof(DAPHNEFrame::PeakDescriptorData));
-
-// ===============================================================
-// Accessors
-// ===============================================================
 
 /**
   * @brief Get the ith ADC value in the frame
@@ -234,7 +207,7 @@ DAPHNEFrame::get_adc(int i) const // NOLINT
 {
   // We can safely case from word_t to uint16_t as the ADC value can always be represented in 16 bits
   return static_cast<uint16_t>(
-			       dunedaq::fddetdataformats::get_adc<word_t, s_num_adc_words, s_bits_per_adc>(i, adc_words)
+			       dunedaq::fddetdataformats::get_adc_1d<word_t, s_num_adc_words, s_bits_per_adc>(i, adc_words)
 			       );
 }
 
@@ -244,7 +217,7 @@ DAPHNEFrame::get_adc(int i) const // NOLINT
 inline void
 DAPHNEFrame::set_adc(int i, uint16_t val) // NOLINT
 {
-  dunedaq::fddetdataformats::set_adc<word_t, s_num_adc_words, s_bits_per_adc>(i, val, adc_words);
+  dunedaq::fddetdataformats::set_adc_1d<word_t, s_num_adc_words, s_bits_per_adc>(i, val, adc_words);
 }
 
 // --- Trailer Accessors (Manual Shift–Mask Extraction) ---
@@ -260,7 +233,7 @@ DAPHNEFrame::PeakDescriptorData::is_found(int idx) const // idx index 0 to 4
     throw std::out_of_range("Peak index out of range (must be 0-4)");
   const word_t* tw = as_words();
   // In odd word, Found is in bit 31.
-  return static_cast<uint8_t>((tw[2*idx] >> 31) & 0x1);
+  return static_cast<uint8_t>((tw[2*idx] >> 31) & 0x1); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 /**
@@ -274,7 +247,7 @@ DAPHNEFrame::PeakDescriptorData::set_found(uint8_t val, int idx)
   if (val > 1)
     throw std::out_of_range("Found value out of range (must be 0-1)");
   word_t* tw = as_words();
-  tw[2*idx] = (tw[2*idx] & ~(1u << 31)) | ((val & 0x1) << 31);
+  tw[2*idx] = (tw[2*idx] & ~(1u << 31)) | ((val & 0x1) << 31); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 /**
@@ -287,7 +260,7 @@ DAPHNEFrame::PeakDescriptorData::get_adc_integral(int idx) const
   if (idx < 0 || idx > 4)
     throw std::out_of_range("Peak index out of range (must be 0-4)");
   const word_t* tw = as_words();
-  return (tw[2*idx] >> 8) & 0x7FFFFF; // Mask 23 bits
+  return (tw[2*idx] >> 8) & 0x7FFFFF; // Mask 23 bits // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 /**
@@ -301,7 +274,7 @@ DAPHNEFrame::PeakDescriptorData::set_adc_integral(uint32_t val, int idx)
   if (val > 0x7FFFFF)
     throw std::out_of_range("ADC_Integral value out of range (must be 0-8388607)");
   word_t* tw = as_words();
-  tw[2*idx] = (tw[2*idx] & ~(0x7FFFFFu << 8)) | ((val & 0x7FFFFF) << 8);
+  tw[2*idx] = (tw[2*idx] & ~(0x7FFFFFu << 8)) | ((val & 0x7FFFFF) << 8); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 /**
@@ -314,7 +287,7 @@ DAPHNEFrame::PeakDescriptorData::get_num_subpeaks(int idx) const
   if (idx < 0 || idx > 4)
     throw std::out_of_range("Peak index out of range (must be 0-4)");
   const word_t* tw = as_words();
-  return static_cast<uint8_t>(tw[2*idx] & 0xF);
+  return static_cast<uint8_t>(tw[2*idx] & 0xF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 /**
@@ -328,7 +301,7 @@ DAPHNEFrame::PeakDescriptorData::set_num_subpeaks(uint8_t val, int idx)
   if (val > 0xF)
     throw std::out_of_range("Num_SubPeaks value out of range (must be 0-15)");
   word_t* tw = as_words();
-  tw[2*idx] = (tw[2*idx] & ~0xF) | (val & 0xF);
+  tw[2*idx] = (tw[2*idx] & ~0xF) | (val & 0xF);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 /**
@@ -341,7 +314,7 @@ DAPHNEFrame::PeakDescriptorData::get_samples_over_baseline(int idx) const
   if (idx < 0 || idx > 4)
     throw std::out_of_range("Peak index out of range (must be 0-4)");
   const word_t* tw = as_words();
-  return static_cast<uint16_t>((tw[2*idx+1] >> 23) & 0x1FF);
+  return static_cast<uint16_t>((tw[2*idx+1] >> 23) & 0x1FF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
 }
 
 /**
@@ -355,7 +328,7 @@ DAPHNEFrame::PeakDescriptorData::set_samples_over_baseline(uint16_t val, int idx
   if (val > 0x1FF)
     throw std::out_of_range("Time_Over_Baseline value out of range (must be 0-511)");
   word_t* tw = as_words();
-  tw[2*idx+1] = (tw[2*idx+1] & ~(0x1FFu << 23)) | ((val & 0x1FF) << 23);
+  tw[2*idx+1] = (tw[2*idx+1] & ~(0x1FFu << 23)) | ((val & 0x1FF) << 23); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
 }
 
 /**
@@ -368,7 +341,7 @@ DAPHNEFrame::PeakDescriptorData::get_sample_max(int idx) const
   if (idx < 0 || idx > 4)
     throw std::out_of_range("Peak index out of range (must be 0-4)");
   const word_t* tw = as_words();
-  return static_cast<uint16_t>((tw[2*idx+1] >> 14) & 0x1FF);
+  return static_cast<uint16_t>((tw[2*idx+1] >> 14) & 0x1FF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
 }
 
 
@@ -383,7 +356,7 @@ DAPHNEFrame::PeakDescriptorData::set_sample_max(uint16_t val, int idx)
   if (val > 0x1FF)
     throw std::out_of_range("Time_Peak value out of range (must be 0-511)");
   word_t* tw = as_words();
-  tw[2*idx+1] = (tw[2*idx+1] & ~(0x1FFu << 14)) | ((val & 0x1FF) << 14);
+  tw[2*idx+1] = (tw[2*idx+1] & ~(0x1FFu << 14)) | ((val & 0x1FF) << 14); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
 }
 
 /**
@@ -397,7 +370,7 @@ DAPHNEFrame::PeakDescriptorData::get_adc_max(int idx) const
     throw std::out_of_range("Peak index out of range (must be 0-4)");
   const word_t* tw = as_words();
   // Even word for idx is at index 2*idx+1; ADC Max is in bits 13:0.
-  return static_cast<uint16_t>(tw[2*idx+1] & 0x3FFF);
+  return static_cast<uint16_t>(tw[2*idx+1] & 0x3FFF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
 }
 
 /**
@@ -411,7 +384,7 @@ DAPHNEFrame::PeakDescriptorData::set_adc_max(uint16_t val, int idx)
   if (val > 0x3FFF)
     throw std::out_of_range("ADC Max value out of range (must be 0-16383)");
   word_t* tw = as_words();
-  tw[2*idx+1] = (tw[2*idx+1] & ~0x3FFFu) | (val & 0x3FFF);
+  tw[2*idx+1] = (tw[2*idx+1] & ~0x3FFFu) | (val & 0x3FFF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
 }
 
 /**
@@ -435,10 +408,10 @@ DAPHNEFrame::PeakDescriptorData::get_sample_start(int idx) const
   const word_t* tw = as_words();
   if (idx < 3) {
     int shift = 22 - 10 * idx;
-    return static_cast<uint16_t>((tw[10] >> shift) & 0x3FF);
+    return static_cast<uint16_t>((tw[10] >> shift) & 0x3FF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
   } else {
     int shift = 22 - 10 * (idx - 3);
-    return static_cast<uint16_t>((tw[11] >> shift) & 0x3FF);
+    return static_cast<uint16_t>((tw[11] >> shift) & 0x3FF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
   }
 }
 
@@ -466,15 +439,15 @@ DAPHNEFrame::PeakDescriptorData::set_sample_start(uint16_t val, int idx)
 
   if (idx < 3) {
     int shift = 22 - 10 * idx;
-    tw[10] = (tw[10] & ~(mask << shift)) | ((val & mask) << shift);
+    tw[10] = (tw[10] & ~(mask << shift)) | ((val & mask) << shift); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
   } else {
     int shift = 22 - 10 * (idx - 3);
-    tw[11] = (tw[11] & ~(mask << shift)) | ((val & mask) << shift);
+    tw[11] = (tw[11] & ~(mask << shift)) | ((val & mask) << shift); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
   }
 }
 
+// NOLINTEND(build/unsigned)
 
-} // namespace fddetdataformats
-} // namespace dunedaq
+} // namespace dunedaq::fddetdataformats
 
-#endif // FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_DAPHNE_DAPHNEFRAME_HPP_
+#endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_

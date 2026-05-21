@@ -27,6 +27,8 @@
 
 namespace dunedaq::fddetdataformats {
 
+// NOLINTBEGIN(build/unsigned) 
+  
 /**
  *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
  *
@@ -36,10 +38,6 @@ namespace dunedaq::fddetdataformats {
 class WIBEthFrame
 {
 public:
-  // ===============================================================
-  // Preliminaries
-  // ===============================================================
-
   // The definition of the format is in terms of 64-bit words
   typedef uint64_t word_t; // NOLINT
 
@@ -50,7 +48,6 @@ public:
   static constexpr int s_half_fembs_per_frame = 1;
   static constexpr int s_num_channels = s_channels_per_half_femb * s_half_fembs_per_frame;
   static constexpr int s_num_adc_words_per_ts = s_num_channels * s_bits_per_adc / s_bits_per_word;
-  static constexpr int s_num_adc_words = s_time_samples_per_frame * s_num_channels * s_bits_per_adc / s_bits_per_word;
     
   struct WIBEthHeader
   {	  
@@ -74,58 +71,40 @@ public:
   };
   static_assert(sizeof(WIBEthHeader) == 8 + 8); // 8 bytes for the bitfield section, 8 for the extra_data
   
-  // ===============================================================
-  // Data members
-  // ===============================================================
   detdataformats::DAQEthHeader daq_header;
   WIBEthHeader header;
-  // word_t adc_words[s_num_adc_words_per_ts][s_time_samples_per_frame]; // NOLINT
   word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
 
-  // ===============================================================
-  // Accessors
-  // ===============================================================
-
   /**
-   * @brief Get the ith ADC value in the frame
+   * @brief Get the i_channel-th ADC value in the i_sample-th time sample
    *
-   * The ADC words are 14 bits long;
-   * wrod_t stored packed in the data structure. 
    * The order is: 64 channels repeated for 64 time samples
+   * The ADC words are 14 bits long
    *
    */
-  uint16_t get_adc(int i_channel, int i_sample=0) const; // NOLINT(build/unsigned)
+  uint16_t get_adc(int i_channel, int i_sample=0) const;
 
-  /**
-   * @brief Set the ith ADC value in the frame to @p val
-   */
-  void set_adc(int i_channel, int i_sample, uint16_t adc_val); // NOLINT(build/unsigned)
+  
+  /// @brief Set the i_channel-th ADC value in the i_sample-th time sample to @p adc_val
+  void set_adc(int i_channel, int i_sample, uint16_t adc_val);
 
-  /** @brief Get the starting 64-bit timestamp of the frame
-   */
-  uint64_t get_timestamp() const // NOLINT(build/unsigned)
-  {
-    return daq_header.get_timestamp() ; // NOLINT(build/unsigned)
+  /// @brief Get the starting 64-bit timestamp of the frame
+  uint64_t get_timestamp() const {
+    return daq_header.get_timestamp() ;
   }
 
-  /** @brief Set the starting 64-bit timestamp of the frame
-   */
-  void set_timestamp(const uint64_t new_timestamp) // NOLINT(build/unsigned)
-  {
+  /// @brief Set the starting 64-bit timestamp of the frame
+  void set_timestamp(const uint64_t new_timestamp) {
     daq_header.timestamp = new_timestamp;
   }
 
-  /** @brief Get the channel identifier of the frame
-   */
-  uint8_t get_channel() const // NOLINT(build/unsigned)
-  {
-    return header.channel ; // NOLINT(build/unsigned)
+  /// @brief Get the channel identifier of the frame
+  uint8_t get_channel() const {
+    return header.channel ;
   }
 
-  /** @brief Set the channel identifier of the frame
-   */
-  void set_channel(const uint8_t new_channel) // NOLINT(build/unsigned)
-  {
+  /// @brief Set the channel identifier of the frame
+  void set_channel(const uint8_t new_channel) {
     header.channel = new_channel;
   }
 
@@ -134,11 +113,11 @@ public:
 		sizeof(WIBEthFrame::WIBEthHeader) +
 		sizeof(WIBEthFrame::word_t) * WIBEthFrame::s_time_samples_per_frame * WIBEthFrame::s_num_adc_words_per_ts);
 
-  inline uint16_t WIBEthFrame::get_adc(int i_channel, int i_sample) const { // NOLINT(build/unsigned)
+  inline uint16_t WIBEthFrame::get_adc(int i_channel, int i_sample) const {
     
-    // Note the generic get_adc function takes the channel and the sample (timeslice) in reverse order
+    // Note the generic get_adc_2d function takes the channel and the time sample in reverse order
     return static_cast<uint16_t>(
-				 dunedaq::fddetdataformats::get_adc<
+				 dunedaq::fddetdataformats::get_adc_2d<
 				 word_t,
 				 s_time_samples_per_frame,
 				 s_num_adc_words_per_ts,
@@ -149,10 +128,10 @@ public:
 				 );
   }
 
-  inline void WIBEthFrame::set_adc(int i_channel, int i_sample, uint16_t adc_val) { // NOLINT(build/unsigned)
+  inline void WIBEthFrame::set_adc(int i_channel, int i_sample, uint16_t adc_val) {
 
-    // Note the generic set_adc function takes the channel and the sample (timeslice) in reverse order
-    dunedaq::fddetdataformats::set_adc<
+    // Note the generic set_adc_2d function takes the channel and the time sample in reverse order
+    dunedaq::fddetdataformats::set_adc_2d<
       word_t,
       s_time_samples_per_frame,
       s_num_adc_words_per_ts,
@@ -162,7 +141,9 @@ public:
 		      adc_words
 		      );
   }
-    
+
+// NOLINTEND(build/unsigned)
+  
 } // namespace dunedaq::fddetdataformats
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBETHFRAME_HPP_

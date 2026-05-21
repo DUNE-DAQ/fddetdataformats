@@ -19,6 +19,7 @@ void
 register_tdeeth(py::module& m)
 {
 
+  // NOLINTBEGIN(build/unsigned)
 
   // py::class_<TDEEthFrame::TDEHeader>(m, "TDEHeader")
   //   .def_property("channel",
@@ -133,9 +134,11 @@ register_tdeeth(py::module& m)
     .def_static("sizeof", [](){ return sizeof(TDEEthFrame); })
     .def("get_bytes",
          [](TDEEthFrame* fr) -> py::bytes {
-           return py::bytes(reinterpret_cast<char*>(fr), sizeof(TDEEthFrame));
+           return py::bytes(reinterpret_cast<char*>(fr), sizeof(TDEEthFrame)); // NOLINT reinterpret_cast
         })
   ;
 }
 
+  // NOLINTEND(build/unsigned)
+  
 } // namespace dunedaq::fddetdataformats::python

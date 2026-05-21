@@ -4,7 +4,7 @@
  * Contains declaration of DAPHNEEthFrame, a class for accessing raw WIB eth frames, as used in ProtoDUNE-SP-II
  * 
  * The canonical definition of the DAPHNE format is given in EDMS document 2088726: 
- * https://edms.cern.ch/document/2088726
+ * https://edms.cern.ch/document/2088726/XXX (XXX a stand-in for the doc version, e.g. 5)
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -27,21 +27,20 @@
 
 namespace dunedaq::fddetdataformats {
 
+  // NOLINTBEGIN(build/unsigned)
+  
 /**
  *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
  *
  *  The canonical definition of the WIB format is given in EDMS document 2088713:
- *  https://edms.cern.ch/document/2088726
+ *  https://edms.cern.ch/document/2088726/XXX, (XXX a stand-in for the doc version, e.g. 5)
  */
 class DAPHNEEthFrame
 {
 public:
-  // ===============================================================
-  // Preliminaries
-  // ===============================================================
 
   // The definition of the format is in terms of 64-bit words
-  typedef uint64_t word_t; // NOLINT
+  typedef uint64_t word_t;
 
   // Dataframe format version
   static constexpr uint8_t version = 1;
@@ -53,7 +52,7 @@ public:
 
   struct Header
   {	  
-    // word_t w0;
+    // The following bitfields constitute what could be considered "word_t w0;"
     word_t trig_sample : 14;
     word_t rsv_0       : 2;
     word_t threshold   : 14;
@@ -72,16 +71,9 @@ public:
   };
   static_assert(sizeof(Header) == 7*sizeof(word_t));
   
-  // ===============================================================
-  // Data members
-  // ===============================================================
   detdataformats::DAQEthHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT
-
-// ===============================================================
-// Accessors
-// ===============================================================
 
 /**
   * @brief Get the ith ADC value in the frame
@@ -90,45 +82,35 @@ public:
   *
   * - 1024 adc values from one daphne channel
   */
-uint16_t
-get_adc(int i) const; // NOLINT
+uint16_t get_adc(int i) const; // NOLINT
 
-/**
-  * @brief Set the ith ADC value in the frame to @p val
-  */
-  void
-  set_adc(int i, uint16_t val); // NOLINT
 
-  /** @brief Get the starting 64-bit timestamp of the frame
-   */
-  uint64_t get_timestamp() const // NOLINT(build/unsigned)
-  {
-    return daq_header.get_timestamp() ; // NOLINT(build/unsigned)
+  /// @brief Set the ith ADC value in the frame to @p val
+  void set_adc(int i, uint16_t val); // NOLINT
+
+  /// @brief Get the starting 64-bit timestamp of the frame
+  uint64_t get_timestamp() const {
+    return daq_header.get_timestamp() ;
   }
 
-  /** @brief Set the starting 64-bit timestamp of the frame
-   */
-  void set_timestamp(const uint64_t new_timestamp) // NOLINT(build/unsigned)
-  {
+  /// @brief Set the starting 64-bit timestamp of the frame
+  void set_timestamp(const uint64_t new_timestamp) {
     daq_header.timestamp = new_timestamp;
   }
 
-  /** @brief Get the channel identifier of the frame
-   */
-  uint8_t get_channel() const // NOLINT(build/unsigned)
-  {
-    return header.channel ; // NOLINT(build/unsigned)
+  /// @brief Get the channel identifier of the frame
+  uint8_t get_channel() const {
+    return header.channel ;
   }
 
-  /** @brief Set the channel identifier of the frame
-   */
-  void set_channel(const uint8_t new_channel) // NOLINT(build/unsigned)
-  {
+  /// @brief Set the channel identifier of the frame
+  void set_channel(const uint8_t new_channel) {
     header.channel = new_channel;
   }
-
 };
-  static_assert(sizeof(DAPHNEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(DAPHNEEthFrame::Header) + sizeof(DAPHNEEthFrame::word_t) * DAPHNEEthFrame::s_num_adc_words);
+  static_assert(sizeof(DAPHNEEthFrame) == sizeof(detdataformats::DAQEthHeader) +
+		sizeof(DAPHNEEthFrame::Header) +
+		sizeof(DAPHNEEthFrame::word_t) * DAPHNEEthFrame::s_num_adc_words);
 
   inline uint16_t DAPHNEEthFrame::get_adc(int i) const {
 
@@ -136,7 +118,8 @@ get_adc(int i) const; // NOLINT
     // the ADC value is guaranteed to be storable in 16 bits
 
     return static_cast<uint16_t>(
-				 dunedaq::fddetdataformats::get_adc<DAPHNEEthFrame::word_t,
+				 dunedaq::fddetdataformats::get_adc_1d<
+				 DAPHNEEthFrame::word_t,
 				 DAPHNEEthFrame::s_num_adc_words,
 				 DAPHNEEthFrame::s_bits_per_adc>(
 								 i,
@@ -145,18 +128,19 @@ get_adc(int i) const; // NOLINT
 				 );
   }
 
-  inline void
-  DAPHNEEthFrame::set_adc(int i, uint16_t val) { // NOLINT
+  inline void DAPHNEEthFrame::set_adc(int i, uint16_t val) { // NOLINT
     
-    dunedaq::fddetdataformats::set_adc<DAPHNEEthFrame::word_t,
-				       DAPHNEEthFrame::s_num_adc_words,
-				       DAPHNEEthFrame::s_bits_per_adc>(
-								    i,
-								    val,
-								    adc_words
-								       );
-
+    dunedaq::fddetdataformats::set_adc_1d<
+      DAPHNEEthFrame::word_t,
+      DAPHNEEthFrame::s_num_adc_words,
+      DAPHNEEthFrame::s_bits_per_adc>(
+				      i,
+				      val,
+				      adc_words
+				      );
   }
+
+  // NOLINTEND(build/unsigned)
 
 } // namespace dunedaq::fddetdataformats
 

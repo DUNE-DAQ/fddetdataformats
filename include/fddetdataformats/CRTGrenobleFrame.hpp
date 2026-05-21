@@ -21,22 +21,17 @@
 
 namespace dunedaq::fddetdataformats {
 
-/**
- *  @brief Class for accessing/holding raw CRT data from the 'Grenoble' panels ProtoDUNE-II VD
- *
- */
+  // NOLINTBEGIN(build/unsigned)
+  
+  ///  @brief Class for accessing/holding raw CRT data from the 'Grenoble' panels ProtoDUNE-II VD
     class CRTGrenobleFrame
     {
     public:
-        // ===============================================================
-        // Preliminaries
-        // ===============================================================
-
         // The definition of the format is in terms of 64-bit words
-        typedef uint64_t word_t; // NOLINT
+        typedef uint64_t word_t;
 
         static constexpr int      s_num_channels = 32;
-        static constexpr uint64_t s_DTS_ticks_per_second = 62'500'000;
+      static constexpr uint64_t s_DTS_ticks_per_second = 62'500'000;
         static constexpr uint64_t s_ns_per_DTS_tick = 16;
 
         struct TGpsDateStruct{
@@ -76,20 +71,11 @@ namespace dunedaq::fddetdataformats {
       #warning "CRTGrenobleFrame::STEvent has padding inserted"
       // static_assert(sizeof(STEvent) == 3 * sizeof(unsigned int) + sizeof(TGpsDateStruct) + 2 * sizeof(unsigned int) + sizeof(STChannel) * s_num_channels);
 
-        // ===============================================================
-        // Data members
-        // ===============================================================
         detdataformats::DAQEthHeader daq_header;
         STEvent event;
 
-        // ===============================================================
-        // Accessors
-        // ===============================================================
-
-        /**
-         * @brief Get the adc value for channel i_ch
-         */
-        int get_adc(int i_ch) const // NOLINT(build/unsigned)
+      /// @brief Get the adc value for channel i_ch
+        int get_adc(const int i_ch) const
         {
             if (i_ch < 0 || i_ch >= s_num_channels)
                 throw std::out_of_range("ADC channel index out of range");
@@ -97,10 +83,8 @@ namespace dunedaq::fddetdataformats {
             return event.channels[i_ch].qTot;
         }
 
-        /**
-         * @brief Set the adc value for channel i_ch to @p val
-         */
-        void set_adc(int i_ch, int val) // NOLINT(build/unsigned)
+      /// @brief Set the adc value for channel i_ch to @p val
+      void set_adc(const int i_ch, const int val)
         {
             if (i_ch < 0 || i_ch >= s_num_channels)
                 throw std::out_of_range("ADC channel index out of range");
@@ -108,16 +92,14 @@ namespace dunedaq::fddetdataformats {
             event.channels[i_ch].qTot=val;
         }
 
-        /** @brief Get the starting 64-bit timestamp of the frame
-         */
-        uint64_t get_timestamp() const // NOLINT(build/unsigned)
+        /// @brief Get the starting 64-bit timestamp of the frame
+        uint64_t get_timestamp() const
         {
-            return daq_header.get_timestamp() ; // NOLINT(build/unsigned)
+            return daq_header.get_timestamp() ;
         }
 
-        /** @brief Set the starting 64-bit timestamp of the frame
-         */
-        void set_timestamp(const uint64_t new_timestamp) // NOLINT(build/unsigned)
+      /// @brief Set the starting 64-bit timestamp of the frame
+        void set_timestamp(const uint64_t new_timestamp)
         {
             daq_header.timestamp = new_timestamp;
         }
@@ -127,6 +109,8 @@ namespace dunedaq::fddetdataformats {
     }; //CRTGrenobleFrame
    #warning "CRTGrenobleFrame has padding inserted"
   // static_assert(sizeof(CRTGrenobleFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(CRTGrenobleFrame::STEvent));
+
+  // NOLINTEND(build/unsigned)
 
 } // namespace dunedaq::fddetdataformats
 

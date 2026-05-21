@@ -15,6 +15,8 @@ namespace py = pybind11;
 
 namespace dunedaq::fddetdataformats::python {
 
+  // NOLINTBEGIN(build/unsigned)
+  
 void
 register_daphneethstream(py::module& m)
 {
@@ -45,7 +47,7 @@ register_daphneethstream(py::module& m)
         return result;
       },
       [](DAPHNEEthStreamFrame::Header& self, py::list channel_words) {
-        for (int i = 0; i < 4 && i < len(channel_words); i++) {
+        for (int i = 0; i < 4 && i < static_cast<int>(len(channel_words)); i++) {
           self.channel_words[i] = channel_words[i].cast<DAPHNEEthStreamFrame::ChannelWord>();
         }
       }
@@ -79,9 +81,11 @@ register_daphneethstream(py::module& m)
     .def_static("sizeof", [](){ return sizeof(DAPHNEEthStreamFrame); })
     .def("get_bytes",
          [](DAPHNEEthStreamFrame* fr) -> py::bytes {
-           return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEEthStreamFrame));
+           return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEEthStreamFrame)); // NOLINT reinterpret_cast
         })
   ;
 }
 
+  // NOLINTEND(build/unsigned)
+  
 } // namespace dunedaq::fddetdataformats::python

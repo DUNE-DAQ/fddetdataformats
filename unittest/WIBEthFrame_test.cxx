@@ -9,7 +9,7 @@
 
 #include "fddetdataformats/WIBEthFrame.hpp"
 
-#define BOOST_TEST_MODULE WIBEthFrame_test
+#define BOOST_TEST_MODULE WIBEthFrame_test // NOLINT
 
 #include "boost/test/unit_test.hpp"
 #include "logging/Logging.hpp"  // For TLOG_DEBUG
@@ -18,6 +18,8 @@
 #include <vector>
 #include <random>
 
+// NOLINTBEGIN(build/unsigned)
+
 BOOST_AUTO_TEST_SUITE(WIBEthFrame_test)
 
 BOOST_AUTO_TEST_CASE(WIBEthFrame_ADCDataMutators)
@@ -25,16 +27,16 @@ BOOST_AUTO_TEST_CASE(WIBEthFrame_ADCDataMutators)
   // RNG with max ADC-width values
   std::random_device dev;
   std::mt19937 rng(dev());
-  int max_adc_value = (unsigned)(1 << dunedaq::fddetdataformats::WIBEthFrame::s_bits_per_adc) - 1;
+  int max_adc_value = (static_cast<dunedaq::fddetdataformats::WIBEthFrame::word_t>(1) << dunedaq::fddetdataformats::WIBEthFrame::s_bits_per_adc) - 1;
   std::uniform_int_distribution<std::mt19937::result_type> dist(1, max_adc_value);
 
   // Prepare source vector with ADC samples
   std::vector<std::vector<uint16_t>> v;
   for(int i=0; i<64; ++i) {
-    v.emplace_back(std::vector<uint16_t>(64));
+    v.emplace_back(64); // i.e., emplace back a 64-element 1-d vector
     for (int j=0; j<64; ++j) {
       auto rand_val = dist(rng);
-      v[i][j] = ((uint16_t)rand_val);
+      v[i][j] = static_cast<uint16_t>(rand_val);
     }
   }
 
@@ -86,7 +88,7 @@ BOOST_AUTO_TEST_CASE(WIBEthFrame_NeighborIsolationAcrossWordBoundary)
   using dunedaq::fddetdataformats::WIBEthFrame;
 
   WIBEthFrame wibethframe {};
-  constexpr uint16_t max_adc = static_cast<uint16_t>((1u << WIBEthFrame::s_bits_per_adc) - 1u);
+  constexpr auto max_adc = static_cast<uint16_t>((1u << WIBEthFrame::s_bits_per_adc) - 1u);
   constexpr int sample = 5;
   constexpr int boundary_channel = 4;
 
@@ -128,3 +130,5 @@ BOOST_AUTO_TEST_CASE(WIBEthFrame_MetadataMutators)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+// NOLINTEND(build/unsigned)

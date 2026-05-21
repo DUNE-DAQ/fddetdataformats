@@ -28,15 +28,13 @@
 
 namespace dunedaq::fddetdataformats {
 
+  // NOLINTBEGIN(build/unsigned)
+  
 class DAPHNEStreamFrame
 {
 public:
-  // ===============================================================
-  // Preliminaries
-  // ===============================================================
-
   // The definition of the format is in terms of 32-bit words
-  typedef uint32_t word_t; // NOLINT
+  typedef uint32_t word_t;
 
   static constexpr int s_bits_per_adc = 14;
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);
@@ -58,66 +56,50 @@ public:
   };
   static_assert(sizeof(Trailer) == 4);
 
-  // ===============================================================
-  // Data members
-  // ===============================================================
   detdataformats::DAQHeader daq_header;
   Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT
+  word_t adc_words[s_num_adc_words]; // NOLINT (a false accusation from the linter that s_num_adc_words is a variable)
   Trailer trailer; 
 
-  // ===============================================================
-  // Accessors
-  // ===============================================================
-
-  uint64_t get_timestamp() const 
+  uint64_t get_timestamp() const
   {
     return daq_header.get_timestamp();
   }
 
-  /** @brief Set the 64-bit timestamp of the frame
-  */
-  void set_timestamp(const uint64_t new_timestamp) // NOLINT(build/unsigned)
+  /// @brief Set the 64-bit timestamp of the frame
+  void set_timestamp(const uint64_t new_timestamp)
   {
     daq_header.timestamp_1 = new_timestamp;
     daq_header.timestamp_2 = new_timestamp >> 32;
   }
 
 
-  /**
-   * @brief Get the @p i ADC value of @p chn in the frame
-   */
-  uint16_t get_adc(uint i_adc, uint i_channel) const; // NOLINT
+  /// @brief Get the @p i ADC value of @p chn in the frame
+  uint16_t get_adc(uint i_adc, uint i_channel) const;
 
-  /**
-   * @brief Set the @p i ADC value of @p chn in the frame to @p val
-   */
+  /// @brief Set the @p i ADC value of @p chn in the frame to @p val
+  void set_adc(uint i, uint chn, uint16_t val);
 
-  void set_adc(uint i, uint chn, uint16_t val); // NOLINT
-   /** @brief Get the channel 0 from the DAPHNE Stream frame header                                                                                                           
-   */
-  uint8_t get_channel0() const { return header.channel_0; } // NOLINT(build/unsigned)                                                                                        
+  /// @brief Get the channel 0 from the DAPHNE Stream frame header 
+  uint8_t get_channel0() const { return header.channel_0; }
+  
+  /// @brief Get the channel 1 from the DAPHNE Stream frame header
+  uint8_t get_channel1() const { return header.channel_1; }
 
-  /** @brief Get the channel 1 from the DAPHNE Stream frame header                                                                                                           
-   */
-  uint8_t get_channel1() const { return header.channel_1; } // NOLINT(build/unsigned)                                                                                        
-
-  /** @brief Get the channel 2 from the DAPHNE Stream frame header                                                                                                           
-   */
-  uint8_t get_channel2() const { return header.channel_2; } // NOLINT(build/unsigned)                                                                                        
-
-  /** @brief Get the channel 3 from the DAPHNE Stream frame header                                                                                                           
-   */
-  uint8_t get_channel3() const { return header.channel_3; } // NOLINT(build/unsigned)        
+  /// @brief Get the channel 2 from the DAPHNE Stream frame header 
+  uint8_t get_channel2() const { return header.channel_2; }
+  
+  /// @brief Get the channel 3 from the DAPHNE Stream frame header  
+  uint8_t get_channel3() const { return header.channel_3; }
 };
   static_assert(sizeof(DAPHNEStreamFrame) == sizeof(detdataformats::DAQHeader) +
 		sizeof(DAPHNEStreamFrame::Header) +
 		sizeof(DAPHNEStreamFrame::word_t) * DAPHNEStreamFrame::s_num_adc_words +
 		sizeof(DAPHNEStreamFrame::Trailer));
 
-  inline uint16_t DAPHNEStreamFrame::get_adc(uint i_adc, uint i_channel) const { // NOLINT
+  inline uint16_t DAPHNEStreamFrame::get_adc(uint i_adc, uint i_channel) const {
     return static_cast<uint16_t>(
-				 dunedaq::fddetdataformats::get_adc_daphnestream<
+				 dunedaq::fddetdataformats::get_adc_2d_as_1d<
 				 word_t,
 				 s_num_adc_words,
 				 s_bits_per_adc,
@@ -131,8 +113,8 @@ public:
 				 );
   }
 
-  inline void DAPHNEStreamFrame::set_adc(uint i_adc, uint i_channel, uint16_t val) { // NOLINT
-    dunedaq::fddetdataformats::set_adc_daphnestream<
+  inline void DAPHNEStreamFrame::set_adc(uint i_adc, uint i_channel, uint16_t val) {
+    dunedaq::fddetdataformats::set_adc_2d_as_1d<
       word_t,
       s_num_adc_words,
       s_bits_per_adc,
@@ -145,7 +127,9 @@ public:
 	adc_words
 	);
   }
-    
+
+  // NOLINTEND(build/unsigned)
+  
 } // namespace dunedaq::fddetdataformats
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNESTREAMFRAME_HPP_

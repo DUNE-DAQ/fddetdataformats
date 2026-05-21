@@ -15,6 +15,8 @@
 #include <random>
 #include <vector>
 
+// NOLINTBEGIN(build/unsigned)
+
 BOOST_AUTO_TEST_SUITE(DAPHNEEthFrame_test)
 
 BOOST_AUTO_TEST_CASE(DAPHNEEthFrame_ADCDataMutators)
@@ -69,7 +71,7 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthFrame_BitPackingBoundaryIsolation)
   using dunedaq::fddetdataformats::DAPHNEEthFrame;
 
   DAPHNEEthFrame frame{};
-  constexpr uint16_t max_adc = static_cast<uint16_t>((1u << DAPHNEEthFrame::s_bits_per_adc) - 1u);
+  constexpr auto max_adc = static_cast<uint16_t>((1u << DAPHNEEthFrame::s_bits_per_adc) - 1u);
 
   constexpr int boundary_adc = 4;
   frame.set_adc(boundary_adc - 1, 0x0000u);
@@ -109,3 +111,5 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthFrame_MetadataMutators)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+// NOLINTEND(build/unsigned)

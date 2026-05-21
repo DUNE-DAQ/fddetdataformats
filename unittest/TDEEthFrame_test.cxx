@@ -8,12 +8,14 @@
 
 #include "fddetdataformats/TDEEthFrame.hpp"
 
-#define BOOST_TEST_MODULE TDEEthFrame_test
+#define BOOST_TEST_MODULE TDEEthFrame_test // NOLINT
 
 #include "boost/test/unit_test.hpp"
 
 #include <random>
 #include <vector>
+
+// NOLINTBEGIN(build/unsigned)
 
 BOOST_AUTO_TEST_SUITE(TDEEthFrame_test)
 
@@ -83,7 +85,7 @@ BOOST_AUTO_TEST_CASE(TDEEthFrame_BitPackingBoundaryIsolation)
   using dunedaq::fddetdataformats::TDEEthFrame;
 
   TDEEthFrame frame{};
-  constexpr uint16_t max_adc = static_cast<uint16_t>((1u << TDEEthFrame::s_bits_per_adc) - 1u);
+  constexpr auto max_adc = static_cast<uint16_t>((1u << TDEEthFrame::s_bits_per_adc) - 1u);
   constexpr int sample = 5;
   constexpr int boundary_channel = 4;
 
@@ -124,3 +126,5 @@ BOOST_AUTO_TEST_CASE(TDEEthFrame_MetadataMutators)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+// NOLINTEND(build/unsigned)

@@ -15,6 +15,8 @@ namespace py = pybind11;
 
 namespace dunedaq::fddetdataformats::python {
 
+// NOLINTBEGIN(build/unsigned) 
+  
 void
 register_daphneeth(py::module& m)
 {
@@ -94,9 +96,11 @@ register_daphneeth(py::module& m)
     .def_static("sizeof", [](){ return sizeof(DAPHNEEthFrame); })
     .def("get_bytes",
          [](DAPHNEEthFrame* fr) -> py::bytes {
-           return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEEthFrame));
+           return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEEthFrame)); // NOLINT reinterpret_cast
         })
   ;
 }
 
+// NOLINTEND(build/unsigned) 
+  
 } // namespace dunedaq::fddetdataformats::python

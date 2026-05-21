@@ -8,7 +8,7 @@
 
 #include "fddetdataformats/CRTGrenobleFrame.hpp"
 
-#define BOOST_TEST_MODULE CRTGrenobleFrame_test
+#define BOOST_TEST_MODULE CRTGrenobleFrame_test // NOLINT
 
 #include "boost/test/unit_test.hpp"
 

@@ -1,16 +1,23 @@
 /**
  * @file DAPHNEFrame_test.cxx - Comprehensive unit tests for DAPHNEFrame
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2022.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
+ *
  */
 
 #include "fddetdataformats/DAPHNEFrame.hpp"
 
-#define BOOST_TEST_MODULE DAPHNEFrame_test
+#define BOOST_TEST_MODULE DAPHNEFrame_test // NOLINT
 
 #include "boost/test/unit_test.hpp"
 
 #include <vector>
 #include <random>
 #include <algorithm>
+
+// NOLINTBEGIN(build/unsigned)
 
 BOOST_AUTO_TEST_SUITE(DAPHNEFrame_test)
 
@@ -85,3 +92,5 @@ BOOST_AUTO_TEST_CASE(DAPHNEFrame_AllFieldsTest)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+// NOLINTEND(build/unsigned)
