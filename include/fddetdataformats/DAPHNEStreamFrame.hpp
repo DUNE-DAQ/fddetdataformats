@@ -34,7 +34,7 @@ class DAPHNEStreamFrame
 {
 public:
   // The definition of the format is in terms of 32-bit words
-  typedef uint32_t word_t;
+  using word_t = uint32_t;
 
   static constexpr int s_bits_per_adc = 14;
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);

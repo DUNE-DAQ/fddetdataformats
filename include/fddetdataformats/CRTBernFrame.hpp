@@ -33,7 +33,7 @@ namespace dunedaq::fddetdataformats {
         // ===============================================================
 
         // The definition of the format is in terms of 64-bit words
-        typedef uint64_t word_t; // NOLINT
+        using word_t = uint64_t; // NOLINT
 
         static constexpr int      s_num_channels = 32;
         static constexpr uint64_t s_DTS_ticks_per_second = 62'500'000;
@@ -80,7 +80,7 @@ namespace dunedaq::fddetdataformats {
             if (i_ch < 0 || i_ch >= s_num_channels)
                 throw std::out_of_range("ADC channel index out of range");
 
-            data.adc[i_ch]=val;
+            data.adc[i_ch] = val;
         }
 
         /** @brief Get the starting 64-bit timestamp of the frame

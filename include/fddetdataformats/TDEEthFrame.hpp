@@ -40,7 +40,7 @@ class TDEEthFrame
 public:
 
   // The definition of the format is in terms of 64-bit words
-  typedef uint64_t word_t; // NOLINT
+  using word_t = uint64_t;
 
   static constexpr int s_bits_per_adc = 14;
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);

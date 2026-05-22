@@ -32,7 +32,7 @@ class DAPHNEFrame
 {
 public:
   // The definition of the format is in terms of 32-bit words
-  typedef uint32_t word_t; // NOLINT
+  using word_t = uint32_t;
 
   // Dataframe format version
   static constexpr uint8_t version = 2;

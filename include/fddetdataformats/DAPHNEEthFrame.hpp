@@ -40,7 +40,7 @@ class DAPHNEEthFrame
 public:
 
   // The definition of the format is in terms of 64-bit words
-  typedef uint64_t word_t;
+  using word_t = uint64_t;
 
   // Dataframe format version
   static constexpr uint8_t version = 1;
