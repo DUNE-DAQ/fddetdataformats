@@ -35,7 +35,7 @@ DAPHNEFrame::PeakDescriptorData::set_found(uint8_t val, int idx)
   if (val > 1)
     throw std::out_of_range("Found value out of range (must be 0-1)");
   word_t* tw = as_words();
-  tw[2 * idx] =
+  tw[2 * idx] = // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     (tw[2 * idx] & ~(1u << 31)) | ((val & 0x1) << 31); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
@@ -56,7 +56,7 @@ DAPHNEFrame::PeakDescriptorData::set_adc_integral(uint32_t val, int idx)
   if (val > 0x7FFFFF)
     throw std::out_of_range("ADC_Integral value out of range (must be 0-8388607)");
   word_t* tw = as_words();
-  tw[2 * idx] = (tw[2 * idx] & ~(0x7FFFFFu << 8)) |
+  tw[2 * idx] = (tw[2 * idx] & ~(0x7FFFFFu << 8)) | // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                 ((val & 0x7FFFFF) << 8); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
@@ -86,7 +86,7 @@ DAPHNEFrame::PeakDescriptorData::get_samples_over_baseline(int idx) const
   if (idx < 0 || idx > 4)
     throw std::out_of_range("Peak index out of range (must be 0-4)");
   const word_t* tw = as_words();
-  return static_cast<uint16_t>((tw[2 * idx + 1] >> 23) &
+  return static_cast<uint16_t>((tw[2 * idx + 1] >> 23) & // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                                0x1FF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
@@ -98,7 +98,7 @@ DAPHNEFrame::PeakDescriptorData::set_samples_over_baseline(uint16_t val, int idx
   if (val > 0x1FF)
     throw std::out_of_range("Time_Over_Baseline value out of range (must be 0-511)");
   word_t* tw = as_words();
-  tw[2 * idx + 1] = (tw[2 * idx + 1] & ~(0x1FFu << 23)) |
+  tw[2 * idx + 1] = (tw[2 * idx + 1] & ~(0x1FFu << 23)) | // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                     ((val & 0x1FF) << 23); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
@@ -108,7 +108,7 @@ DAPHNEFrame::PeakDescriptorData::get_sample_max(int idx) const
   if (idx < 0 || idx > 4)
     throw std::out_of_range("Peak index out of range (must be 0-4)");
   const word_t* tw = as_words();
-  return static_cast<uint16_t>((tw[2 * idx + 1] >> 14) &
+  return static_cast<uint16_t>((tw[2 * idx + 1] >> 14) & // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                                0x1FF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
@@ -120,7 +120,7 @@ DAPHNEFrame::PeakDescriptorData::set_sample_max(uint16_t val, int idx)
   if (val > 0x1FF)
     throw std::out_of_range("Time_Peak value out of range (must be 0-511)");
   word_t* tw = as_words();
-  tw[2 * idx + 1] = (tw[2 * idx + 1] & ~(0x1FFu << 14)) |
+  tw[2 * idx + 1] = (tw[2 * idx + 1] & ~(0x1FFu << 14)) | // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                     ((val & 0x1FF) << 14); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
@@ -142,7 +142,7 @@ DAPHNEFrame::PeakDescriptorData::set_adc_max(uint16_t val, int idx)
   if (val > 0x3FFF)
     throw std::out_of_range("ADC Max value out of range (must be 0-16383)");
   word_t* tw = as_words();
-  tw[2 * idx + 1] =
+  tw[2 * idx + 1] = // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     (tw[2 * idx + 1] & ~0x3FFFu) | (val & 0x3FFF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
@@ -175,11 +175,11 @@ DAPHNEFrame::PeakDescriptorData::set_sample_start(uint16_t val, int idx)
 
   if (idx < 3) {
     int shift = 22 - 10 * idx;
-    tw[10] =
+    tw[10] = // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
       (tw[10] & ~(mask << shift)) | ((val & mask) << shift); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   } else {
     int shift = 22 - 10 * (idx - 3);
-    tw[11] =
+    tw[11] = // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
       (tw[11] & ~(mask << shift)) | ((val & mask) << shift); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   }
 }

@@ -8,7 +8,7 @@
 
 #include "fddetdataformats/DAPHNEEthFrame.hpp"
 
-#define BOOST_TEST_MODULE DAPHNEEthFrame_test
+#define BOOST_TEST_MODULE DAPHNEEthFrame_test // NOLINT
 
 #include "boost/test/unit_test.hpp"
 

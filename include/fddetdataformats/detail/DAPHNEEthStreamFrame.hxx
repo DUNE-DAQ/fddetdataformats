@@ -20,8 +20,8 @@ DAPHNEEthStreamFrame::set_channel(const uint i_channel, const uint8_t new_channe
       std::format("Requested channel index of {} is outside of allowed range 0-{}", i_channel, s_num_channels - 1));
   }
 
-  header.channel_words[i_channel].channel =
-    new_channel_val; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  header.channel_words[i_channel].channel = // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    new_channel_val; 
 }
 
 inline uint16_t
