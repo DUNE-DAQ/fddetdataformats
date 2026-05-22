@@ -97,39 +97,18 @@ public:
 		sizeof(DAPHNEStreamFrame::word_t) * DAPHNEStreamFrame::s_num_adc_words +
 		sizeof(DAPHNEStreamFrame::Trailer));
 
-  inline uint16_t DAPHNEStreamFrame::get_adc(uint i_adc, uint i_channel) const {
-    return static_cast<uint16_t>(
-				 dunedaq::fddetdataformats::get_adc_2d_as_1d<
-				 word_t,
-				 s_num_adc_words,
-				 s_bits_per_adc,
-				 s_adcs_per_channel,
-				 s_channels_per_frame
-				 >(
-				   static_cast<int>(i_adc),
-				   static_cast<int>(i_channel),
-				   adc_words
-				   )
-				 );
-  }
+  static_assert(std::endian::native == std::endian::little,
+		"The DAPHNEStreamFrame bitfield layout assumes little-endian architecture");
 
-  inline void DAPHNEStreamFrame::set_adc(uint i_adc, uint i_channel, uint16_t val) {
-    dunedaq::fddetdataformats::set_adc_2d_as_1d<
-      word_t,
-      s_num_adc_words,
-      s_bits_per_adc,
-      s_adcs_per_channel,
-      s_channels_per_frame
-      >(
-	static_cast<int>(i_adc),
-	static_cast<int>(i_channel),
-	val,
-	adc_words
-	);
-  }
+  static_assert(std::is_trivially_copyable_v<DAPHNEStreamFrame>,
+		"DAPHNEStreamFrame isn't trivially copyable and can't be safely std::memcpy'd");
+  static_assert(std::is_standard_layout_v<DAPHNEStreamFrame>,
+		"DAPHNEStreamFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+
+} // namespace dunedaq::fddetdataformats
+
+#include "detail/DAPHNEStreamFrame.hxx"
 
   // NOLINTEND(build/unsigned)
-  
-} // namespace dunedaq::fddetdataformats
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNESTREAMFRAME_HPP_

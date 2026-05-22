@@ -112,60 +112,18 @@ public:
 		sizeof(DAPHNEEthStreamFrame::Header) +
 		sizeof(DAPHNEEthStreamFrame::word_t) * DAPHNEEthStreamFrame::s_num_adc_words) ;
 
-  inline uint8_t DAPHNEEthStreamFrame::get_channel(const uint i_channel) const {
-    if (i_channel >= s_num_channels) {
-      throw std::out_of_range(std::format("Requested channel index of {} is outside of allowed range 0-{}",
-					  i_channel, s_num_channels - 1
-					  ));
-    }
+  static_assert(std::endian::native == std::endian::little,
+		"The DAPHNEEthStreamFrame bitfield layout assumes little-endian architecture");
 
-    return header.channel_words[i_channel].channel ; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-  }
+  static_assert(std::is_trivially_copyable_v<DAPHNEEthStreamFrame>,
+		"DAPHNEEthStreamFrame isn't trivially copyable and can't be safely std::memcpy'd");
+  static_assert(std::is_standard_layout_v<DAPHNEEthStreamFrame>,
+		"DAPHNEEthStreamFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
-  inline void DAPHNEEthStreamFrame::set_channel(const uint i_channel, const uint8_t new_channel_val) {
-    if (i_channel >= s_num_channels) { 
-      throw std::out_of_range(std::format("Requested channel index of {} is outside of allowed range 0-{}",
-					  i_channel, s_num_channels - 1
-					  ));
-    }
-
-    header.channel_words[i_channel].channel = new_channel_val; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-  }
-
-  
-inline uint16_t DAPHNEEthStreamFrame::get_adc(uint i_adc, uint i_channel) const {
-  return static_cast<uint16_t>(
-			       dunedaq::fddetdataformats::get_adc_2d_as_1d<
-			       word_t,
-			       s_num_adc_words,
-			       s_bits_per_adc,
-			       s_adcs_per_channel,
-			       s_num_channels
-			       >(
-				 static_cast<int>(i_adc),
-				 static_cast<int>(i_channel),
-				 adc_words
-				 )
-			       );
-}
-
-inline void DAPHNEEthStreamFrame::set_adc(uint i_channel, uint i_adc, uint16_t val) { // NOLINT
-  dunedaq::fddetdataformats::set_adc_2d_as_1d<
-    word_t,
-    s_num_adc_words,
-    s_bits_per_adc,
-    s_adcs_per_channel,
-    s_num_channels
-    >(
-      static_cast<int>(i_adc),
-      static_cast<int>(i_channel),
-      val,
-      adc_words
-      );
-}
-
-  // NOLINTEND(build/unsigned)
-  
 } // namespace dunedaq::fddetdataformats
+
+#include "detail/DAPHNEEthStreamFrame.hxx"
+
+// NOLINTEND(build/unsigned)
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHSTREAMFRAME_HPP_

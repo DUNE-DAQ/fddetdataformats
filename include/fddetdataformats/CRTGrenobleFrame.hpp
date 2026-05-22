@@ -110,6 +110,13 @@ namespace dunedaq::fddetdataformats {
    #warning "CRTGrenobleFrame has padding inserted"
   // static_assert(sizeof(CRTGrenobleFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(CRTGrenobleFrame::STEvent));
 
+  static_assert(std::endian::native == std::endian::little,
+		"The CRTGrenobleFrame bitfield layout assumes little-endian architecture");
+  static_assert(std::is_trivially_copyable_v<CRTGrenobleFrame>,
+		"CRTGrenobleFrame isn't trivially copyable and can't be safely std::memcpy'd");
+  static_assert(std::is_standard_layout_v<CRTGrenobleFrame>,
+		"CRTGrenobleFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+  
   // NOLINTEND(build/unsigned)
 
 } // namespace dunedaq::fddetdataformats

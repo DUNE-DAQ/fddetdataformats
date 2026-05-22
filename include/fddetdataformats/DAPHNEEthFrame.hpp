@@ -112,36 +112,18 @@ uint16_t get_adc(int i) const; // NOLINT
 		sizeof(DAPHNEEthFrame::Header) +
 		sizeof(DAPHNEEthFrame::word_t) * DAPHNEEthFrame::s_num_adc_words);
 
-  inline uint16_t DAPHNEEthFrame::get_adc(int i) const {
+  static_assert(std::endian::native == std::endian::little,
+		"The DAPHNEEthFrame bitfield layout assumes little-endian architecture");
 
-    // We're static_casting the returned DAPHNEEthFrame::word_t to a uint16_t, which is fine since
-    // the ADC value is guaranteed to be storable in 16 bits
-
-    return static_cast<uint16_t>(
-				 dunedaq::fddetdataformats::get_adc_1d<
-				 DAPHNEEthFrame::word_t,
-				 DAPHNEEthFrame::s_num_adc_words,
-				 DAPHNEEthFrame::s_bits_per_adc>(
-								 i,
-								 adc_words
-								 )
-				 );
-  }
-
-  inline void DAPHNEEthFrame::set_adc(int i, uint16_t val) { // NOLINT
-    
-    dunedaq::fddetdataformats::set_adc_1d<
-      DAPHNEEthFrame::word_t,
-      DAPHNEEthFrame::s_num_adc_words,
-      DAPHNEEthFrame::s_bits_per_adc>(
-				      i,
-				      val,
-				      adc_words
-				      );
-  }
-
-  // NOLINTEND(build/unsigned)
+  static_assert(std::is_trivially_copyable_v<DAPHNEEthFrame>,
+		"DAPHNEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
+  static_assert(std::is_standard_layout_v<DAPHNEEthFrame>,
+		"DAPHNEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
 } // namespace dunedaq::fddetdataformats
+
+#include "detail/DAPHNEEthFrame.hxx"
+
+  // NOLINTEND(build/unsigned)
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_

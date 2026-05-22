@@ -140,26 +140,87 @@ public:
     word_t trailer;
 
     static const uint8_t max_peaks = 5;
-    
+
+    /**
+     * @brief Get the Found value for a specific peak (channel) from the trailer.
+     *        (Word 2*idx, bit 31)
+     */
     bool is_found( int idx ) const;
+
+    /// @brief Set the Found value for a specific peak (channel) in the trailer.
     void set_found( uint8_t val, int idx );
 
+    /**
+     * @brief Get the ADC_Integral value for a specific peak.
+     *        (Word 2*idx, bits [30:8])
+     */
     uint32_t get_adc_integral(int idx) const;
+
+    /// @brief Set the ADC_Integral value for a specific peak.
     void set_adc_integral(uint32_t val, int idx);
 
+    /**
+     * @brief Get the Num_SubPeaks value for a specific peak.
+     *        (Word 2*idx, bits [3:0])
+     */
     uint8_t get_num_subpeaks(int idx) const;
+
+    /// @brief Set the Num_SubPeaks value for a specific peak.
     void set_num_subpeaks(uint8_t val, int idx);
-    
+
+    /**
+     * @brief Get the Time_Over_Baseline value for a specific peak.
+     *        (Word 2*idx+1, bits [8:0])
+     */
     uint16_t get_samples_over_baseline(int idx) const;
+
+    // @brief Set the Time_Over_Baseline value for a specific peak.
     void set_samples_over_baseline(uint16_t val, int idx);
-    
+
+    /**
+     * @brief Get the Time_Peak value for a specific peak.
+     *        (Word 2*idx+1, bits [17:9])
+     */
     uint16_t get_sample_max(int idx) const;
+
+    /// @brief Set the Time_Peak value for a specific peak.
     void set_sample_max(uint16_t val, int idx);
-    
+
+    /**
+     * @brief Get the ADC Max value for a specific peak.
+     *        (Word 2*idx+1, bits [31:18])
+     */
     uint16_t get_adc_max(int idx) const;
+
+    /// @brief Set the ADC Max value for a specific peak.
     void set_adc_max(uint16_t val, int idx);
-    
+
+    /**
+     * @brief Get the Time_Start value for a given index (0-4).
+     *
+     * For indices 0,1,2 these are stored in trailer word 11 (index 10):
+     *   - index 0: bits [9:0]
+     *   - index 1: bits [19:10]
+     *   - index 2: bits [29:20]
+     *
+     * For indices 3,4 these are stored in trailer word 12 (index 11):
+     *   - index 3: bits [9:0]
+     *   - index 4: bits [19:10]
+     */
+
     uint16_t get_sample_start(int idx) const;
+
+    /**
+     * @brief Set the time_start field for Peak index 0–4 using bit shifts.
+     * 
+     * Trailer word 11 (index 10):
+     *   - idx 0: bits [31:22]
+     *   - idx 1: bits [21:12]
+     *   - idx 2: bits [11:2]
+     * Trailer word 12 (index 11):
+     *   - idx 3: bits [31:22]
+     *   - idx 4: bits [21:12]
+     */
     void set_sample_start(uint16_t val, int idx);
 
     // ===============================================================
@@ -179,8 +240,18 @@ public:
   word_t adc_words[s_num_adc_words]; // NOLINT
   PeakDescriptorData peaks_data;
 
-  uint16_t get_adc(int i) const; // NOLINT;
-  void set_adc(int i, uint16_t val); // NOLINT;
+  
+/**
+  * @brief Get the ith ADC value in the frame
+  *
+  * The ADC words are 14 bits long, stored packed in the data structure. The order is:
+  *
+  * - 1024 adc values from one daphne channel
+  */
+  uint16_t get_adc(int i) const;
+
+  /// @brief Set the ith ADC value in the frame to @p val
+  void set_adc(int i, uint16_t val);
 
   uint8_t get_channel() const { return header.channel; }
   void set_channel( uint8_t val) { header.channel = val & 0x3Fu; }
@@ -195,259 +266,17 @@ public:
 		sizeof(DAPHNEFrame::word_t) * DAPHNEFrame::s_num_adc_words +
 		sizeof(DAPHNEFrame::PeakDescriptorData));
 
-/**
-  * @brief Get the ith ADC value in the frame
-  *
-  * The ADC words are 14 bits long, stored packed in the data structure. The order is:
-  *
-  * - 1024 adc values from one daphne channel
-  */
-inline uint16_t
-DAPHNEFrame::get_adc(int i) const // NOLINT
-{
-  // We can safely case from word_t to uint16_t as the ADC value can always be represented in 16 bits
-  return static_cast<uint16_t>(
-			       dunedaq::fddetdataformats::get_adc_1d<word_t, s_num_adc_words, s_bits_per_adc>(i, adc_words)
-			       );
-}
-
-/**
-  * @brief Set the ith ADC value in the frame to @p val
-  */
-inline void
-DAPHNEFrame::set_adc(int i, uint16_t val) // NOLINT
-{
-  dunedaq::fddetdataformats::set_adc_1d<word_t, s_num_adc_words, s_bits_per_adc>(i, val, adc_words);
-}
-
-// --- Trailer Accessors (Manual Shift–Mask Extraction) ---
-
-/**
-* @brief Get the Found value for a specific peak (channel) from the trailer.
-*        (Word 2*idx, bit 31)
-*/
-inline bool 
-DAPHNEFrame::PeakDescriptorData::is_found(int idx) const // idx index 0 to 4
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  const word_t* tw = as_words();
-  // In odd word, Found is in bit 31.
-  return static_cast<uint8_t>((tw[2*idx] >> 31) & 0x1); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-}
-
-/**
-* @brief Set the Found value for a specific peak (channel) in the trailer.
-*/
-inline void
-DAPHNEFrame::PeakDescriptorData::set_found(uint8_t val, int idx)
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("peak index out of range (must be 0-4)");
-  if (val > 1)
-    throw std::out_of_range("Found value out of range (must be 0-1)");
-  word_t* tw = as_words();
-  tw[2*idx] = (tw[2*idx] & ~(1u << 31)) | ((val & 0x1) << 31); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-}
-
-/**
-* @brief Get the ADC_Integral value for a specific peak.
-*        (Word 2*idx, bits [30:8])
-*/
-inline uint32_t 
-DAPHNEFrame::PeakDescriptorData::get_adc_integral(int idx) const
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  const word_t* tw = as_words();
-  return (tw[2*idx] >> 8) & 0x7FFFFF; // Mask 23 bits // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-}
-
-/**
-* @brief Set the ADC_Integral value for a specific peak.
-*/
-inline void 
-DAPHNEFrame::PeakDescriptorData::set_adc_integral(uint32_t val, int idx)
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  if (val > 0x7FFFFF)
-    throw std::out_of_range("ADC_Integral value out of range (must be 0-8388607)");
-  word_t* tw = as_words();
-  tw[2*idx] = (tw[2*idx] & ~(0x7FFFFFu << 8)) | ((val & 0x7FFFFF) << 8); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-}
-
-/**
-* @brief Get the Num_SubPeaks value for a specific peak.
-*        (Word 2*idx, bits [3:0])
-*/
-inline uint8_t 
-DAPHNEFrame::PeakDescriptorData::get_num_subpeaks(int idx) const
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  const word_t* tw = as_words();
-  return static_cast<uint8_t>(tw[2*idx] & 0xF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-}
-
-/**
-* @brief Set the Num_SubPeaks value for a specific peak.
-*/
-inline void
-DAPHNEFrame::PeakDescriptorData::set_num_subpeaks(uint8_t val, int idx)
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  if (val > 0xF)
-    throw std::out_of_range("Num_SubPeaks value out of range (must be 0-15)");
-  word_t* tw = as_words();
-  tw[2*idx] = (tw[2*idx] & ~0xF) | (val & 0xF);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-}
-
-/**
-* @brief Get the Time_Over_Baseline value for a specific peak.
-*        (Word 2*idx+1, bits [8:0])
-*/
-inline uint16_t
-DAPHNEFrame::PeakDescriptorData::get_samples_over_baseline(int idx) const
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  const word_t* tw = as_words();
-  return static_cast<uint16_t>((tw[2*idx+1] >> 23) & 0x1FF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
-}
-
-/**
-* @brief Set the Time_Over_Baseline value for a specific peak.
-*/
-inline void
-DAPHNEFrame::PeakDescriptorData::set_samples_over_baseline(uint16_t val, int idx)
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  if (val > 0x1FF)
-    throw std::out_of_range("Time_Over_Baseline value out of range (must be 0-511)");
-  word_t* tw = as_words();
-  tw[2*idx+1] = (tw[2*idx+1] & ~(0x1FFu << 23)) | ((val & 0x1FF) << 23); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
-}
-
-/**
-* @brief Get the Time_Peak value for a specific peak.
-*        (Word 2*idx+1, bits [17:9])
-*/
-inline uint16_t
-DAPHNEFrame::PeakDescriptorData::get_sample_max(int idx) const
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  const word_t* tw = as_words();
-  return static_cast<uint16_t>((tw[2*idx+1] >> 14) & 0x1FF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
-}
-
-
-/**
-* @brief Set the Time_Peak value for a specific peak.
-*/
-inline void
-DAPHNEFrame::PeakDescriptorData::set_sample_max(uint16_t val, int idx)
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  if (val > 0x1FF)
-    throw std::out_of_range("Time_Peak value out of range (must be 0-511)");
-  word_t* tw = as_words();
-  tw[2*idx+1] = (tw[2*idx+1] & ~(0x1FFu << 14)) | ((val & 0x1FF) << 14); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
-}
-
-/**
-* @brief Get the ADC Max value for a specific peak.
-*        (Word 2*idx+1, bits [31:18])
-*/
-inline uint16_t
-DAPHNEFrame::PeakDescriptorData::get_adc_max(int idx) const
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  const word_t* tw = as_words();
-  // Even word for idx is at index 2*idx+1; ADC Max is in bits 13:0.
-  return static_cast<uint16_t>(tw[2*idx+1] & 0x3FFF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
-}
-
-/**
-* @brief Set the ADC Max value for a specific peak.
-*/
-inline void
-DAPHNEFrame::PeakDescriptorData::set_adc_max(uint16_t val, int idx)
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Peak index out of range (must be 0-4)");
-  if (val > 0x3FFF)
-    throw std::out_of_range("ADC Max value out of range (must be 0-16383)");
-  word_t* tw = as_words();
-  tw[2*idx+1] = (tw[2*idx+1] & ~0x3FFFu) | (val & 0x3FFF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
-}
-
-/**
-* @brief Get the Time_Start value for a given index (0-4).
-*
-* For indices 0,1,2 these are stored in trailer word 11 (index 10):
-*   - index 0: bits [9:0]
-*   - index 1: bits [19:10]
-*   - index 2: bits [29:20]
-*
-* For indices 3,4 these are stored in trailer word 12 (index 11):
-*   - index 3: bits [9:0]
-*   - index 4: bits [19:10]
-*/
-inline uint16_t
-DAPHNEFrame::PeakDescriptorData::get_sample_start(int idx) const
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Time_Start index out of range (must be 0-4)");
-
-  const word_t* tw = as_words();
-  if (idx < 3) {
-    int shift = 22 - 10 * idx;
-    return static_cast<uint16_t>((tw[10] >> shift) & 0x3FF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
-  } else {
-    int shift = 22 - 10 * (idx - 3);
-    return static_cast<uint16_t>((tw[11] >> shift) & 0x3FF); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
-  }
-}
-
-/**
-* @brief Set the time_start field for Peak index 0–4 using bit shifts.
-* 
-* Trailer word 11 (index 10):
-*   - idx 0: bits [31:22]
-*   - idx 1: bits [21:12]
-*   - idx 2: bits [11:2]
-* Trailer word 12 (index 11):
-*   - idx 3: bits [31:22]
-*   - idx 4: bits [21:12]
-*/
-inline void
-DAPHNEFrame::PeakDescriptorData::set_sample_start(uint16_t val, int idx)
-{
-  if (idx < 0 || idx > 4)
-    throw std::out_of_range("Time_Start index out of range (must be 0–4)");
-  if (val > 0x3FF)
-    throw std::out_of_range("Time_Start value out of range (must be 0–1023)");
-
-  word_t* tw = as_words();
-  word_t mask = 0x3FFu;
-
-  if (idx < 3) {
-    int shift = 22 - 10 * idx;
-    tw[10] = (tw[10] & ~(mask << shift)) | ((val & mask) << shift); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
-  } else {
-    int shift = 22 - 10 * (idx - 3);
-    tw[11] = (tw[11] & ~(mask << shift)) | ((val & mask) << shift); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic) 
-  }
-}
-
-// NOLINTEND(build/unsigned)
+  static_assert(std::endian::native == std::endian::little,
+		"The DAPHNEFrame bitfield layout assumes little-endian architecture");
+  static_assert(std::is_trivially_copyable_v<DAPHNEFrame>,
+		"DAPHNEFrame isn't trivially copyable and can't be safely std::memcpy'd");
+  static_assert(std::is_standard_layout_v<DAPHNEFrame>,
+		"DAPHNEFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
 } // namespace dunedaq::fddetdataformats
+
+#include "detail/DAPHNEFrame.hxx"
+
+// NOLINTEND(build/unsigned)
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
