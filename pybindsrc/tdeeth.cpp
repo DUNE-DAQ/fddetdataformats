@@ -80,7 +80,8 @@ register_tdeeth(py::module& m)
   //     )
   //   .def_property("colddata_timestamp_0",
   //     [](TDEEthFrame::TDEHeader& self) -> uint32_t {return self.colddata_timestamp_0;},
-  //     [](TDEEthFrame::TDEHeader& self, uint32_t colddata_timestamp_0) {self.colddata_timestamp_0 = colddata_timestamp_0;}
+  //     [](TDEEthFrame::TDEHeader& self, uint32_t colddata_timestamp_0) {self.colddata_timestamp_0 =
+  //     colddata_timestamp_0;}
   //     )
   //   .def_property("extra_data",
   //     [](TDEEthFrame::TDEHeader& self) -> uint64_t {return self.extra_data;},
@@ -89,56 +90,58 @@ register_tdeeth(py::module& m)
   //   ;
 
   py::class_<TDEEthFrame::TDEEthHeader>(m, "TDEEthHeader")
-    .def_property("channel", 
-      [](TDEEthFrame::TDEEthHeader& self) -> uint16_t {return self.channel;},
-      [](TDEEthFrame::TDEEthHeader& self, uint16_t channel) {self.channel = channel;}
-      )
-    .def_property("version",
-      [](TDEEthFrame::TDEEthHeader& self) -> uint16_t {return self.version;},
-      [](TDEEthFrame::TDEEthHeader& self, uint16_t version) {self.version = version;}
-      )
-    .def_property("tde_header",
-      [](TDEEthFrame::TDEEthHeader& self) -> uint16_t {return self.tde_header;},
-      [](TDEEthFrame::TDEEthHeader& self, uint16_t tde_header) {self.tde_header = tde_header;}
-      )
-    .def_property("tde_errors",
-      [](TDEEthFrame::TDEEthHeader& self) -> uint16_t {return self.tde_errors;},
-      [](TDEEthFrame::TDEEthHeader& self, uint16_t tde_errors) {self.tde_errors = tde_errors;}
-      )
-    .def_property("TAItime",
-      [](TDEEthFrame::TDEEthHeader& self) -> uint64_t {return self.TAItime;},
-      [](TDEEthFrame::TDEEthHeader& self, uint64_t TAItime) {self.TAItime = TAItime;}
-      )
-  ;
+    .def_property(
+      "channel",
+      [](TDEEthFrame::TDEEthHeader& self) -> uint16_t { return self.channel; },
+      [](TDEEthFrame::TDEEthHeader& self, uint16_t channel) { self.channel = channel; })
+    .def_property(
+      "version",
+      [](TDEEthFrame::TDEEthHeader& self) -> uint16_t { return self.version; },
+      [](TDEEthFrame::TDEEthHeader& self, uint16_t version) { self.version = version; })
+    .def_property(
+      "tde_header",
+      [](TDEEthFrame::TDEEthHeader& self) -> uint16_t { return self.tde_header; },
+      [](TDEEthFrame::TDEEthHeader& self, uint16_t tde_header) { self.tde_header = tde_header; })
+    .def_property(
+      "tde_errors",
+      [](TDEEthFrame::TDEEthHeader& self) -> uint16_t { return self.tde_errors; },
+      [](TDEEthFrame::TDEEthHeader& self, uint16_t tde_errors) { self.tde_errors = tde_errors; })
+    .def_property(
+      "TAItime",
+      [](TDEEthFrame::TDEEthHeader& self) -> uint64_t { return self.TAItime; },
+      [](TDEEthFrame::TDEEthHeader& self, uint64_t TAItime) { self.TAItime = TAItime; });
 
-  
   py::class_<TDEEthFrame>(m, "TDEEthFrame", py::buffer_protocol())
     .def(py::init())
     .def(py::init([](py::capsule capsule) {
-        auto tfp = *static_cast<TDEEthFrame*>(capsule.get_pointer());
-        return tfp;
-    } ))
-    .def(py::init([](py::bytes bytes){
-        py::buffer_info info(py::buffer(bytes).request());
-        auto tfp = *static_cast<TDEEthFrame*>(info.ptr);
-        return tfp;
+      auto tfp = *static_cast<TDEEthFrame*>(capsule.get_pointer());
+      return tfp;
     }))
-    .def("get_daqheader", [](TDEEthFrame& self) -> const detdataformats::DAQEthHeader& {return self.daq_header;}, py::return_value_policy::reference_internal)
-    .def("get_tdeheader", [](TDEEthFrame& self) -> const TDEEthFrame::TDEEthHeader& {return self.header;}, py::return_value_policy::reference_internal)
+    .def(py::init([](py::bytes bytes) {
+      py::buffer_info info(py::buffer(bytes).request());
+      auto tfp = *static_cast<TDEEthFrame*>(info.ptr);
+      return tfp;
+    }))
+    .def(
+      "get_daqheader",
+      [](TDEEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.daq_header; },
+      py::return_value_policy::reference_internal)
+    .def(
+      "get_tdeheader",
+      [](TDEEthFrame& self) -> const TDEEthFrame::TDEEthHeader& { return self.header; },
+      py::return_value_policy::reference_internal)
     .def("get_adc", &TDEEthFrame::get_adc)
     .def("set_adc", &TDEEthFrame::set_adc)
     .def("get_timestamp", &TDEEthFrame::get_timestamp)
     .def("set_timestamp", &TDEEthFrame::set_timestamp)
     .def("get_channel", &TDEEthFrame::get_channel)
     .def("set_channel", &TDEEthFrame::set_channel)
-    .def_static("sizeof", [](){ return sizeof(TDEEthFrame); })
-    .def("get_bytes",
-         [](TDEEthFrame* fr) -> py::bytes {
-           return py::bytes(reinterpret_cast<char*>(fr), sizeof(TDEEthFrame)); // NOLINT reinterpret_cast
-        })
-  ;
+    .def_static("sizeof", []() { return sizeof(TDEEthFrame); })
+    .def("get_bytes", [](TDEEthFrame* fr) -> py::bytes {
+      return py::bytes(reinterpret_cast<char*>(fr), sizeof(TDEEthFrame)); // NOLINT reinterpret_cast
+    });
 }
 
-  // NOLINTEND(build/unsigned)
-  
+// NOLINTEND(build/unsigned)
+
 } // namespace dunedaq::fddetdataformats::python

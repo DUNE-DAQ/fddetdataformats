@@ -1,7 +1,7 @@
 /**
  * @file DAPHNEStreamFrame.hpp
  *
- *  Contains declaration of DAPHNEStreamFrame, a class for accessing 
+ *  Contains declaration of DAPHNEStreamFrame, a class for accessing
  *  raw DAPHNE streaming version frames, as produced by the DAPHNE boards
  *
  *  The canonical definition of the PDS DAPHNE format is given in EDMS document 2088726:
@@ -21,15 +21,15 @@
 
 #include <algorithm> // For std::min
 #include <cassert>   // For assert()
+#include <cstdint>   // For uint32_t etc
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept> // For std::out_of_range
-#include <cstdint>  // For uint32_t etc
 
 namespace dunedaq::fddetdataformats {
 
-  // NOLINTBEGIN(build/unsigned)
-  
+// NOLINTBEGIN(build/unsigned)
+
 class DAPHNEStreamFrame
 {
 public:
@@ -59,12 +59,9 @@ public:
   detdataformats::DAQHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT (a false accusation from the linter that s_num_adc_words is a variable)
-  Trailer trailer; 
+  Trailer trailer;
 
-  uint64_t get_timestamp() const
-  {
-    return daq_header.get_timestamp();
-  }
+  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
   /// @brief Set the 64-bit timestamp of the frame
   void set_timestamp(const uint64_t new_timestamp)
@@ -73,42 +70,40 @@ public:
     daq_header.timestamp_2 = new_timestamp >> 32;
   }
 
-
   /// @brief Get the @p i ADC value of @p chn in the frame
   uint16_t get_adc(uint i_adc, uint i_channel) const;
 
   /// @brief Set the @p i ADC value of @p chn in the frame to @p val
   void set_adc(uint i, uint chn, uint16_t val);
 
-  /// @brief Get the channel 0 from the DAPHNE Stream frame header 
+  /// @brief Get the channel 0 from the DAPHNE Stream frame header
   uint8_t get_channel0() const { return header.channel_0; }
-  
+
   /// @brief Get the channel 1 from the DAPHNE Stream frame header
   uint8_t get_channel1() const { return header.channel_1; }
 
-  /// @brief Get the channel 2 from the DAPHNE Stream frame header 
+  /// @brief Get the channel 2 from the DAPHNE Stream frame header
   uint8_t get_channel2() const { return header.channel_2; }
-  
-  /// @brief Get the channel 3 from the DAPHNE Stream frame header  
+
+  /// @brief Get the channel 3 from the DAPHNE Stream frame header
   uint8_t get_channel3() const { return header.channel_3; }
 };
-  static_assert(sizeof(DAPHNEStreamFrame) == sizeof(detdataformats::DAQHeader) +
-		sizeof(DAPHNEStreamFrame::Header) +
-		sizeof(DAPHNEStreamFrame::word_t) * DAPHNEStreamFrame::s_num_adc_words +
-		sizeof(DAPHNEStreamFrame::Trailer));
+static_assert(sizeof(DAPHNEStreamFrame) == sizeof(detdataformats::DAQHeader) + sizeof(DAPHNEStreamFrame::Header) +
+                                             sizeof(DAPHNEStreamFrame::word_t) * DAPHNEStreamFrame::s_num_adc_words +
+                                             sizeof(DAPHNEStreamFrame::Trailer));
 
-  static_assert(std::endian::native == std::endian::little,
-		"The DAPHNEStreamFrame bitfield layout assumes little-endian architecture");
+static_assert(std::endian::native == std::endian::little,
+              "The DAPHNEStreamFrame bitfield layout assumes little-endian architecture");
 
-  static_assert(std::is_trivially_copyable_v<DAPHNEStreamFrame>,
-		"DAPHNEStreamFrame isn't trivially copyable and can't be safely std::memcpy'd");
-  static_assert(std::is_standard_layout_v<DAPHNEStreamFrame>,
-		"DAPHNEStreamFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+static_assert(std::is_trivially_copyable_v<DAPHNEStreamFrame>,
+              "DAPHNEStreamFrame isn't trivially copyable and can't be safely std::memcpy'd");
+static_assert(std::is_standard_layout_v<DAPHNEStreamFrame>,
+              "DAPHNEStreamFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
 } // namespace dunedaq::fddetdataformats
 
 #include "detail/DAPHNEStreamFrame.hxx"
 
-  // NOLINTEND(build/unsigned)
+// NOLINTEND(build/unsigned)
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNESTREAMFRAME_HPP_

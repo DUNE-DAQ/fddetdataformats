@@ -75,7 +75,8 @@ BOOST_AUTO_TEST_CASE(DAPHNEStreamFrame_IndexAndValueBounds)
   BOOST_CHECK_THROW(frame.set_adc(0, DAPHNEStreamFrame::s_channels_per_frame, 123), std::out_of_range);
   BOOST_CHECK_THROW(frame.set_adc(static_cast<uint32_t>(-1), 0, 123), std::out_of_range);
   BOOST_CHECK_THROW(frame.set_adc(0, static_cast<uint32_t>(-1), 123), std::out_of_range);
-  BOOST_CHECK_THROW(frame.set_adc(0, 0, static_cast<uint16_t>(1 << DAPHNEStreamFrame::s_bits_per_adc)), std::out_of_range);
+  BOOST_CHECK_THROW(frame.set_adc(0, 0, static_cast<uint16_t>(1 << DAPHNEStreamFrame::s_bits_per_adc)),
+                    std::out_of_range);
 
   BOOST_CHECK_NO_THROW(frame.set_adc(0, 0, static_cast<uint16_t>((1 << DAPHNEStreamFrame::s_bits_per_adc) - 1)));
   BOOST_CHECK_EQUAL(frame.get_adc(0, 0), static_cast<uint16_t>((1 << DAPHNEStreamFrame::s_bits_per_adc) - 1));

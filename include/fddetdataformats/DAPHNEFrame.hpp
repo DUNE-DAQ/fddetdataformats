@@ -10,7 +10,7 @@
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
  */
- 
+
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
 
@@ -19,15 +19,15 @@
 #include "detdataformats/DAQHeader.hpp"
 #include <algorithm> // For std::min
 #include <cassert>   // For assert()
+#include <cstdint>   // For uint32_t etc
 #include <cstdio>
 #include <cstdlib>
 #include <stdexcept> // For std::out_of_range
-#include <cstdint>   // For uint32_t etc
 
 namespace dunedaq::fddetdataformats {
 
 // NOLINTBEGIN(build/unsigned)
-  
+
 class DAPHNEFrame
 {
 public:
@@ -50,71 +50,72 @@ public:
   };
   static_assert(sizeof(Header) == 8);
 
-  struct PeakDescriptorData {
+  struct PeakDescriptorData
+  {
 
-        // Word 1: peak 0 odd
+    // Word 1: peak 0 odd
     // Declared in reverse order (LSB first) so that:
     //   - num_subpeaks_0 occupies bits [3:0]
     //   - reserved_0 occupies bits [7:4]
     //   - adc_integral_0 occupies bits [30:8]
     //   - found_0 occupies bit [31]
-    word_t num_subpeaks_0   : 4;   // Num_SubPeaks [3:0]
-    word_t reserved_0       : 4;   // Reserved      [7:4]
-    word_t adc_integral_0   : 23;  // ADC_Integral [30:8]
-    word_t found_0             : 1;   // Found       [31]
+    word_t num_subpeaks_0 : 4;  // Num_SubPeaks [3:0]
+    word_t reserved_0 : 4;      // Reserved      [7:4]
+    word_t adc_integral_0 : 23; // ADC_Integral [30:8]
+    word_t found_0 : 1;         // Found       [31]
 
     // Word 2: peak 0 even
     // Declared (LSB first) so that:
     //   - adc_max_0 occupies bits [13:0]
     //   - sample_max_0 occupies bits [22:14]
     //   - samples_over_baseline_0 occupies bits [31:23]
-    word_t adc_max_0                : 14;  // ADC Max         [13:0]
-    word_t sample_max_0            : 9;   // Time_Peak        [22:14]
-    word_t samples_over_baseline_0  : 9; // Time_Over_Baseline [31:23]
+    word_t adc_max_0 : 14;              // ADC Max         [13:0]
+    word_t sample_max_0 : 9;            // Time_Peak        [22:14]
+    word_t samples_over_baseline_0 : 9; // Time_Over_Baseline [31:23]
 
     // Word 3: peak 1 odd
-    word_t num_subpeaks_1           : 4;   // Num_SubPeaks [3:0]
-    word_t reserved_1               : 4;   // Reserved      [7:4]
-    word_t adc_integral_1           : 23;  // ADC_Integral [30:8]
-    word_t found_1                  : 1;   // Found       [31]
+    word_t num_subpeaks_1 : 4;  // Num_SubPeaks [3:0]
+    word_t reserved_1 : 4;      // Reserved      [7:4]
+    word_t adc_integral_1 : 23; // ADC_Integral [30:8]
+    word_t found_1 : 1;         // Found       [31]
 
     // Word 4: peak 1 even
-    word_t adc_max_1               : 14; // ADC Max         [13:0]
-    word_t sample_max_1           : 9;  // Time_Peak        [22:14]
-    word_t samples_over_baseline_1 : 9;// Time_Over_Baseline [31:23]
+    word_t adc_max_1 : 14;              // ADC Max         [13:0]
+    word_t sample_max_1 : 9;            // Time_Peak        [22:14]
+    word_t samples_over_baseline_1 : 9; // Time_Over_Baseline [31:23]
 
     // Word 5: peak 2 odd
-    word_t num_subpeaks_2          : 4;   // Num_SubPeaks [3:0]
-    word_t reserved_2              : 4;   // Reserved      [7:4]
-    word_t adc_integral_2          : 23;  // ADC_Integral [30:8]
-    word_t found_2                 : 1;   // Found       [31]
+    word_t num_subpeaks_2 : 4;  // Num_SubPeaks [3:0]
+    word_t reserved_2 : 4;      // Reserved      [7:4]
+    word_t adc_integral_2 : 23; // ADC_Integral [30:8]
+    word_t found_2 : 1;         // Found       [31]
 
     // Word 6: peak 2 even
-    word_t adc_max_2               : 14; // ADC Max         [13:0]
-    word_t sample_max_2           : 9;  // Time_Peak        [22:14]
-    word_t samples_over_baseline_2 : 9;// Time_Over_Baseline [31:23]
+    word_t adc_max_2 : 14;              // ADC Max         [13:0]
+    word_t sample_max_2 : 9;            // Time_Peak        [22:14]
+    word_t samples_over_baseline_2 : 9; // Time_Over_Baseline [31:23]
 
     // Word 7: peak 3 odd
-    word_t num_subpeaks_3          : 4;   // Num_SubPeaks [3:0]
-    word_t reserved_3              : 4;   // Reserved      [7:4]
-    word_t adc_integral_3          : 23;  // ADC_Integral [30:8]
-    word_t found_3                 : 1;   // Found       [31]
+    word_t num_subpeaks_3 : 4;  // Num_SubPeaks [3:0]
+    word_t reserved_3 : 4;      // Reserved      [7:4]
+    word_t adc_integral_3 : 23; // ADC_Integral [30:8]
+    word_t found_3 : 1;         // Found       [31]
 
     // Word 8: peak 3 even
-    word_t adc_max_3               : 14; // ADC Max         [13:0]
-    word_t sample_max_3           : 9;  // Time_Peak        [22:14]
-    word_t samples_over_baseline_3 : 9;// Time_Over_Baseline [31:23]
+    word_t adc_max_3 : 14;              // ADC Max         [13:0]
+    word_t sample_max_3 : 9;            // Time_Peak        [22:14]
+    word_t samples_over_baseline_3 : 9; // Time_Over_Baseline [31:23]
 
     // Word 9: peak 4 odd
-    word_t num_subpeaks_4          : 4;   // Num_SubPeaks [3:0]
-    word_t reserved_4              : 4;   // Reserved      [7:4]
-    word_t adc_integral_4          : 23;  // ADC_Integral [30:8]
-    word_t found_4                 : 1;   // Found       [31]
+    word_t num_subpeaks_4 : 4;  // Num_SubPeaks [3:0]
+    word_t reserved_4 : 4;      // Reserved      [7:4]
+    word_t adc_integral_4 : 23; // ADC_Integral [30:8]
+    word_t found_4 : 1;         // Found       [31]
 
     // Word 10: peak 4 even
-    word_t adc_max_4               : 14; // ADC Max         [13:0]
-    word_t sample_max_4           : 9;  // Time_Peak        [22:14]
-    word_t samples_over_baseline_4 : 9;// Time_Over_Baseline [31:23]
+    word_t adc_max_4 : 14;              // ADC Max         [13:0]
+    word_t sample_max_4 : 9;            // Time_Peak        [22:14]
+    word_t samples_over_baseline_4 : 9; // Time_Over_Baseline [31:23]
 
     // Word 11: Time_Start fields for indices 0,1,2 and Reserved
     // Declared in LSB-first order:
@@ -122,19 +123,19 @@ public:
     //   - samples_start_1 occupies bits [21:12]
     //   - samples_start_0 occupies bits [31:22]
     //   - reserved_5 occupies bits [1:0]
-    word_t samples_start_2     : 10;  // Time_Start(2) [11:2]
-    word_t samples_start_1     : 10;  // Time_Start(1) [21:12]
-    word_t samples_start_0     : 10;  // Time_Start(0) [31:22]
-    word_t reserved_5       : 2;   // Reserved         [1:0]
+    word_t samples_start_2 : 10; // Time_Start(2) [11:2]
+    word_t samples_start_1 : 10; // Time_Start(1) [21:12]
+    word_t samples_start_0 : 10; // Time_Start(0) [31:22]
+    word_t reserved_5 : 2;       // Reserved         [1:0]
 
     // Word 12: Time_Start fields for indices 3,4 and Reserved
     // Declared in LSB-first order:
     //   - reserved_6 occupies bits [11:0]
     //   - samples_start_4 occupies bits [21:12]
     //   - samples_start_3 occupies bits [31:22]
-    word_t reserved_6       : 12;  // Reserved         [11:0]
-    word_t samples_start_4     : 10;  // Time_Start(4) [21:12]
-    word_t samples_start_3     : 10;  // Time_Start(3) [31:22]
+    word_t reserved_6 : 12;      // Reserved         [11:0]
+    word_t samples_start_4 : 10; // Time_Start(4) [21:12]
+    word_t samples_start_3 : 10; // Time_Start(3) [31:22]
 
     // Word 13: Trailer word (all 32 bits), typically 0xFFFFFFFF.
     word_t trailer;
@@ -145,10 +146,10 @@ public:
      * @brief Get the Found value for a specific peak (channel) from the trailer.
      *        (Word 2*idx, bit 31)
      */
-    bool is_found( int idx ) const;
+    bool is_found(int idx) const;
 
     /// @brief Set the Found value for a specific peak (channel) in the trailer.
-    void set_found( uint8_t val, int idx );
+    void set_found(uint8_t val, int idx);
 
     /**
      * @brief Get the ADC_Integral value for a specific peak.
@@ -212,7 +213,7 @@ public:
 
     /**
      * @brief Set the time_start field for Peak index 0–4 using bit shifts.
-     * 
+     *
      * Trailer word 11 (index 10):
      *   - idx 0: bits [31:22]
      *   - idx 1: bits [21:12]
@@ -226,10 +227,12 @@ public:
     // ===============================================================
     // Helper: Reinterpret Trailer as an array of word_t
     // ===============================================================
-    const word_t* as_words() const {
+    const word_t* as_words() const
+    {
       return reinterpret_cast<const word_t*>(this); // NOLINT
     }
-    word_t* as_words() {
+    word_t* as_words()
+    {
       return reinterpret_cast<word_t*>(this); // NOLINT
     }
   };
@@ -240,38 +243,34 @@ public:
   word_t adc_words[s_num_adc_words]; // NOLINT
   PeakDescriptorData peaks_data;
 
-  
-/**
-  * @brief Get the ith ADC value in the frame
-  *
-  * The ADC words are 14 bits long, stored packed in the data structure. The order is:
-  *
-  * - 1024 adc values from one daphne channel
-  */
+  /**
+   * @brief Get the ith ADC value in the frame
+   *
+   * The ADC words are 14 bits long, stored packed in the data structure. The order is:
+   *
+   * - 1024 adc values from one daphne channel
+   */
   uint16_t get_adc(int i) const;
 
   /// @brief Set the ith ADC value in the frame to @p val
   void set_adc(int i, uint16_t val);
 
   uint8_t get_channel() const { return header.channel; }
-  void set_channel( uint8_t val) { header.channel = val & 0x3Fu; }
+  void set_channel(uint8_t val) { header.channel = val & 0x3Fu; }
 
   /// @brief Get the 64-bit timestamp of the frame
-  uint64_t get_timestamp() const {
-    return daq_header.get_timestamp();
-  }
+  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 };
-  static_assert(sizeof(DAPHNEFrame) == sizeof(detdataformats::DAQHeader) +
-		sizeof(DAPHNEFrame::Header) +
-		sizeof(DAPHNEFrame::word_t) * DAPHNEFrame::s_num_adc_words +
-		sizeof(DAPHNEFrame::PeakDescriptorData));
+static_assert(sizeof(DAPHNEFrame) == sizeof(detdataformats::DAQHeader) + sizeof(DAPHNEFrame::Header) +
+                                       sizeof(DAPHNEFrame::word_t) * DAPHNEFrame::s_num_adc_words +
+                                       sizeof(DAPHNEFrame::PeakDescriptorData));
 
-  static_assert(std::endian::native == std::endian::little,
-		"The DAPHNEFrame bitfield layout assumes little-endian architecture");
-  static_assert(std::is_trivially_copyable_v<DAPHNEFrame>,
-		"DAPHNEFrame isn't trivially copyable and can't be safely std::memcpy'd");
-  static_assert(std::is_standard_layout_v<DAPHNEFrame>,
-		"DAPHNEFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+static_assert(std::endian::native == std::endian::little,
+              "The DAPHNEFrame bitfield layout assumes little-endian architecture");
+static_assert(std::is_trivially_copyable_v<DAPHNEFrame>,
+              "DAPHNEFrame isn't trivially copyable and can't be safely std::memcpy'd");
+static_assert(std::is_standard_layout_v<DAPHNEFrame>,
+              "DAPHNEFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
 } // namespace dunedaq::fddetdataformats
 

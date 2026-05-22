@@ -13,9 +13,9 @@
 
 #include "boost/test/unit_test.hpp"
 
-#include <vector>
-#include <random>
 #include <algorithm>
+#include <random>
+#include <vector>
 
 // NOLINTBEGIN(build/unsigned)
 
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(DAPHNEFrame_AllFieldsTest)
     frame.set_adc(i, adcs[i]);
 
   frame.set_adc(0, adcs[0]);
-  
+
   for (int i = 0; i < n_adcs; ++i)
     BOOST_CHECK_EQUAL(frame.get_adc(i), adcs[i]);
 

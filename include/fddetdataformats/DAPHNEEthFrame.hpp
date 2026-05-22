@@ -2,8 +2,8 @@
  * @file DAPHNEEthFrame.hpp
  *
  * Contains declaration of DAPHNEEthFrame, a class for accessing raw WIB eth frames, as used in ProtoDUNE-SP-II
- * 
- * The canonical definition of the DAPHNE format is given in EDMS document 2088726: 
+ *
+ * The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  * https://edms.cern.ch/document/2088726/XXX (XXX a stand-in for the doc version, e.g. 5)
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -27,8 +27,8 @@
 
 namespace dunedaq::fddetdataformats {
 
-  // NOLINTBEGIN(build/unsigned)
-  
+// NOLINTBEGIN(build/unsigned)
+
 /**
  *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
  *
@@ -38,7 +38,6 @@ namespace dunedaq::fddetdataformats {
 class DAPHNEEthFrame
 {
 public:
-
   // The definition of the format is in terms of 64-bit words
   using word_t = uint64_t;
 
@@ -51,16 +50,16 @@ public:
   static constexpr int s_num_adc_words = s_num_adcs * s_bits_per_adc / s_bits_per_word;
 
   struct Header
-  {	  
+  {
     // The following bitfields constitute what could be considered "word_t w0;"
     word_t trig_sample : 14;
-    word_t rsv_0       : 2;
-    word_t threshold   : 14;
-    word_t rsv_1       : 2;
-    word_t baseline    : 14;
-    word_t rsv_2       : 6;
-    word_t version     : 4;
-    word_t channel     : 8;
+    word_t rsv_0 : 2;
+    word_t threshold : 14;
+    word_t rsv_1 : 2;
+    word_t baseline : 14;
+    word_t rsv_2 : 6;
+    word_t version : 4;
+    word_t channel : 8;
 
     word_t w1;
     word_t w2;
@@ -69,61 +68,51 @@ public:
     word_t w5;
     word_t w6;
   };
-  static_assert(sizeof(Header) == 7*sizeof(word_t));
-  
+  static_assert(sizeof(Header) == 7 * sizeof(word_t));
+
   detdataformats::DAQEthHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT
 
-/**
-  * @brief Get the ith ADC value in the frame
-  *
-  * The ADC words are 14 bits long, stored packed in the data structure. The order is:
-  *
-  * - 1024 adc values from one daphne channel
-  */
-uint16_t get_adc(int i) const; // NOLINT
-
+  /**
+   * @brief Get the ith ADC value in the frame
+   *
+   * The ADC words are 14 bits long, stored packed in the data structure. The order is:
+   *
+   * - 1024 adc values from one daphne channel
+   */
+  uint16_t get_adc(int i) const; // NOLINT
 
   /// @brief Set the ith ADC value in the frame to @p val
   void set_adc(int i, uint16_t val); // NOLINT
 
   /// @brief Get the starting 64-bit timestamp of the frame
-  uint64_t get_timestamp() const {
-    return daq_header.get_timestamp() ;
-  }
+  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
   /// @brief Set the starting 64-bit timestamp of the frame
-  void set_timestamp(const uint64_t new_timestamp) {
-    daq_header.timestamp = new_timestamp;
-  }
+  void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
 
   /// @brief Get the channel identifier of the frame
-  uint8_t get_channel() const {
-    return header.channel ;
-  }
+  uint8_t get_channel() const { return header.channel; }
 
   /// @brief Set the channel identifier of the frame
-  void set_channel(const uint8_t new_channel) {
-    header.channel = new_channel;
-  }
+  void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
 };
-  static_assert(sizeof(DAPHNEEthFrame) == sizeof(detdataformats::DAQEthHeader) +
-		sizeof(DAPHNEEthFrame::Header) +
-		sizeof(DAPHNEEthFrame::word_t) * DAPHNEEthFrame::s_num_adc_words);
+static_assert(sizeof(DAPHNEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(DAPHNEEthFrame::Header) +
+                                          sizeof(DAPHNEEthFrame::word_t) * DAPHNEEthFrame::s_num_adc_words);
 
-  static_assert(std::endian::native == std::endian::little,
-		"The DAPHNEEthFrame bitfield layout assumes little-endian architecture");
+static_assert(std::endian::native == std::endian::little,
+              "The DAPHNEEthFrame bitfield layout assumes little-endian architecture");
 
-  static_assert(std::is_trivially_copyable_v<DAPHNEEthFrame>,
-		"DAPHNEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
-  static_assert(std::is_standard_layout_v<DAPHNEEthFrame>,
-		"DAPHNEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+static_assert(std::is_trivially_copyable_v<DAPHNEEthFrame>,
+              "DAPHNEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
+static_assert(std::is_standard_layout_v<DAPHNEEthFrame>,
+              "DAPHNEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
 } // namespace dunedaq::fddetdataformats
 
 #include "detail/DAPHNEEthFrame.hxx"
 
-  // NOLINTEND(build/unsigned)
+// NOLINTEND(build/unsigned)
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_

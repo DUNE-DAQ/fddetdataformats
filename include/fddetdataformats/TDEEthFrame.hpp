@@ -2,8 +2,8 @@
  * @file TDEEthFrame.hpp
  *
  * Contains declaration of TDEEthFrame, a class for accessing raw WIB v2 frames, as used in ProtoDUNE-SP-II
- * 
- * The canonical definition of the WIB format is given in EDMS document 2088713: 
+ *
+ * The canonical definition of the WIB format is given in EDMS document 2088713:
  * https://edms.cern.ch/document/2088713
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
@@ -27,8 +27,8 @@
 
 namespace dunedaq::fddetdataformats {
 
-  // NOLINTBEGIN(build/unsigned)
-  
+// NOLINTBEGIN(build/unsigned)
+
 /**
  *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
  *
@@ -38,7 +38,6 @@ namespace dunedaq::fddetdataformats {
 class TDEEthFrame
 {
 public:
-
   // The definition of the format is in terms of 64-bit words
   using word_t = uint64_t;
 
@@ -61,7 +60,6 @@ public:
   };
   static_assert(sizeof(TDEEthHeader) == 16);
 
-  
   detdataformats::DAQEthHeader daq_header;
   TDEEthHeader header;
   word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
@@ -73,42 +71,33 @@ public:
    * The ADC words are 14 bits long
    *
    */
-  uint16_t get_adc(int i_channel, int i_sample=0) const;
-
+  uint16_t get_adc(int i_channel, int i_sample = 0) const;
 
   /// @brief Set the i_channel-th ADC value in the i_sample-th time sample to @p val
   void set_adc(int i_channel, int i_sample, uint16_t val);
 
   /// @brief Get the starting 64-bit timestamp of the frame
-  uint64_t get_timestamp() const {
-    return daq_header.get_timestamp() ;
-  }
+  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
   /// @brief Set the starting 64-bit timestamp of the frame
-  void set_timestamp(const uint64_t new_timestamp) {
-    daq_header.timestamp = new_timestamp;
-  }
+  void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
 
   /// @brief Get the channel identifier of the frame
-  uint8_t get_channel() const {
-    return header.channel ;
-  }
+  uint8_t get_channel() const { return header.channel; }
 
   /// @brief Set the channel identifier of the frame
-  void set_channel(const uint8_t new_channel) {
-    header.channel = new_channel;
-  }
+  void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
 };
-  static_assert(sizeof(TDEEthFrame) == sizeof(detdataformats::DAQEthHeader) +
-		sizeof(TDEEthFrame::TDEEthHeader) +
-		sizeof(TDEEthFrame::word_t) * TDEEthFrame::s_time_samples_per_frame * TDEEthFrame::s_num_adc_words_per_ts);
+static_assert(sizeof(TDEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(TDEEthFrame::TDEEthHeader) +
+                                       sizeof(TDEEthFrame::word_t) * TDEEthFrame::s_time_samples_per_frame *
+                                         TDEEthFrame::s_num_adc_words_per_ts);
 
-  static_assert(std::endian::native == std::endian::little,
-		"The TDEEthFrame bitfield layout assumes little-endian architecture");
-  static_assert(std::is_trivially_copyable_v<TDEEthFrame>,
-		"TDEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
-  static_assert(std::is_standard_layout_v<TDEEthFrame>,
-		"TDEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+static_assert(std::endian::native == std::endian::little,
+              "The TDEEthFrame bitfield layout assumes little-endian architecture");
+static_assert(std::is_trivially_copyable_v<TDEEthFrame>,
+              "TDEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
+static_assert(std::is_standard_layout_v<TDEEthFrame>,
+              "TDEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
 } // namespace dunedaq::fddetdataformats
 

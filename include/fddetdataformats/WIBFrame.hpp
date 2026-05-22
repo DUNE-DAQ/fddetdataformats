@@ -12,10 +12,10 @@
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBFRAME_HPP_
 
 #include <bitset>
-#include <iostream>
-#include <vector>
-#include <stdexcept>
 #include <cstdint>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
 
 namespace dunedaq::fddetdataformats {
 
@@ -319,7 +319,7 @@ private:
     auto segment_id = (adc / 2) * 2 + ch / 4;
 
     if (segment_id < 0 || segment_id > s_num_seg_per_block - 1) {
-        throw std::out_of_range("ADC index out of range");      
+      throw std::out_of_range("ADC index out of range");
     }
     return segment_id;
   }
@@ -418,7 +418,7 @@ private:
   void throw_if_invalid_block_index_(const int block_num) const
   {
     if (block_num < 0 || block_num > s_num_block_per_frame - 1) {
-       throw std::out_of_range("FEMB index out of range");
+      throw std::out_of_range("FEMB index out of range");
     }
   }
 
@@ -437,6 +437,6 @@ operator<<(std::ostream& o, WIBFrame const& frame)
   return o;
 }
 
-} // namespace dunedaq::fddetdataformats 
+} // namespace dunedaq::fddetdataformats
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBFRAME_HPP_
