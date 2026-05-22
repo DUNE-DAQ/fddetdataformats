@@ -1,5 +1,5 @@
 /**
- * @file Utils_test.cxx Utils Unit Tests
+ * @file Utils_fddetdataformats_test.cxx Utils Unit Tests
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2022.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -8,7 +8,7 @@
 
 #include "fddetdataformats/Utils.hpp"
 
-#define BOOST_TEST_MODULE Utils_test // NOLINT
+#define BOOST_TEST_MODULE Utils_fddetdataformats_test // NOLINT
 
 #include "boost/test/unit_test.hpp"
 
@@ -17,9 +17,9 @@
 
 // NOLINTBEGIN(build/unsigned)
 
-BOOST_AUTO_TEST_SUITE(Utils_test)
+BOOST_AUTO_TEST_SUITE(Utils_fddetdataformats_test)
 
-BOOST_AUTO_TEST_CASE(Utils_ADCOperation_LowLevelChecks)
+BOOST_AUTO_TEST_CASE(Utils_fddetdataformats_ADCOperation_LowLevelChecks)
 {
   // Start with something really low level
 
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(Utils_ADCOperation_LowLevelChecks)
       1, 0, tiny_adc_arr)));
 }
 
-BOOST_AUTO_TEST_CASE(Utils_ADCOperation_BasicChecks)
+BOOST_AUTO_TEST_CASE(Utils_fddetdataformats_ADCOperation_BasicChecks)
 {
 
   using wordtype_t = uint32_t;

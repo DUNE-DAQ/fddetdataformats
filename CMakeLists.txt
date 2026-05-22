@@ -33,7 +33,7 @@ daq_add_unit_test(DAPHNEEthFrame_test LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(DAPHNEEthStreamFrame_test LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(CRTGrenobleFrame_test LINK_LIBRARIES fddetdataformats)
 
-daq_add_unit_test(Utils_test)
+daq_add_unit_test(Utils_fddetdataformats_test)
 
 ##############################################################################
 
