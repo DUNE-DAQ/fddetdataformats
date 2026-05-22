@@ -360,7 +360,7 @@ BOOST_DATA_TEST_CASE(CompareToUnpack, boost::unit_test::data::make(make_vals()),
   // Create the packed array from the unpacked array
   wib2unpack::repack_frame(&unpacked, &packed);
 
-  //WIB2Frame* wib2frame = reinterpret_cast<WIB2Frame*>(&packed); // NOLINT
+  // WIB2Frame* wib2frame = reinterpret_cast<WIB2Frame*>(&packed); // NOLINT
   size_t num_errors = 0;
 
   // TODO: replace with some meaningul test in the future
@@ -398,21 +398,20 @@ BOOST_AUTO_TEST_CASE(WIB2Frame_ADCDataMutators)
 {
   std::random_device dev;
   std::mt19937 rng(dev());
-  std::uniform_int_distribution<std::mt19937::result_type> dist(1,(1<<14)-1);
+  std::uniform_int_distribution<std::mt19937::result_type> dist(1, (1 << 14) - 1);
   std::vector<int> v;
-  for(int i=0; i<256; i++) {
+  for (int i = 0; i < 256; i++) {
     v.push_back(dist(rng));
   }
 
-  dunedaq::fddetdataformats::WIB2Frame wib2frame {};
-  for(int i=0; i<256; i++) {
+  dunedaq::fddetdataformats::WIB2Frame wib2frame{};
+  for (int i = 0; i < 256; i++) {
     wib2frame.set_adc(i, v[i]);
   }
 
-  for(int i=0; i<256; i++) {
+  for (int i = 0; i < 256; i++) {
     BOOST_REQUIRE_EQUAL(wib2frame.get_adc(i), v[i]);
   }
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

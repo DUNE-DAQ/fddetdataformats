@@ -7,6 +7,9 @@ daq_setup_environment()
 
 find_package(detdataformats REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+
+# Logging functionality + ERS should only be used in unit tests since
+# offline uses this code
 find_package(logging REQUIRED)
 
 ##############################################################################
@@ -23,7 +26,14 @@ daq_add_unit_test(WIBEthFrame_test LINK_LIBRARIES fddetdataformats logging::logg
 daq_add_unit_test(WIB2Frame_test   LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(WIBFrame_test    LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(TDE16Frame_test  LINK_LIBRARIES fddetdataformats)
+daq_add_unit_test(TDEEthFrame_test LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(DAPHNEFrame_test LINK_LIBRARIES fddetdataformats)
+daq_add_unit_test(DAPHNEStreamFrame_test LINK_LIBRARIES fddetdataformats)
+daq_add_unit_test(DAPHNEEthFrame_test LINK_LIBRARIES fddetdataformats)
+daq_add_unit_test(DAPHNEEthStreamFrame_test LINK_LIBRARIES fddetdataformats)
+daq_add_unit_test(CRTGrenobleFrame_test LINK_LIBRARIES fddetdataformats)
+
+daq_add_unit_test(Utils_fddetdataformats_test)
 
 ##############################################################################
 
