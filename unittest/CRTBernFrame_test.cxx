@@ -15,6 +15,8 @@
 #include <random>
 #include <vector>
 
+// NOLINTBEGIN(build/unsigned)
+
 BOOST_AUTO_TEST_SUITE(CRTBernFrame_test)
 
 BOOST_AUTO_TEST_CASE(CRTBernFrame_ADCDataMutators)
@@ -152,3 +154,5 @@ BOOST_AUTO_TEST_CASE(CRTBernFrame_Constants)
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+// NOLINTEND(build/unsigned)

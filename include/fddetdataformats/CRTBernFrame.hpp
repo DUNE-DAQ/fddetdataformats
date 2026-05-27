@@ -22,6 +22,8 @@
 
 namespace dunedaq::fddetdataformats {
 
+// NOLINTBEGIN(build/unsigned)
+
 /**
  *  @brief Class for accessing/holding raw CRT data from the 'Bern' panels ProtoDUNE-II VD
  *
@@ -29,10 +31,6 @@ namespace dunedaq::fddetdataformats {
 class CRTBernFrame
 {
 public:
-  // ===============================================================
-  // Preliminaries
-  // ===============================================================
-
   // The definition of the format is in terms of 64-bit words
   using word_t = uint64_t; // NOLINT
 
@@ -47,25 +45,18 @@ public:
     uint16_t lostfpga = 0;
     uint32_t ts0 = 0;
     uint32_t ts1 = 0;
-    uint16_t adc[s_num_channels] = { 0 };
+    uint16_t adc[s_num_channels] = { 0 }; // NOLINT
     uint32_t coinc = 0;
   };
+  #warning "CRTBernData has padding inserted"
+  //static_assert(sizeof(CRTBernData) == 2 + 2 + 2 + 4 + 4 + 2 * s_num_channels + 4);
 
-  // ===============================================================
-  // Data members
-  // ===============================================================
   detdataformats::DAQEthHeader daq_header;
   uint16_t mac5;
   CRTBernData data;
 
-  // ===============================================================
-  // Accessors
-  // ===============================================================
-
-  /**
-   * @brief Get the adc value for channel i_ch
-   */
-  uint16_t get_adc(int i_ch) const // NOLINT(build/unsigned)
+  /// @brief Get the adc value for channel i_ch
+  uint16_t get_adc(int i_ch) const
   {
     if (i_ch < 0 || i_ch >= s_num_channels)
       throw std::out_of_range("ADC channel index out of range");
@@ -73,10 +64,8 @@ public:
     return data.adc[i_ch];
   }
 
-  /**
-   * @brief Set the adc value for channel i_ch to @p val
-   */
-  void set_adc(int i_ch, uint16_t val) // NOLINT(build/unsigned)
+  /// @brief Set the adc value for channel i_ch to @p val
+  void set_adc(int i_ch, uint16_t val)
   {
     if (i_ch < 0 || i_ch >= s_num_channels)
       throw std::out_of_range("ADC channel index out of range");
@@ -84,104 +73,63 @@ public:
     data.adc[i_ch] = val;
   }
 
-  /** @brief Get the starting 64-bit timestamp of the frame
-   */
-  uint64_t get_timestamp() const // NOLINT(build/unsigned)
-  {
-    return daq_header.get_timestamp(); // NOLINT(build/unsigned)
-  }
+  /// @brief Get the starting 64-bit timestamp of the frame
+  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
   /** @brief Set the starting 64-bit timestamp of the frame
    *  also set the underlying ts0 to be consistent
    */
-  void set_timestamp(const uint64_t new_timestamp) // NOLINT(build/unsigned)
+  void set_timestamp(const uint64_t new_timestamp)
   {
     daq_header.timestamp = new_timestamp;
     data.ts0 = (new_timestamp % s_DTS_ticks_per_second) * s_ns_per_DTS_tick;
   }
 
-  /** @brief Get the MAC5 identifier of the frame
-   */
-  uint16_t get_mac5() const // NOLINT(build/unsigned)
-  {
-    return mac5; // NOLINT(build/unsigned)
-  }
+  uint16_t get_mac5() const { return mac5; }
 
-  /** @brief Set the MAC5 identifier of the frame
-   */
-  void set_mac5(const uint16_t new_mac5) // NOLINT(build/unsigned)
-  {
-    mac5 = new_mac5;
-  }
+  void set_mac5(const uint16_t new_mac5) { mac5 = new_mac5; }
 
-  /** @brief Get the flags field of the CRTBernData
-   */
-  uint16_t get_flags() const // NOLINT(build/unsigned)
-  {
-    return data.flags; // NOLINT(build/unsigned)
-  }
+  uint16_t get_flags() const { return data.flags; }
 
-  /** @brief Set the flags field of the CRTBernData
-   */
-  void set_flags(const uint16_t new_flags) // NOLINT(build/unsigned)
-  {
-    data.flags = new_flags;
-  }
+  void set_flags(const uint16_t new_flags) { data.flags = new_flags; }
 
-  /** @brief Get the lostcpu counter of the CRTBernData
-   */
-  uint16_t get_lostcpu() const // NOLINT(build/unsigned)
-  {
-    return data.lostcpu; // NOLINT(build/unsigned)
-  }
+  /// @brief Get the lostcpu counter of the CRTBernData
+  uint16_t get_lostcpu() const { return data.lostcpu; }
 
-  /** @brief Set the lostcpu counter of the CRTBernData
-   */
-  void set_lostcpu(const uint16_t new_lostcpu) // NOLINT(build/unsigned)
-  {
-    data.lostcpu = new_lostcpu;
-  }
+  /// @brief Set the lostcpu counter of the CRTBernData
+  void set_lostcpu(const uint16_t new_lostcpu) { data.lostcpu = new_lostcpu; }
 
-  /** @brief Get the lostfpga counter of the CRTBernData
-   */
-  uint16_t get_lostfpga() const // NOLINT(build/unsigned)
-  {
-    return data.lostfpga; // NOLINT(build/unsigned)
-  }
+  /// @brief Get the lostfpga counter of the CRTBernData
+  uint16_t get_lostfpga() const { return data.lostfpga; }
 
-  /** @brief Set the lostfpga counter of the CRTBernData
-   */
-  void set_lostfpga(const uint16_t new_lostfpga) // NOLINT(build/unsigned)
-  {
-    data.lostfpga = new_lostfpga;
-  }
+  /// @brief Set the lostfpga counter of the CRTBernData
+  void set_lostfpga(const uint16_t new_lostfpga) { data.lostfpga = new_lostfpga; }
 
-  /** @brief Get the ts0 timestamp of the CRTBernData
-   */
   uint32_t get_ts0() const { return data.ts0; }
 
-  /** @brief Set the ts0 timestamp of the CRTBernData
-   */
   void set_ts0(const uint32_t new_ts0) { data.ts0 = new_ts0; }
 
-  /** @brief Get the ts1 timestamp of the CRTBernData
-   */
   uint32_t get_ts1() const { return data.ts1; }
 
-  /** @brief Set the ts1 timestamp of the CRTBernData
-   */
   void set_ts1(const uint32_t new_ts1) { data.ts1 = new_ts1; }
 
-  /** @brief Get the coinc counter of the CRTBernData
-   */
   uint32_t get_coinc() const { return data.coinc; }
 
-  /** @brief Set the coinc counter of the CRTBernData
-   */
   void set_coinc(const uint32_t new_coinc) { data.coinc = new_coinc; }
 
 }; // CRTBernFrame
+  #warning "CRTBernFrame has padding inserted"
+  // static_assert(sizeof(CRTBernFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(uint16_t) + sizeof(CRTBernFrame::CRTBernData));
+
+  static_assert(std::endian::native == std::endian::little,
+		"The CRTBernFrame bitfield layout assumes little-endian architecture");
+  static_assert(std::is_trivially_copyable_v<CRTBernFrame>,
+		"CRTBernFrame isn't trivially copyable and can't be safely std::memcpy'd");
+  static_assert(std::is_standard_layout_v<CRTBernFrame>,
+		"CRTBernFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
 } // namespace dunedaq::fddetdataformats
+
+// NOLINTEND(build/unsigned)
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_CRTBERNFRAME_HPP_
