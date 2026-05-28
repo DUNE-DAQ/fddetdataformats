@@ -74,10 +74,10 @@ public:
   }
 
   /// @brief Get the @p i ADC value of @p chn in the frame
-  uint16_t get_adc(uint i_adc, uint i_channel) const;
+  uint16_t get_adc(int i_adc, int i_channel) const;
 
   /// @brief Set the @p i ADC value of @p chn in the frame to @p val
-  void set_adc(uint i, uint chn, uint16_t val);
+  void set_adc(int i, int i_channel, uint16_t val);
 
   /// @brief Get the channel 0 from the DAPHNE Stream frame header
   uint8_t get_channel0() const { return header.channel_0; }

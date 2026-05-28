@@ -75,14 +75,12 @@ public:
   const Header& get_header() const {
     return header;
   }
-  
+
   /// @brief Get the @p i_adc-th ADC value of @p i_channel-th channel in the frame
-  uint16_t get_adc(uint i_adc, uint i_channel) const;
+  uint16_t get_adc(int i_adc, int i_channel) const;
 
   /// @brief Set the @p i_adc-th ADC value of @p i_channel-th channel in the frame to @p val
-
-  // WARNING: ORDER OF CHANNEL AND ADC IS REVERSED RELATIVE TO get_adc
-  void set_adc(uint i_channel, uint i_adc, uint16_t val); // NOLINT
+  void set_adc(int i_adc, int i_channel, uint16_t val); // NOLINT
 
   /// @brief Get the starting 64-bit timestamp of the frame
   uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
@@ -91,10 +89,10 @@ public:
   void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
 
   /// @brief Get the channel identifier of the frame
-  uint8_t get_channel(const uint i_channel) const;
+  uint8_t get_channel(const int i_channel) const;
 
   /// @brief Set the channel identifier of the frame
-  void set_channel(const uint i_channel, const uint8_t new_channel_val);
+  void set_channel(const int i_channel, const uint8_t new_channel_val);
 
   /// @brief Get the channel 0 from the DAPHNE Stream frame header
   uint8_t get_channel0() const { return header.channel_words[0].channel; }
