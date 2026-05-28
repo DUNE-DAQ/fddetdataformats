@@ -70,10 +70,14 @@ public:
   };
   static_assert(sizeof(Header) == 7 * sizeof(word_t));
 
-  detdataformats::DAQEthHeader daq_header;
-  Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT
+  const detdataformats::DAQEthHeader& get_daqheader() const {
+    return daq_header;
+  }
 
+  const Header& get_header() const {
+    return header;
+  }
+  
   /**
    * @brief Get the ith ADC value in the frame
    *
@@ -97,6 +101,16 @@ public:
 
   /// @brief Set the channel identifier of the frame
   void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
+
+  void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
+    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
+  }
+  
+private:
+  detdataformats::DAQEthHeader daq_header;
+  Header header;
+  word_t adc_words[s_num_adc_words]; // NOLINT
+
 };
 static_assert(sizeof(DAPHNEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(DAPHNEEthFrame::Header) +
                                           sizeof(DAPHNEEthFrame::word_t) * DAPHNEEthFrame::s_num_adc_words);

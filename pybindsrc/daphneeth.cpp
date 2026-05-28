@@ -84,15 +84,15 @@ register_daphneeth(py::module& m)
     }))
     .def(
       "get_daqheader",
-      [](DAPHNEEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.daq_header; },
+      [](DAPHNEEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.get_daqheader(); },
       py::return_value_policy::reference_internal)
     .def(
       "get_daphneheader",
-      [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& { return self.header; },
+      [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& { return self.get_header(); },
       py::return_value_policy::reference_internal)
     .def(
       "get_header",
-      [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& { return self.header; },
+      [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& { return self.get_header(); },
       py::return_value_policy::reference_internal)
     .def("get_adc", &DAPHNEEthFrame::get_adc)
     .def("set_adc", &DAPHNEEthFrame::set_adc)
