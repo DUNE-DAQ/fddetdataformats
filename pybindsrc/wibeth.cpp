@@ -102,11 +102,11 @@ register_wibeth(py::module& m)
     }))
     .def(
       "get_daqheader",
-      [](WIBEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.daq_header; },
+      [](WIBEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.get_daqheader(); },
       py::return_value_policy::reference_internal)
     .def(
       "get_wibheader",
-      [](WIBEthFrame& self) -> const WIBEthFrame::WIBEthHeader& { return self.header; },
+      [](WIBEthFrame& self) -> const WIBEthFrame::WIBEthHeader& { return self.get_header(); },
       py::return_value_policy::reference_internal)
     .def("get_adc", &WIBEthFrame::get_adc)
     .def("set_adc", &WIBEthFrame::set_adc)

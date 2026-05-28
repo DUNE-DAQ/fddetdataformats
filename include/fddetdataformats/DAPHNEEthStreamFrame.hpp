@@ -15,7 +15,7 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHSTREAMFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHSTREAMFRAME_HPP_
 
-#include "Utils.hpp"
+#include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
 
@@ -68,10 +68,14 @@ public:
   };
   static_assert(sizeof(Header) == sizeof(ChannelWord) * s_num_channels);
 
-  detdataformats::DAQEthHeader daq_header;
-  Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT
+  const detdataformats::DAQEthHeader& get_daqheader() const {
+    return daq_header;
+  }
 
+  const Header& get_header() const {
+    return header;
+  }
+  
   /// @brief Get the @p i_adc-th ADC value of @p i_channel-th channel in the frame
   uint16_t get_adc(uint i_adc, uint i_channel) const;
 
@@ -103,6 +107,15 @@ public:
 
   /// @brief Get the channel 3 from the DAPHNE Stream frame header
   uint8_t get_channel3() const { return header.channel_words[3].channel; }
+
+  void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
+    fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
+  }
+
+private:
+  detdataformats::DAQEthHeader daq_header;
+  Header header;
+  word_t adc_words[s_num_adc_words]; // NOLINT
 };
 static_assert(sizeof(DAPHNEEthStreamFrame) ==
               sizeof(detdataformats::DAQEthHeader) + sizeof(DAPHNEEthStreamFrame::Header) +

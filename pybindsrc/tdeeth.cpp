@@ -124,11 +124,15 @@ register_tdeeth(py::module& m)
     }))
     .def(
       "get_daqheader",
-      [](TDEEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.daq_header; },
+      [](TDEEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.get_daqheader(); },
       py::return_value_policy::reference_internal)
     .def(
       "get_tdeheader",
-      [](TDEEthFrame& self) -> const TDEEthFrame::TDEEthHeader& { return self.header; },
+      [](TDEEthFrame& self) -> const TDEEthFrame::TDEEthHeader& { return self.get_header(); },
+      py::return_value_policy::reference_internal)
+    .def(
+      "get_header",
+      [](TDEEthFrame& self) -> const TDEEthFrame::TDEEthHeader& { return self.get_header(); },
       py::return_value_policy::reference_internal)
     .def("get_adc", &TDEEthFrame::get_adc)
     .def("set_adc", &TDEEthFrame::set_adc)

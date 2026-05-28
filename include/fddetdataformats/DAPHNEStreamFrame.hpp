@@ -15,7 +15,7 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNESTREAMFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNESTREAMFRAME_HPP_
 
-#include "Utils.hpp"
+#include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQHeader.hpp" // For unified DAQ header
 
@@ -56,11 +56,14 @@ public:
   };
   static_assert(sizeof(Trailer) == 4);
 
-  detdataformats::DAQHeader daq_header;
-  Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT (a false accusation from the linter that s_num_adc_words is a variable)
-  Trailer trailer;
+  const detdataformats::DAQHeader& get_daqheader() const {
+    return daq_header;
+  }
 
+  const Header& get_header() const {
+    return header;
+  }
+  
   uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
   /// @brief Set the 64-bit timestamp of the frame
@@ -87,6 +90,13 @@ public:
 
   /// @brief Get the channel 3 from the DAPHNE Stream frame header
   uint8_t get_channel3() const { return header.channel_3; }
+
+private:
+  detdataformats::DAQHeader daq_header;
+  Header header;
+  word_t adc_words[s_num_adc_words]; // NOLINT (a false accusation from the linter that s_num_adc_words is a variable)
+  Trailer trailer;
+
 };
 static_assert(sizeof(DAPHNEStreamFrame) == sizeof(detdataformats::DAQHeader) + sizeof(DAPHNEStreamFrame::Header) +
                                              sizeof(DAPHNEStreamFrame::word_t) * DAPHNEStreamFrame::s_num_adc_words +

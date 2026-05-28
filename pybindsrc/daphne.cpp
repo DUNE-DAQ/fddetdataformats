@@ -246,11 +246,11 @@ register_daphne(py::module& m)
     }))
     .def(
       "get_daqheader",
-      [](DAPHNEStreamFrame& self) -> const detdataformats::DAQHeader& { return self.daq_header; },
+      [](DAPHNEStreamFrame& self) -> const detdataformats::DAQHeader& { return self.get_daqheader(); },
       py::return_value_policy::reference_internal)
     .def(
       "get_header",
-      [](DAPHNEStreamFrame& self) -> const DAPHNEStreamFrame::Header& { return self.header; },
+      [](DAPHNEStreamFrame& self) -> const DAPHNEStreamFrame::Header& { return self.get_header(); },
       py::return_value_policy::reference_internal)
     //.def("get_trailer", [](DAPHNEStreamFrame& self) -> const DAPHNEStreamFrame::PeakDescriptorData& {return
     //self.trailer;}, py::return_value_policy::reference_internal)

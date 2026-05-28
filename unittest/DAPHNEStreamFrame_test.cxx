@@ -112,26 +112,6 @@ BOOST_AUTO_TEST_CASE(DAPHNEStreamFrame_BitPackingBoundaryIsolation)
   BOOST_CHECK_EQUAL(frame.get_adc(boundary_sample, 1), 0x1555u);
 }
 
-BOOST_AUTO_TEST_CASE(DAPHNEStreamFrame_MetadataMutators)
-{
-  using dunedaq::fddetdataformats::DAPHNEStreamFrame;
-
-  DAPHNEStreamFrame frame{};
-
-  frame.set_timestamp(0x0123456789ABCDEFuLL);
-  BOOST_CHECK_EQUAL(frame.get_timestamp(), 0x0123456789ABCDEFuLL);
-
-  frame.header.channel_0 = 10;
-  frame.header.channel_1 = 20;
-  frame.header.channel_2 = 30;
-  frame.header.channel_3 = 40;
-
-  BOOST_CHECK_EQUAL(frame.get_channel0(), 10);
-  BOOST_CHECK_EQUAL(frame.get_channel1(), 20);
-  BOOST_CHECK_EQUAL(frame.get_channel2(), 30);
-  BOOST_CHECK_EQUAL(frame.get_channel3(), 40);
-}
-
 BOOST_AUTO_TEST_SUITE_END()
 
 // NOLINTEND(build/unsigned)

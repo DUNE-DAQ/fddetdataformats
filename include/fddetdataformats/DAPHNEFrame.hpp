@@ -14,7 +14,7 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
 
-#include "Utils.hpp"
+#include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQHeader.hpp"
 #include <algorithm> // For std::min

@@ -11,6 +11,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_CRTGRENOBLEFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_CRTGRENOBLEFRAME_HPP_
 
+#include "fddetdataformats/Utils.hpp"
+
 #include "detdataformats/DAQEthHeader.hpp"
 
 #include <algorithm> // For std::min
@@ -73,13 +75,18 @@ public:
 
     struct STChannel channels[s_num_channels];
   };
-
 #warning "CRTGrenobleFrame::STEvent has padding inserted"
   // static_assert(sizeof(STEvent) == 3 * sizeof(unsigned int) + sizeof(TGpsDateStruct) + 2 * sizeof(unsigned int) +
   // sizeof(STChannel) * s_num_channels);
 
-  detdataformats::DAQEthHeader daq_header;
-  STEvent event;
+  const detdataformats::DAQEthHeader& get_daqheader() const {
+    return daq_header;
+  }
+
+  // CRTGrenobleReaderModule needs full access to the daq_header for fake data purposes
+  detdataformats::DAQEthHeader& get_daqheader() {
+    return daq_header;
+  }
 
   /// @brief Get the adc value for channel i_ch
   int get_adc(const int i_ch) const
@@ -105,6 +112,14 @@ public:
   /// @brief Set the starting 64-bit timestamp of the frame
   void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
 
+  void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
+    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
+  }
+
+private:
+  detdataformats::DAQEthHeader daq_header; // Formally private, but has a non-const accessor
+  STEvent event;
+  
 }; // CRTGrenobleFrame
 #warning "CRTGrenobleFrame has padding inserted"
 // static_assert(sizeof(CRTGrenobleFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(CRTGrenobleFrame::STEvent));

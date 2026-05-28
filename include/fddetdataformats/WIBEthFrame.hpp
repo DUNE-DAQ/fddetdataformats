@@ -14,7 +14,7 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBETHFRAME_HPP_
 
-#include "Utils.hpp"
+#include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
 
@@ -71,9 +71,13 @@ public:
   };
   static_assert(sizeof(WIBEthHeader) == 8 + 8); // 8 bytes for the bitfield section, 8 for the extra_data
 
-  detdataformats::DAQEthHeader daq_header;
-  WIBEthHeader header;
-  word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
+  const detdataformats::DAQEthHeader& get_daqheader() const {
+    return daq_header;
+  }
+
+  const WIBEthHeader& get_header() const {
+    return header;
+  }
 
   /**
    * @brief Get the i_channel-th ADC value in the i_sample-th time sample
@@ -98,6 +102,20 @@ public:
 
   /// @brief Set the channel identifier of the frame
   void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
+
+  void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
+    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
+  }
+
+  const word_t* get_adc_words() const {
+    return &adc_words[0][0];
+  }
+
+private:
+  detdataformats::DAQEthHeader daq_header;
+  WIBEthHeader header;
+  word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
+
 };
 static_assert(sizeof(WIBEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(WIBEthFrame::WIBEthHeader) +
                                        sizeof(WIBEthFrame::word_t) * WIBEthFrame::s_time_samples_per_frame *

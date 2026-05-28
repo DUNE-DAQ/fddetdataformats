@@ -13,6 +13,9 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_UTILS_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_UTILS_HPP_
 
+#include "detdataformats/DAQHeader.hpp"
+#include "detdataformats/DAQEthHeader.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <format>
@@ -221,6 +224,26 @@ set_adc_2d(const int i_sample, const int i_adc, WordType adc_val, WordType (&adc
   }
 
   set_adc_1d<WordType, Columns, BitsPerADC>(i_adc, adc_val, adc_matrix[i_sample]);
+}
+
+inline void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id, detdataformats::DAQEthHeader& hdr) {
+  hdr.crate_id = crate_id;
+  hdr.slot_id = slot_id;
+  hdr.stream_id = stream_id;
+
+  assert(hdr.crate_id == crate_id);
+  assert(hdr.slot_id == slot_id);
+  assert(hdr.stream_id == stream_id);
+}
+
+inline void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t link_id, detdataformats::DAQHeader& hdr) {
+  hdr.crate_id = crate_id;
+  hdr.slot_id = slot_id;
+  hdr.link_id = link_id;
+
+  assert(hdr.crate_id == crate_id);
+  assert(hdr.slot_id == slot_id);
+  assert(hdr.link_id == link_id);
 }
 
 // NOLINTEND(modernize-avoid-c-arrays)
