@@ -35,7 +35,7 @@ public:
   // ===============================================================
 
   // The definition of the format is in terms of 32-bit words
-  typedef uint32_t word_t; // NOLINT
+  using word_t = uint32_t; // NOLINT
 
   static constexpr int s_bits_per_adc = 14;
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);
@@ -47,7 +47,6 @@ public:
   static constexpr int s_num_channels = s_fembs_per_frame * s_channels_per_femb;
   static constexpr int s_num_adc_words = s_num_channels * s_bits_per_adc / s_bits_per_word;
   static constexpr int s_num_ch_per_frame = s_channels_per_femb * s_fembs_per_frame;
-  
 
   struct Header
   {
@@ -149,9 +148,6 @@ public:
     header.timestamp_1 = new_timestamp;
     header.timestamp_2 = new_timestamp >> 32;
   }
-
-  
-
 };
 
 } // namespace dunedaq::fddetdataformats
