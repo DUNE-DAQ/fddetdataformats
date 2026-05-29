@@ -5,7 +5,7 @@
  * Ethernet frames.
  *
  * The canonical definition of the DAPHNE format is given in EDMS document 2088726:
- * https://edms.cern.ch/document/2088726
+ * https://edms.cern.ch/document/2088726/XXX (XXX a stand-in for the doc version, e.g. 5)
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -14,6 +14,8 @@
 
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_
+
+#include "Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
 
@@ -27,23 +29,25 @@
 
 namespace dunedaq::fddetdataformats {
 
+// NOLINTBEGIN(build/unsigned)
+
 /**
  *  @brief Class for accessing raw DAPHNE Ethernet frames.
  *
  *  The on-wire frame uses one 64-bit header word containing trigger metadata,
  *  followed by six 64-bit words that carry twelve 32-bit peak descriptor words,
  *  and finally 1024 packed ADC samples for a single channel.
+ *
+ *  The canonical definition of the WIB format is given in EDMS document 2088713:
+ *  https://edms.cern.ch/document/2088726/XXX, (XXX a stand-in for the doc version, e.g. 5)
  */
 class DAPHNEEthFrame
 {
 public:
-  // ===============================================================
-  // Preliminaries
-  // ===============================================================
 
-  // The top-level frame format is described in 64-bit words.
-  typedef uint64_t word_t; // NOLINT
-  typedef uint32_t descriptor_word_t; // NOLINT
+  // The definition of the format is in terms of 64-bit words
+  using word_t = uint64_t;
+  using descriptor_word_t = uint32_t;
 
   // Dataframe format version
   static constexpr uint8_t version = 1;
@@ -197,87 +201,35 @@ public:
                   sizeof(value));
     }
   };
+  static_assert(sizeof(Header) == 7 * sizeof(word_t));
 
-  // ===============================================================
-  // Data members
-  // ===============================================================
   detdataformats::DAQEthHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT
 
-  // ===============================================================
-  // Accessors
-  // ===============================================================
-
   /**
    * @brief Get the ith ADC value in the frame
+   *
+   * The ADC words are 14 bits long, stored packed in the data structure. The order is:
+   *
+   * - 1024 adc values from one daphne channel
    */
-  uint16_t get_adc(int i) const // NOLINT
-  {
-    if (i < 0 || i >= s_num_adcs) {
-      throw std::out_of_range("ADC index out of range");
-    }
+  uint16_t get_adc(int i) const; // NOLINT
 
-    int word_index = s_bits_per_adc * i / s_bits_per_word;
-    assert(word_index < s_num_adc_words);
-    int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
-    int bits_from_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-    uint16_t adc = adc_words[word_index] >> first_bit_position; // NOLINT
-    if (bits_from_first_word < s_bits_per_adc) {
-      assert(word_index + 1 < s_num_adc_words);
-      adc |= adc_words[word_index + 1] << bits_from_first_word;
-    }
-    return adc & 0x3FFFu;
-  }
+  /// @brief Set the ith ADC value in the frame to @p val
+  void set_adc(int i, uint16_t val); // NOLINT
 
-  /**
-   * @brief Set the ith ADC value in the frame to @p val
-   */
-  void set_adc(int i, uint16_t val) // NOLINT
-  {
-    if (i < 0 || i >= s_num_adcs) {
-      throw std::out_of_range("ADC index out of range");
-    }
-    if (val >= (1 << s_bits_per_adc)) {
-      throw std::out_of_range("ADC value out of range");
-    }
+  /// @brief Get the starting 64-bit timestamp of the frame
+  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
-    int word_index = s_bits_per_adc * i / s_bits_per_word;
-    assert(word_index < s_num_adc_words);
-    int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
-    int bits_in_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-    word_t lower_mask = (static_cast<word_t>(1) << first_bit_position) - 1;
-    adc_words[word_index] =
-      ((static_cast<word_t>(val) << first_bit_position) & ~lower_mask) |
-      (adc_words[word_index] & lower_mask);
-    if (bits_in_first_word < s_bits_per_adc) {
-      assert(word_index + 1 < s_num_adc_words);
-      word_t upper_mask = (static_cast<word_t>(1) << (s_bits_per_adc - bits_in_first_word)) - 1;
-      adc_words[word_index + 1] =
-        ((static_cast<word_t>(val) >> bits_in_first_word) & upper_mask) |
-        (adc_words[word_index + 1] & ~upper_mask);
-    }
-  }
+  /// @brief Set the starting 64-bit timestamp of the frame
+  void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
 
-  uint64_t get_timestamp() const // NOLINT(build/unsigned)
-  {
-    return daq_header.get_timestamp();
-  }
+  /// @brief Get the channel identifier of the frame
+  uint8_t get_channel() const { return header.channel; }
 
-  void set_timestamp(const uint64_t new_timestamp) // NOLINT(build/unsigned)
-  {
-    daq_header.timestamp = new_timestamp;
-  }
-
-  uint8_t get_channel() const // NOLINT(build/unsigned)
-  {
-    return header.channel;
-  }
-
-  void set_channel(const uint8_t new_channel) // NOLINT(build/unsigned)
-  {
-    header.channel = new_channel;
-  }
+  /// @brief Set the channel identifier of the frame
+  void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
 
   const PeakDescriptorData& get_peaks_data() const
   {
@@ -288,7 +240,18 @@ public:
   {
     return header.peaks_data;
   }
+
 };
+static_assert(sizeof(DAPHNEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(DAPHNEEthFrame::Header) +
+                                          sizeof(DAPHNEEthFrame::word_t) * DAPHNEEthFrame::s_num_adc_words);
+
+static_assert(std::endian::native == std::endian::little,
+              "The DAPHNEEthFrame bitfield layout assumes little-endian architecture");
+
+static_assert(std::is_trivially_copyable_v<DAPHNEEthFrame>,
+              "DAPHNEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
+static_assert(std::is_standard_layout_v<DAPHNEEthFrame>,
+              "DAPHNEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
 static_assert(sizeof(DAPHNEEthFrame::PeakDescriptorData) ==
                 DAPHNEEthFrame::s_peak_descriptor_words * sizeof(DAPHNEEthFrame::descriptor_word_t),
@@ -475,5 +438,9 @@ DAPHNEEthFrame::PeakDescriptorData::set_sample_start(uint16_t val, int idx)
 }
 
 } // namespace dunedaq::fddetdataformats
+
+#include "detail/DAPHNEEthFrame.hxx"
+
+// NOLINTEND(build/unsigned)
 
 #endif // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_
