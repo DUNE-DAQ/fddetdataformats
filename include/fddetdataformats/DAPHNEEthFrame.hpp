@@ -14,6 +14,7 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_
 
+#include "fddetdataformats/FrameConcepts.hpp"
 #include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
@@ -23,6 +24,8 @@
 #include <cstdint>   // For uint32_t etc
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
+#include <tuple>
 #include <stdexcept> // For std::out_of_range
 
 namespace dunedaq::fddetdataformats {
@@ -51,6 +54,8 @@ public:
 
   struct Header
   {
+    static constexpr size_t s_expected_bytes { 7 * sizeof(word_t) };
+    
     // The following bitfields constitute what could be considered "word_t w0;"
     word_t trig_sample : 14;
     word_t rsv_0 : 2;
@@ -68,8 +73,11 @@ public:
     word_t w5;
     word_t w6;
   };
-  static_assert(sizeof(Header) == 7 * sizeof(word_t));
+  static_assert(sizeof(Header) == Header::s_expected_bytes);
 
+  static constexpr size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + Header::s_expected_bytes + s_num_adc_words * sizeof(word_t);
+
+  
   const detdataformats::DAQEthHeader& get_daqheader() const {
     return daq_header;
   }
@@ -105,23 +113,26 @@ public:
   void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
     dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
   }
+
+  bool operator<(const DAPHNEEthFrame& other) const {
+    return std::tuple(this->get_timestamp(), this->get_channel()) < std::tuple(other.get_timestamp(), other.get_channel());
+  }
   
 private:
   detdataformats::DAQEthHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT
-
 };
-static_assert(sizeof(DAPHNEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(DAPHNEEthFrame::Header) +
-                                          sizeof(DAPHNEEthFrame::word_t) * DAPHNEEthFrame::s_num_adc_words);
 
-static_assert(std::endian::native == std::endian::little,
+  static_assert(std::endian::native == std::endian::little,
               "The DAPHNEEthFrame bitfield layout assumes little-endian architecture");
 
 static_assert(std::is_trivially_copyable_v<DAPHNEEthFrame>,
               "DAPHNEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
 static_assert(std::is_standard_layout_v<DAPHNEEthFrame>,
               "DAPHNEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+
+  static_assert(AdaptableFrameConcept<DAPHNEEthFrame>, "DAPHNEEthFrame does not satisfy the AdaptableFrameConcept");
 
 } // namespace dunedaq::fddetdataformats
 

@@ -15,6 +15,7 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHSTREAMFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHSTREAMFRAME_HPP_
 
+#include "fddetdataformats/FrameConcepts.hpp"
 #include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
@@ -68,6 +69,9 @@ public:
   };
   static_assert(sizeof(Header) == sizeof(ChannelWord) * s_num_channels);
 
+  static constexpr int s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + sizeof(Header) +
+    sizeof(word_t) * s_num_adc_words;
+
   const detdataformats::DAQEthHeader& get_daqheader() const {
     return daq_header;
   }
@@ -110,14 +114,15 @@ public:
     fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
   }
 
+  bool operator<(const DAPHNEEthStreamFrame& other) const {
+    return this->get_timestamp() < other.get_timestamp();
+  }
+
 private:
   detdataformats::DAQEthHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT
 };
-static_assert(sizeof(DAPHNEEthStreamFrame) ==
-              sizeof(detdataformats::DAQEthHeader) + sizeof(DAPHNEEthStreamFrame::Header) +
-                sizeof(DAPHNEEthStreamFrame::word_t) * DAPHNEEthStreamFrame::s_num_adc_words);
 
 static_assert(std::endian::native == std::endian::little,
               "The DAPHNEEthStreamFrame bitfield layout assumes little-endian architecture");
@@ -127,6 +132,8 @@ static_assert(std::is_trivially_copyable_v<DAPHNEEthStreamFrame>,
 static_assert(std::is_standard_layout_v<DAPHNEEthStreamFrame>,
               "DAPHNEEthStreamFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
+  static_assert(AdaptableFrameConcept<DAPHNEEthStreamFrame>, "DAPHNEEthStreamFrame does not satisfy the AdaptableFrameConcept");
+  
 } // namespace dunedaq::fddetdataformats
 
 #include "detail/DAPHNEEthStreamFrame.hxx"

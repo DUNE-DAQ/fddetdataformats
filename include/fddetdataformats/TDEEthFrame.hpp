@@ -14,6 +14,7 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_TDEETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_TDEETHFRAME_HPP_
 
+#include "fddetdataformats/FrameConcepts.hpp"
 #include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
@@ -23,6 +24,7 @@
 #include <cstdint>   // For uint32_t etc
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 #include <stdexcept> // For std::out_of_range
 
 namespace dunedaq::fddetdataformats {
@@ -51,15 +53,20 @@ public:
 
   struct TDEEthHeader
   {
+    static constexpr size_t s_expected_bytes { 8 + 8 }; // bitfields + TAItime
+
     uint64_t reserved : 26;
     uint64_t tde_errors : 16;
     uint64_t tde_header : 10;
     uint64_t version : 4;
     uint64_t channel : 8;
-    uint64_t TAItime : 64;
+    uint64_t TAItime { std::numeric_limits<uint64_t>::max() };
   };
-  static_assert(sizeof(TDEEthHeader) == 16);
+  static_assert(sizeof(TDEEthHeader) == TDEEthHeader::s_expected_bytes);
 
+  static constexpr size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + TDEEthHeader::s_expected_bytes + s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t);
+
+  
   const detdataformats::DAQEthHeader& get_daqheader() const {
     return daq_header;
   }
@@ -99,23 +106,25 @@ public:
   const word_t* get_adc_words() const {
     return &adc_words[0][0];
   }
+
+  bool operator<(const TDEEthFrame& other) const {
+    return this->get_timestamp() < other.get_timestamp();
+  }
   
 private:  
   detdataformats::DAQEthHeader daq_header;
   TDEEthHeader header;
   word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
-
 };
-static_assert(sizeof(TDEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(TDEEthFrame::TDEEthHeader) +
-                                       sizeof(TDEEthFrame::word_t) * TDEEthFrame::s_time_samples_per_frame *
-                                         TDEEthFrame::s_num_adc_words_per_ts);
 
-static_assert(std::endian::native == std::endian::little,
+  static_assert(std::endian::native == std::endian::little,
               "The TDEEthFrame bitfield layout assumes little-endian architecture");
 static_assert(std::is_trivially_copyable_v<TDEEthFrame>,
               "TDEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
 static_assert(std::is_standard_layout_v<TDEEthFrame>,
               "TDEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+
+  static_assert(AdaptableFrameConcept<TDEEthFrame>, "TDEEthFrame does not satisfy the AdaptableFrameConcept");
 
 } // namespace dunedaq::fddetdataformats
 
