@@ -51,6 +51,8 @@ public:
 
   struct WIBEthHeader
   {
+    static constexpr int s_expected_bytes {8 + 8}; // 8 bytes for the bitfield section, 8 for the extra_data 
+      
     word_t colddata_timestamp_0 : 15;
     word_t pad_0 : 1;
     word_t colddata_timestamp_1 : 15;
@@ -69,7 +71,11 @@ public:
     word_t channel : 8;
     word_t extra_data;
   };
-  static_assert(sizeof(WIBEthHeader) == 8 + 8); // 8 bytes for the bitfield section, 8 for the extra_data
+  static_assert(sizeof(WIBEthHeader) == WIBEthHeader::s_expected_bytes);
+
+  static constexpr size_t s_expected_bytes { sizeof(detdataformats::DAQEthHeader) +
+    WIBEthHeader::s_expected_bytes +
+    s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t) };
 
   const detdataformats::DAQEthHeader& get_daqheader() const {
     return daq_header;
@@ -111,6 +117,10 @@ public:
     return &adc_words[0][0];
   }
 
+  bool operator<(const WIBEthFrame& other) const {
+    return this->get_timestamp() < other.get_timestamp();
+  }
+  
 private:
   detdataformats::DAQEthHeader daq_header;
   WIBEthHeader header;

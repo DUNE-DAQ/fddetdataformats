@@ -35,15 +35,15 @@ register_daphne(py::module& m)
     }))
     .def(
       "get_daqheader",
-      [](DAPHNEFrame& self) -> const detdataformats::DAQHeader& { return self.daq_header; },
+      [](DAPHNEFrame& self) -> const detdataformats::DAQHeader& { return self.get_daqheader(); },
       py::return_value_policy::reference_internal)
     .def(
       "get_header",
-      [](DAPHNEFrame& self) -> const DAPHNEFrame::Header& { return self.header; },
+      [](DAPHNEFrame& self) -> const DAPHNEFrame::Header& { return self.get_header(); },
       py::return_value_policy::reference_internal)
     .def(
       "get_peaks_data",
-      [](DAPHNEFrame& self) -> const DAPHNEFrame::PeakDescriptorData& { return self.peaks_data; },
+      [](DAPHNEFrame& self) -> const DAPHNEFrame::PeakDescriptorData& { return self.get_peaks_data(); },
       py::return_value_policy::reference_internal)
     .def("get_adc", static_cast<uint16_t (DAPHNEFrame::*)(const int) const>(&DAPHNEFrame::get_adc))
     .def("get_timestamp", &DAPHNEFrame::get_timestamp)

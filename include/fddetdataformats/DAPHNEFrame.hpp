@@ -52,6 +52,7 @@ public:
 
   struct PeakDescriptorData
   {
+    static constexpr int s_expected_bytes { 13 * sizeof(uint32_t) };
 
     // Word 1: peak 0 odd
     // Declared in reverse order (LSB first) so that:
@@ -236,13 +237,23 @@ public:
       return reinterpret_cast<word_t*>(this); // NOLINT
     }
   };
-  static_assert(sizeof(PeakDescriptorData) == 13 * sizeof(uint32_t));
+  static_assert(sizeof(PeakDescriptorData) == PeakDescriptorData::s_expected_bytes);
 
-  detdataformats::DAQHeader daq_header;
-  Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT
-  PeakDescriptorData peaks_data;
+  static constexpr int s_expected_bytes { sizeof(detdataformats::DAQHeader) + sizeof(Header) +
+    s_num_adc_words * sizeof(word_t) + PeakDescriptorData::s_expected_bytes };
 
+  const detdataformats::DAQHeader& get_daqheader() const {
+    return daq_header;
+  }
+
+  const Header& get_header() const {
+    return header;
+  }
+
+  const PeakDescriptorData& get_peaks_data() const {
+    return peaks_data;
+  }
+  
   /**
    * @brief Get the ith ADC value in the frame
    *
@@ -260,7 +271,32 @@ public:
 
   /// @brief Get the 64-bit timestamp of the frame
   uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
+
+  void set_timestamp(uint64_t ts) {
+    daq_header.timestamp_1 = ts;
+    daq_header.timestamp_2 = ts >> 32;
+  }
+
+  void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t link_id) {
+    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, link_id, daq_header);
+  }
+  
+  bool operator<(const DAPHNEFrame& other) const {
+
+    if (this->get_timestamp() != other.get_timestamp()) {
+      return this->get_timestamp() < other.get_timestamp();
+    } else {
+      return this->get_channel() < other.get_channel();
+    }
+  }
+
+private:  
+  detdataformats::DAQHeader daq_header;
+  Header header;
+  word_t adc_words[s_num_adc_words]; // NOLINT
+  PeakDescriptorData peaks_data;
 };
+  
 static_assert(sizeof(DAPHNEFrame) == sizeof(detdataformats::DAQHeader) + sizeof(DAPHNEFrame::Header) +
                                        sizeof(DAPHNEFrame::word_t) * DAPHNEFrame::s_num_adc_words +
                                        sizeof(DAPHNEFrame::PeakDescriptorData));
