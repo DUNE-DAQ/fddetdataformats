@@ -14,6 +14,7 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBETHFRAME_HPP_
 
+#include "fddetdataformats/FrameConcepts.hpp"
 #include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
@@ -127,9 +128,6 @@ private:
   word_t m_adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
 
 };
-static_assert(sizeof(WIBEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(WIBEthFrame::WIBEthHeader) +
-                                       sizeof(WIBEthFrame::word_t) * WIBEthFrame::s_time_samples_per_frame *
-                                         WIBEthFrame::s_num_adc_words_per_ts);
 
 static_assert(std::endian::native == std::endian::little,
               "The WIBEthFrame bitfield layout assumes little-endian architecture");
@@ -139,6 +137,8 @@ static_assert(std::is_trivially_copyable_v<WIBEthFrame>,
 static_assert(std::is_standard_layout_v<WIBEthFrame>,
               "WIBEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
+  static_assert(AdaptableFrameConcept<WIBEthFrame>, "WIBEthFrame does not satisfy the AdaptableFrameConcept");
+  
 } // namespace dunedaq::fddetdataformats
 
 #include "detail/WIBEthFrame.hxx"

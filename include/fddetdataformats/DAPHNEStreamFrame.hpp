@@ -56,6 +56,10 @@ public:
   };
   static_assert(sizeof(Trailer) == 4);
 
+  static constexpr int s_expected_bytes { sizeof(detdataformats::DAQHeader) + sizeof(Header) +
+    sizeof(word_t) * s_num_adc_words +
+    sizeof(Trailer) };
+
   const detdataformats::DAQHeader& get_daqheader() const {
     return m_daq_header;
   }
@@ -91,6 +95,10 @@ public:
   /// @brief Get the channel 3 from the DAPHNE Stream frame header
   uint8_t get_channel3() const { return m_header.channel_3; }
 
+  bool operator<(const DAPHNEStreamFrame& other) const {
+    return this->get_timestamp() < other.get_timestamp();
+  }
+  
 private:
   detdataformats::DAQHeader m_daq_header;
   Header m_header;
@@ -98,9 +106,6 @@ private:
   Trailer m_trailer;
 
 };
-static_assert(sizeof(DAPHNEStreamFrame) == sizeof(detdataformats::DAQHeader) + sizeof(DAPHNEStreamFrame::Header) +
-                                             sizeof(DAPHNEStreamFrame::word_t) * DAPHNEStreamFrame::s_num_adc_words +
-                                             sizeof(DAPHNEStreamFrame::Trailer));
 
 static_assert(std::endian::native == std::endian::little,
               "The DAPHNEStreamFrame bitfield layout assumes little-endian architecture");

@@ -14,6 +14,7 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
 
+#include "fddetdataformats/FrameConcepts.hpp"
 #include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQHeader.hpp"
@@ -297,10 +298,6 @@ private:
   PeakDescriptorData m_peaks_data;
 };
   
-static_assert(sizeof(DAPHNEFrame) == sizeof(detdataformats::DAQHeader) + sizeof(DAPHNEFrame::Header) +
-                                       sizeof(DAPHNEFrame::word_t) * DAPHNEFrame::s_num_adc_words +
-                                       sizeof(DAPHNEFrame::PeakDescriptorData));
-
 static_assert(std::endian::native == std::endian::little,
               "The DAPHNEFrame bitfield layout assumes little-endian architecture");
 static_assert(std::is_trivially_copyable_v<DAPHNEFrame>,
@@ -308,6 +305,8 @@ static_assert(std::is_trivially_copyable_v<DAPHNEFrame>,
 static_assert(std::is_standard_layout_v<DAPHNEFrame>,
               "DAPHNEFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
+  static_assert(AdaptableFrameConcept<DAPHNEFrame>, "DAPHNEFrame does not satisfy the AdaptableFrameConcept");
+  
 } // namespace dunedaq::fddetdataformats
 
 #include "detail/DAPHNEFrame.hxx"

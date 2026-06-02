@@ -224,7 +224,7 @@ set_adc_2d(const int i_sample, const int i_adc, WordType adc_val, WordType (&adc
   set_adc_1d<WordType, Columns, BitsPerADC>(i_adc, adc_val, adc_matrix[i_sample]);
 }
 
-inline void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id, detdataformats::DAQEthHeader& hdr) {
+inline void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id, detdataformats::DAQEthHeader& hdr) { // NOLINT(build/unsigned)
   hdr.crate_id = crate_id;
   hdr.slot_id = slot_id;
   hdr.stream_id = stream_id;
@@ -234,7 +234,7 @@ inline void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id, d
   assert(hdr.stream_id == stream_id);
 }
 
-inline void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t link_id, detdataformats::DAQHeader& hdr) {
+inline void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t link_id, detdataformats::DAQHeader& hdr) { // NOLINT(build/unsigned)
   hdr.crate_id = crate_id;
   hdr.slot_id = slot_id;
   hdr.link_id = link_id;
@@ -243,8 +243,6 @@ inline void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t link_id, det
   assert(hdr.slot_id == slot_id);
   assert(hdr.link_id == link_id);
 }
-
-// NOLINTEND(modernize-avoid-c-arrays)
 
 } // namespace dunedaq::fddetdataformats
 

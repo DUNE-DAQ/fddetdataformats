@@ -76,7 +76,7 @@ public:
     if (i_ch < 0 || i_ch >= s_num_channels)
       throw std::out_of_range("ADC channel index out of range");
 
-    m_data.adc[i_ch] = val;
+    m_data.adc[i_ch] = val; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
   }
 
   /// @brief Get the starting 64-bit timestamp of the frame

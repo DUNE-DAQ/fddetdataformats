@@ -31,30 +31,30 @@ BOOST_AUTO_TEST_CASE(DAPHNEStreamFrame_ADCDataMutators)
   std::vector<std::vector<uint16_t>> adcs(DAPHNEStreamFrame::s_adcs_per_channel,
                                           std::vector<uint16_t>(DAPHNEStreamFrame::s_channels_per_frame));
 
-  for (uint32_t sample = 0; sample < DAPHNEStreamFrame::s_adcs_per_channel; ++sample) {
-    for (uint32_t channel = 0; channel < DAPHNEStreamFrame::s_channels_per_frame; ++channel) {
+  for (int sample = 0; sample < DAPHNEStreamFrame::s_adcs_per_channel; ++sample) {
+    for (int channel = 0; channel < DAPHNEStreamFrame::s_channels_per_frame; ++channel) {
       adcs[sample][channel] = dist(rng);
     }
   }
 
   DAPHNEStreamFrame frame{};
 
-  for (uint32_t sample = 0; sample < DAPHNEStreamFrame::s_adcs_per_channel; ++sample) {
-    for (uint32_t channel = 0; channel < DAPHNEStreamFrame::s_channels_per_frame; ++channel) {
+  for (int sample = 0; sample < DAPHNEStreamFrame::s_adcs_per_channel; ++sample) {
+    for (int channel = 0; channel < DAPHNEStreamFrame::s_channels_per_frame; ++channel) {
       frame.set_adc(sample, channel, adcs[sample][channel]);
     }
   }
 
-  for (uint32_t sample = 0; sample < DAPHNEStreamFrame::s_adcs_per_channel; ++sample) {
-    for (uint32_t channel = 0; channel < DAPHNEStreamFrame::s_channels_per_frame; ++channel) {
+  for (int sample = 0; sample < DAPHNEStreamFrame::s_adcs_per_channel; ++sample) {
+    for (int channel = 0; channel < DAPHNEStreamFrame::s_channels_per_frame; ++channel) {
       BOOST_REQUIRE_EQUAL(frame.get_adc(sample, channel), adcs[sample][channel]);
     }
   }
 
   frame.set_adc(0, 0, adcs[0][0]);
 
-  for (uint32_t sample = 0; sample < DAPHNEStreamFrame::s_adcs_per_channel; ++sample) {
-    for (uint32_t channel = 0; channel < DAPHNEStreamFrame::s_channels_per_frame; ++channel) {
+  for (int sample = 0; sample < DAPHNEStreamFrame::s_adcs_per_channel; ++sample) {
+    for (int channel = 0; channel < DAPHNEStreamFrame::s_channels_per_frame; ++channel) {
       BOOST_REQUIRE_EQUAL(frame.get_adc(sample, channel), adcs[sample][channel]);
     }
   }

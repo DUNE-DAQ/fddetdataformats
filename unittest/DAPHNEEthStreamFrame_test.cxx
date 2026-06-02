@@ -31,30 +31,30 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthStreamFrame_ADCDataMutators)
   std::vector<std::vector<uint16_t>> adcs(DAPHNEEthStreamFrame::s_adcs_per_channel,
                                           std::vector<uint16_t>(DAPHNEEthStreamFrame::s_num_channels));
 
-  for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
-    for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
+  for (int channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
+    for (int adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
       adcs[adc_index][channel] = dist(rng);
     }
   }
 
   DAPHNEEthStreamFrame frame{};
 
-  for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
-    for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
+  for (int channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
+    for (int adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
       frame.set_adc(adc_index, channel, adcs[adc_index][channel]);
     }
   }
 
-  for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
-    for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
+  for (int channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
+    for (int adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
       BOOST_REQUIRE_EQUAL(frame.get_adc(adc_index, channel), adcs[adc_index][channel]);
     }
   }
 
   frame.set_adc(0, 0, adcs[0][0]);
 
-  for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
-    for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
+  for (int channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
+    for (int adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
       BOOST_REQUIRE_EQUAL(frame.get_adc(adc_index, channel), adcs[adc_index][channel]);
     }
   }

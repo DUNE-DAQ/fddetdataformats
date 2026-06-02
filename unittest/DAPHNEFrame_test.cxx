@@ -24,7 +24,6 @@ BOOST_AUTO_TEST_SUITE(DAPHNEFrame_test)
 BOOST_AUTO_TEST_CASE(DAPHNEFrame_AllFieldsTest)
 {
   constexpr int n_adcs = 320;
-  constexpr int n_peaks = 5;
 
   std::random_device rd;
   std::mt19937 gen(rd());

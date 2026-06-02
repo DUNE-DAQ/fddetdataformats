@@ -1,6 +1,26 @@
+/**
+ * @file FrameConcepts.hpp
+ *
+ * Contains declaration of various concepts to which a DAQ frame should adhere, including:
+ *
+ * -Having getters and setters for timestamps and ADC values
+ *
+ * -Having const-access getters to the underlying DAQ header and frame-specific header
+ *
+ * -Having an "<" operator implemented
+ *
+ * -Having an s_expected_bytes static member which equals the sizeof
+ *  of the frame, and which should be assigned a value which is simply
+ *  the sum of the sizes of the members - this guards against compiler
+ *  padding
+ *
+ * This is part of the DUNE DAQ Application Framework, copyright 2020.
+ * Licensing/copyright details are in the COPYING file that you should have
+ * received with this code.
+ */
 
-#ifndef FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_FRAMECONCEPTS_HPP_
-#define FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_FRAMECONCEPTS_HPP_
+#ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_FRAMECONCEPTS_HPP_
+#define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_FRAMECONCEPTS_HPP_
 
 #include "detdataformats/DAQHeader.hpp"
 #include "detdataformats/DAQEthHeader.hpp"
@@ -10,16 +30,15 @@
 
 namespace dunedaq::fddetdataformats {
 
-  // ensure ADC functions exist; will think about their different arguments later
   
 template <typename T>
 concept HasGetADC = std::is_member_function_pointer_v<decltype(&T::get_adc)>;
 
 template <typename T>
 concept HasSetADC = std::is_member_function_pointer_v<decltype(&T::set_adc)>;
-
+  
 template <typename T>
-concept HasValidDAQHeader =
+concept HasDAQHeader =
     requires(const T t) {
   t.get_daqheader();
     } &&
@@ -28,11 +47,17 @@ concept HasValidDAQHeader =
      std::same_as<decltype(std::declval<T>().get_daqheader()), const dunedaq::detdataformats::DAQHeader&>
     );
 
+  template <typename T>
+  concept HasFrameHeader =
+    requires(const T t) {
+    t.get_header();
+  }; // NOLINT(readability/braces)
+
   // Instead of std::totally_ordered, this just literally only requires the "<" operator
   template <typename T>
   concept HasLessThan = requires(const T a, const T b) {
     { a < b } -> std::convertible_to<bool>;
-  };
+  }; // NOLINT(readability/braces)
 
   template <typename T>
   concept HasNoCompilerPadding =
@@ -43,19 +68,31 @@ concept HasValidDAQHeader =
     &&
   (T::s_expected_bytes == sizeof(T));
 
+template <typename T>  
+concept HasGetTimestamp =
+  requires(const T ct)
+  {
+    { ct.get_timestamp() } -> std::same_as<uint64_t>; // NOLINT(build/unsigned)
+  };
+
+template <typename T>
+concept HasSetTimestamp =
+  requires(T t, uint64_t ts) // NOLINT(build/unsigned) 
+  {
+    { t.set_timestamp(ts) } -> std::same_as<void>;
+  };
+  
 template <typename T>
 concept AdaptableFrameConcept =
   HasNoCompilerPadding<T> &&
   HasLessThan<T> &&
   HasGetADC<T> &&
   HasSetADC<T> &&
-  HasValidDAQHeader<T> &&
-    requires(T t, const T ct, uint64_t ts)
-{
-    { ct.get_timestamp() } -> std::same_as<uint64_t>;
-    { t.set_timestamp(ts) } -> std::same_as<void>;
-};
+  HasDAQHeader<T> &&
+  HasFrameHeader<T> &&
+  HasGetTimestamp<T> &&
+  HasSetTimestamp<T>;
 
 } // namespace dunedaq::fddetdataformats
 
-#endif  // FDDETDATAFORMATS_INCLUDE_FDDATAFORMATS_FRAMECONCEPTS_HPP_
+#endif  // FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_FRAMECONCEPTS_HPP_
