@@ -6,13 +6,13 @@ DAPHNEFrame::get_adc(int i) const // NOLINT
 {
   // We can safely case from word_t to uint16_t as the ADC value can always be represented in 16 bits
   return static_cast<uint16_t>(
-    dunedaq::fddetdataformats::get_adc_1d<word_t, s_num_adc_words, s_bits_per_adc>(i, adc_words));
+    dunedaq::fddetdataformats::get_adc_1d<word_t, s_num_adc_words, s_bits_per_adc>(i, m_adc_words));
 }
 
 inline void
 DAPHNEFrame::set_adc(int i, uint16_t val) // NOLINT
 {
-  dunedaq::fddetdataformats::set_adc_1d<word_t, s_num_adc_words, s_bits_per_adc>(i, val, adc_words);
+  dunedaq::fddetdataformats::set_adc_1d<word_t, s_num_adc_words, s_bits_per_adc>(i, val, m_adc_words);
 }
 
 // --- Trailer Accessors (Manual Shift–Mask Extraction) ---

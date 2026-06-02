@@ -79,11 +79,11 @@ public:
 
   
   const detdataformats::DAQEthHeader& get_daqheader() const {
-    return daq_header;
+    return m_daq_header;
   }
 
   const Header& get_header() const {
-    return header;
+    return m_header;
   }
   
   /**
@@ -99,19 +99,19 @@ public:
   void set_adc(int i, uint16_t val); // NOLINT
 
   /// @brief Get the starting 64-bit timestamp of the frame
-  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
 
   /// @brief Set the starting 64-bit timestamp of the frame
-  void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
+  void set_timestamp(const uint64_t new_timestamp) { m_daq_header.timestamp = new_timestamp; }
 
   /// @brief Get the channel identifier of the frame
-  uint8_t get_channel() const { return header.channel; }
+  uint8_t get_channel() const { return m_header.channel; }
 
   /// @brief Set the channel identifier of the frame
-  void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
+  void set_channel(const uint8_t new_channel) { m_header.channel = new_channel; }
 
   void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
-    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
+    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, m_daq_header);
   }
 
   bool operator<(const DAPHNEEthFrame& other) const {
@@ -119,9 +119,9 @@ public:
   }
   
 private:
-  detdataformats::DAQEthHeader daq_header;
-  Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT
+  detdataformats::DAQEthHeader m_daq_header;
+  Header m_header;
+  word_t m_adc_words[s_num_adc_words]; // NOLINT
 };
 
   static_assert(std::endian::native == std::endian::little,

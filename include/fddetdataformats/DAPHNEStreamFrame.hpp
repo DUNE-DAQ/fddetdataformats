@@ -57,20 +57,20 @@ public:
   static_assert(sizeof(Trailer) == 4);
 
   const detdataformats::DAQHeader& get_daqheader() const {
-    return daq_header;
+    return m_daq_header;
   }
 
   const Header& get_header() const {
-    return header;
+    return m_header;
   }
   
-  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
 
   /// @brief Set the 64-bit timestamp of the frame
   void set_timestamp(const uint64_t new_timestamp)
   {
-    daq_header.timestamp_1 = new_timestamp;
-    daq_header.timestamp_2 = new_timestamp >> 32;
+    m_daq_header.timestamp_1 = new_timestamp;
+    m_daq_header.timestamp_2 = new_timestamp >> 32;
   }
 
   /// @brief Get the @p i ADC value of @p chn in the frame
@@ -80,22 +80,22 @@ public:
   void set_adc(int i, int i_channel, uint16_t val);
 
   /// @brief Get the channel 0 from the DAPHNE Stream frame header
-  uint8_t get_channel0() const { return header.channel_0; }
+  uint8_t get_channel0() const { return m_header.channel_0; }
 
   /// @brief Get the channel 1 from the DAPHNE Stream frame header
-  uint8_t get_channel1() const { return header.channel_1; }
+  uint8_t get_channel1() const { return m_header.channel_1; }
 
   /// @brief Get the channel 2 from the DAPHNE Stream frame header
-  uint8_t get_channel2() const { return header.channel_2; }
+  uint8_t get_channel2() const { return m_header.channel_2; }
 
   /// @brief Get the channel 3 from the DAPHNE Stream frame header
-  uint8_t get_channel3() const { return header.channel_3; }
+  uint8_t get_channel3() const { return m_header.channel_3; }
 
 private:
-  detdataformats::DAQHeader daq_header;
-  Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT (a false accusation from the linter that s_num_adc_words is a variable)
-  Trailer trailer;
+  detdataformats::DAQHeader m_daq_header;
+  Header m_header;
+  word_t m_adc_words[s_num_adc_words]; // NOLINT (a false accusation from the linter that s_num_adc_words is a variable)
+  Trailer m_trailer;
 
 };
 static_assert(sizeof(DAPHNEStreamFrame) == sizeof(detdataformats::DAQHeader) + sizeof(DAPHNEStreamFrame::Header) +

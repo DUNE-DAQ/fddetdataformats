@@ -73,11 +73,11 @@ public:
     sizeof(word_t) * s_num_adc_words;
 
   const detdataformats::DAQEthHeader& get_daqheader() const {
-    return daq_header;
+    return m_daq_header;
   }
 
   const Header& get_header() const {
-    return header;
+    return m_header;
   }
 
   /// @brief Get the @p i_adc-th ADC value of @p i_channel-th channel in the frame
@@ -87,10 +87,10 @@ public:
   void set_adc(int i_adc, int i_channel, uint16_t val); // NOLINT
 
   /// @brief Get the starting 64-bit timestamp of the frame
-  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
 
   /// @brief Set the starting 64-bit timestamp of the frame
-  void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
+  void set_timestamp(const uint64_t new_timestamp) { m_daq_header.timestamp = new_timestamp; }
 
   /// @brief Get the channel identifier of the frame
   uint8_t get_channel(const int i_channel) const;
@@ -99,19 +99,19 @@ public:
   void set_channel(const int i_channel, const uint8_t new_channel_val);
 
   /// @brief Get the channel 0 from the DAPHNE Stream frame header
-  uint8_t get_channel0() const { return header.channel_words[0].channel; }
+  uint8_t get_channel0() const { return m_header.channel_words[0].channel; }
 
   /// @brief Get the channel 1 from the DAPHNE Stream frame header
-  uint8_t get_channel1() const { return header.channel_words[1].channel; }
+  uint8_t get_channel1() const { return m_header.channel_words[1].channel; }
 
   /// @brief Get the channel 2 from the DAPHNE Stream frame header
-  uint8_t get_channel2() const { return header.channel_words[2].channel; }
+  uint8_t get_channel2() const { return m_header.channel_words[2].channel; }
 
   /// @brief Get the channel 3 from the DAPHNE Stream frame header
-  uint8_t get_channel3() const { return header.channel_words[3].channel; }
+  uint8_t get_channel3() const { return m_header.channel_words[3].channel; }
 
   void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
-    fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
+    fddetdataformats::set_geoid(crate_id, slot_id, stream_id, m_daq_header);
   }
 
   bool operator<(const DAPHNEEthStreamFrame& other) const {
@@ -119,9 +119,9 @@ public:
   }
 
 private:
-  detdataformats::DAQEthHeader daq_header;
-  Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT
+  detdataformats::DAQEthHeader m_daq_header;
+  Header m_header;
+  word_t m_adc_words[s_num_adc_words]; // NOLINT
 };
 
 static_assert(std::endian::native == std::endian::little,

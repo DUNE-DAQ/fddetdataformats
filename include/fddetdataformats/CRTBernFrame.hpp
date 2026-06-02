@@ -54,11 +54,11 @@ public:
   //static_assert(sizeof(CRTBernData) == 2 + 2 + 2 + 4 + 4 + 2 * s_num_channels + 4);
 
   const detdataformats::DAQEthHeader& get_daqheader() const {
-    return daq_header;
+    return m_daq_header;
   }
 
   detdataformats::DAQEthHeader& get_daqheader() {
-    return daq_header;
+    return m_daq_header;
   }
   
   /// @brief Get the adc value for channel i_ch
@@ -67,7 +67,7 @@ public:
     if (i_ch < 0 || i_ch >= s_num_channels)
       throw std::out_of_range("ADC channel index out of range");
 
-    return data.adc[i_ch];
+    return m_data.adc[i_ch];
   }
 
   /// @brief Set the adc value for channel i_ch to @p val
@@ -76,62 +76,62 @@ public:
     if (i_ch < 0 || i_ch >= s_num_channels)
       throw std::out_of_range("ADC channel index out of range");
 
-    data.adc[i_ch] = val;
+    m_data.adc[i_ch] = val;
   }
 
   /// @brief Get the starting 64-bit timestamp of the frame
-  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
 
   /** @brief Set the starting 64-bit timestamp of the frame
    *  also set the underlying ts0 to be consistent
    */
   void set_timestamp(const uint64_t new_timestamp)
   {
-    daq_header.timestamp = new_timestamp;
-    data.ts0 = (new_timestamp % s_DTS_ticks_per_second) * s_ns_per_DTS_tick;
+    m_daq_header.timestamp = new_timestamp;
+    m_data.ts0 = (new_timestamp % s_DTS_ticks_per_second) * s_ns_per_DTS_tick;
   }
 
-  uint16_t get_mac5() const { return mac5; }
+  uint16_t get_mac5() const { return m_mac5; }
 
-  void set_mac5(const uint16_t new_mac5) { mac5 = new_mac5; }
+  void set_mac5(const uint16_t new_mac5) { m_mac5 = new_mac5; }
 
-  uint16_t get_flags() const { return data.flags; }
+  uint16_t get_flags() const { return m_data.flags; }
 
-  void set_flags(const uint16_t new_flags) { data.flags = new_flags; }
+  void set_flags(const uint16_t new_flags) { m_data.flags = new_flags; }
 
   /// @brief Get the lostcpu counter of the CRTBernData
-  uint16_t get_lostcpu() const { return data.lostcpu; }
+  uint16_t get_lostcpu() const { return m_data.lostcpu; }
 
   /// @brief Set the lostcpu counter of the CRTBernData
-  void set_lostcpu(const uint16_t new_lostcpu) { data.lostcpu = new_lostcpu; }
+  void set_lostcpu(const uint16_t new_lostcpu) { m_data.lostcpu = new_lostcpu; }
 
   /// @brief Get the lostfpga counter of the CRTBernData
-  uint16_t get_lostfpga() const { return data.lostfpga; }
+  uint16_t get_lostfpga() const { return m_data.lostfpga; }
 
   /// @brief Set the lostfpga counter of the CRTBernData
-  void set_lostfpga(const uint16_t new_lostfpga) { data.lostfpga = new_lostfpga; }
+  void set_lostfpga(const uint16_t new_lostfpga) { m_data.lostfpga = new_lostfpga; }
 
-  uint32_t get_ts0() const { return data.ts0; }
+  uint32_t get_ts0() const { return m_data.ts0; }
 
-  void set_ts0(const uint32_t new_ts0) { data.ts0 = new_ts0; }
+  void set_ts0(const uint32_t new_ts0) { m_data.ts0 = new_ts0; }
 
-  uint32_t get_ts1() const { return data.ts1; }
+  uint32_t get_ts1() const { return m_data.ts1; }
 
-  void set_ts1(const uint32_t new_ts1) { data.ts1 = new_ts1; }
+  void set_ts1(const uint32_t new_ts1) { m_data.ts1 = new_ts1; }
 
-  uint32_t get_coinc() const { return data.coinc; }
+  uint32_t get_coinc() const { return m_data.coinc; }
 
-  void set_coinc(const uint32_t new_coinc) { data.coinc = new_coinc; }
+  void set_coinc(const uint32_t new_coinc) { m_data.coinc = new_coinc; }
 
   void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
-    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
+    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, m_daq_header);
   }
 
   
 private:
-  detdataformats::DAQEthHeader daq_header; // Note this is de-facto public thanks to non-const get_daqheader
-  uint16_t mac5;
-  CRTBernData data;
+  detdataformats::DAQEthHeader m_daq_header; // Note this is de-facto public thanks to non-const get_daqheader
+  uint16_t m_mac5;
+  CRTBernData m_data;
   
 }; // CRTBernFrame
   #warning "CRTBernFrame has padding inserted"

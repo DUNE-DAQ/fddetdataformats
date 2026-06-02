@@ -9,7 +9,7 @@ DAPHNEEthStreamFrame::get_channel(const int i_channel) const
       std::format("Requested channel index of {} is outside of allowed range 0-{}", i_channel, s_num_channels - 1));
   }
 
-  return header.channel_words[i_channel].channel; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  return m_header.channel_words[i_channel].channel; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 }
 
 inline void
@@ -20,7 +20,7 @@ DAPHNEEthStreamFrame::set_channel(const int i_channel, const uint8_t new_channel
       std::format("Requested channel index of {} is outside of allowed range 0-{}", i_channel, s_num_channels - 1));
   }
 
-  header.channel_words[i_channel].channel = // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+  m_header.channel_words[i_channel].channel = // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     new_channel_val; 
 }
 
@@ -30,7 +30,7 @@ DAPHNEEthStreamFrame::get_adc(int i_adc, int i_channel) const
   return static_cast<uint16_t>(
     dunedaq::fddetdataformats::
       get_adc_2d_as_1d<word_t, s_num_adc_words, s_bits_per_adc, s_adcs_per_channel, s_num_channels>(
-        i_adc, i_channel, adc_words));
+        i_adc, i_channel, m_adc_words));
 }
 
 inline void
@@ -38,7 +38,7 @@ DAPHNEEthStreamFrame::set_adc(int i_adc, int i_channel, uint16_t val)
 { 
   dunedaq::fddetdataformats::
     set_adc_2d_as_1d<word_t, s_num_adc_words, s_bits_per_adc, s_adcs_per_channel, s_num_channels>(
-      i_adc, i_channel, val, adc_words);
+      i_adc, i_channel, val, m_adc_words);
 }
 
 } // namespace dunedaq::fddetdataformats

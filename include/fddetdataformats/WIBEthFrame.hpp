@@ -78,11 +78,11 @@ public:
     s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t) };
 
   const detdataformats::DAQEthHeader& get_daqheader() const {
-    return daq_header;
+    return m_daq_header;
   }
 
   const WIBEthHeader& get_header() const {
-    return header;
+    return m_header;
   }
 
   /**
@@ -98,23 +98,23 @@ public:
   void set_adc(int i_channel, int i_sample, uint16_t adc_val);
 
   /// @brief Get the starting 64-bit timestamp of the frame
-  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
 
   /// @brief Set the starting 64-bit timestamp of the frame
-  void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
+  void set_timestamp(const uint64_t new_timestamp) { m_daq_header.timestamp = new_timestamp; }
 
   /// @brief Get the channel identifier of the frame
-  uint8_t get_channel() const { return header.channel; }
+  uint8_t get_channel() const { return m_header.channel; }
 
   /// @brief Set the channel identifier of the frame
-  void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
+  void set_channel(const uint8_t new_channel) { m_header.channel = new_channel; }
 
   void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
-    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
+    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, m_daq_header);
   }
 
   const word_t* get_adc_words() const {
-    return &adc_words[0][0];
+    return &m_adc_words[0][0];
   }
 
   bool operator<(const WIBEthFrame& other) const {
@@ -122,9 +122,9 @@ public:
   }
   
 private:
-  detdataformats::DAQEthHeader daq_header;
-  WIBEthHeader header;
-  word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
+  detdataformats::DAQEthHeader m_daq_header;
+  WIBEthHeader m_header;
+  word_t m_adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
 
 };
 static_assert(sizeof(WIBEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(WIBEthFrame::WIBEthHeader) +

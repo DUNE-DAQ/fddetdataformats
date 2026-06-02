@@ -243,15 +243,15 @@ public:
     s_num_adc_words * sizeof(word_t) + PeakDescriptorData::s_expected_bytes };
 
   const detdataformats::DAQHeader& get_daqheader() const {
-    return daq_header;
+    return m_daq_header;
   }
 
   const Header& get_header() const {
-    return header;
+    return m_header;
   }
 
   const PeakDescriptorData& get_peaks_data() const {
-    return peaks_data;
+    return m_peaks_data;
   }
   
   /**
@@ -266,19 +266,19 @@ public:
   /// @brief Set the ith ADC value in the frame to @p val
   void set_adc(int i, uint16_t val);
 
-  uint8_t get_channel() const { return header.channel; }
-  void set_channel(uint8_t val) { header.channel = val & 0x3Fu; }
+  uint8_t get_channel() const { return m_header.channel; }
+  void set_channel(uint8_t val) { m_header.channel = val & 0x3Fu; }
 
   /// @brief Get the 64-bit timestamp of the frame
-  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
 
   void set_timestamp(uint64_t ts) {
-    daq_header.timestamp_1 = ts;
-    daq_header.timestamp_2 = ts >> 32;
+    m_daq_header.timestamp_1 = ts;
+    m_daq_header.timestamp_2 = ts >> 32;
   }
 
   void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t link_id) {
-    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, link_id, daq_header);
+    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, link_id, m_daq_header);
   }
   
   bool operator<(const DAPHNEFrame& other) const {
@@ -291,10 +291,10 @@ public:
   }
 
 private:  
-  detdataformats::DAQHeader daq_header;
-  Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT
-  PeakDescriptorData peaks_data;
+  detdataformats::DAQHeader m_daq_header;
+  Header m_header;
+  word_t m_adc_words[s_num_adc_words]; // NOLINT
+  PeakDescriptorData m_peaks_data;
 };
   
 static_assert(sizeof(DAPHNEFrame) == sizeof(detdataformats::DAQHeader) + sizeof(DAPHNEFrame::Header) +

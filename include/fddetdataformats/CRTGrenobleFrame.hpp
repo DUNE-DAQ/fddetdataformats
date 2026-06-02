@@ -80,12 +80,12 @@ public:
   // sizeof(STChannel) * s_num_channels);
 
   const detdataformats::DAQEthHeader& get_daqheader() const {
-    return daq_header;
+    return m_daq_header;
   }
 
   // CRTGrenobleReaderModule needs full access to the daq_header for fake data purposes
   detdataformats::DAQEthHeader& get_daqheader() {
-    return daq_header;
+    return m_daq_header;
   }
 
   /// @brief Get the adc value for channel i_ch
@@ -94,7 +94,7 @@ public:
     if (i_ch < 0 || i_ch >= s_num_channels)
       throw std::out_of_range("ADC channel index out of range");
 
-    return event.channels[i_ch].qTot;
+    return m_event.channels[i_ch].qTot;
   }
 
   /// @brief Set the adc value for channel i_ch to @p val
@@ -103,22 +103,22 @@ public:
     if (i_ch < 0 || i_ch >= s_num_channels)
       throw std::out_of_range("ADC channel index out of range");
 
-    event.channels[i_ch].qTot = val; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    m_event.channels[i_ch].qTot = val; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
   }
 
   /// @brief Get the starting 64-bit timestamp of the frame
-  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
 
   /// @brief Set the starting 64-bit timestamp of the frame
-  void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
+  void set_timestamp(const uint64_t new_timestamp) { m_daq_header.timestamp = new_timestamp; }
 
   void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
-    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
+    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, m_daq_header);
   }
 
 private:
-  detdataformats::DAQEthHeader daq_header; // Formally private, but has a non-const accessor
-  STEvent event;
+  detdataformats::DAQEthHeader m_daq_header; // Formally private, but has a non-const accessor
+  STEvent m_event;
   
 }; // CRTGrenobleFrame
 #warning "CRTGrenobleFrame has padding inserted"
