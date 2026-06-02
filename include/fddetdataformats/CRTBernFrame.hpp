@@ -11,6 +11,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_CRTBERNFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_CRTBERNFRAME_HPP_
 
+#include "fddetdataformats/Utils.hpp"
+
 #include "detdataformats/DAQEthHeader.hpp"
 
 #include <algorithm> // For std::min
@@ -51,10 +53,14 @@ public:
   #warning "CRTBernData has padding inserted"
   //static_assert(sizeof(CRTBernData) == 2 + 2 + 2 + 4 + 4 + 2 * s_num_channels + 4);
 
-  detdataformats::DAQEthHeader daq_header;
-  uint16_t mac5;
-  CRTBernData data;
+  const detdataformats::DAQEthHeader& get_daqheader() const {
+    return daq_header;
+  }
 
+  detdataformats::DAQEthHeader& get_daqheader() {
+    return daq_header;
+  }
+  
   /// @brief Get the adc value for channel i_ch
   uint16_t get_adc(int i_ch) const
   {
@@ -117,6 +123,16 @@ public:
 
   void set_coinc(const uint32_t new_coinc) { data.coinc = new_coinc; }
 
+  void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
+    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, daq_header);
+  }
+
+  
+private:
+  detdataformats::DAQEthHeader daq_header; // Note this is de-facto public thanks to non-const get_daqheader
+  uint16_t mac5;
+  CRTBernData data;
+  
 }; // CRTBernFrame
   #warning "CRTBernFrame has padding inserted"
   // static_assert(sizeof(CRTBernFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(uint16_t) + sizeof(CRTBernFrame::CRTBernData));
