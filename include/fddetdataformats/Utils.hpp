@@ -24,8 +24,6 @@
 
 namespace dunedaq::fddetdataformats {
 
-// NOLINTBEGIN(modernize-avoid-c-arrays)
-
 // get_adc_2d_as_1d will fetch an ADC value from a physical 1-d C++
 // array of WordTypes which can contain a logical 2-d array of
 // ADCs. It exists because the "blob of bytes" in DAPHNE streams
