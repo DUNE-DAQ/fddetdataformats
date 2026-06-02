@@ -21,8 +21,6 @@
 
 namespace dunedaq::fddetdataformats {
 
-// NOLINTBEGIN(modernize-avoid-c-arrays)
-
 // get_adc_2d_as_1d will fetch an ADC value from a physical 1-d C++
 // array of WordTypes which can contain a logical 2-d array of
 // ADCs. It exists because the "blob of bytes" in DAPHNE streams
@@ -222,8 +220,6 @@ set_adc_2d(const int i_sample, const int i_adc, WordType adc_val, WordType (&adc
 
   set_adc_1d<WordType, Columns, BitsPerADC>(i_adc, adc_val, adc_matrix[i_sample]);
 }
-
-// NOLINTEND(modernize-avoid-c-arrays)
 
 } // namespace dunedaq::fddetdataformats
 
