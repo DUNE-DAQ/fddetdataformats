@@ -4,6 +4,10 @@
  * Contains declaration of CRTBernFrame, a class for accessing/holding raw CRT data from the 'Bern' panels ProtoDUNE-II
  * VD
  *
+ * n.b. CRTBernFrame does *not* satisfy the AdaptableFrameConcept; its
+ * size exceeds the sum of its members (i.e., the compiler inserts
+ * padding)
+ *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
@@ -42,6 +46,8 @@ public:
 
   struct CRTBernData
   {
+    static constexpr int s_expected_bytes { 2 + 2 + 2 + 4 + 4 + 2 * s_num_channels + 4 };
+
     uint16_t flags = 0;
     uint16_t lostcpu = 0;
     uint16_t lostfpga = 0;
@@ -51,8 +57,11 @@ public:
     uint32_t coinc = 0;
   };
   #warning "CRTBernData has padding inserted"
-  //static_assert(sizeof(CRTBernData) == 2 + 2 + 2 + 4 + 4 + 2 * s_num_channels + 4);
+  //static_assert(sizeof(CRTBernData) == CRTBernData::s_expected_bytes);
 
+  static constexpr int s_expected_bytes { sizeof(detdataformats::DAQEthHeader) + sizeof(uint16_t) +
+    CRTBernData::s_expected_bytes};
+  
   const detdataformats::DAQEthHeader& get_daqheader() const {
     return m_daq_header;
   }
@@ -135,7 +144,7 @@ private:
   
 }; // CRTBernFrame
   #warning "CRTBernFrame has padding inserted"
-  // static_assert(sizeof(CRTBernFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(uint16_t) + sizeof(CRTBernFrame::CRTBernData));
+  // static_assert(sizeof(CRTBernFrame) == CRTBernFrame::s_expected_bytes)
 
   static_assert(std::endian::native == std::endian::little,
 		"The CRTBernFrame bitfield layout assumes little-endian architecture");
@@ -143,7 +152,7 @@ private:
 		"CRTBernFrame isn't trivially copyable and can't be safely std::memcpy'd");
   static_assert(std::is_standard_layout_v<CRTBernFrame>,
 		"CRTBernFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
-
+  
 } // namespace dunedaq::fddetdataformats
 
 // NOLINTEND(build/unsigned)
