@@ -20,6 +20,7 @@ PYBIND11_MODULE(_daq_fddetdataformats_py, m)
 
   register_wibeth(m);
   register_daphne(m);
+  register_daphnestream(m);
   register_daphneeth(m);
   register_daphneethstream(m);
   register_tdeeth(m);

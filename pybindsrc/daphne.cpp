@@ -7,7 +7,6 @@
  */
 
 #include "fddetdataformats/DAPHNEFrame.hpp"
-#include "fddetdataformats/DAPHNEStreamFrame.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -46,9 +45,30 @@ register_daphne(py::module& m)
       [](DAPHNEFrame& self) -> const DAPHNEFrame::PeakDescriptorData& { return self.get_peaks_data(); },
       py::return_value_policy::reference_internal)
     .def("get_adc", static_cast<uint16_t (DAPHNEFrame::*)(const int) const>(&DAPHNEFrame::get_adc))
+    .def("set_adc", &DAPHNEFrame::set_adc)
     .def("get_timestamp", &DAPHNEFrame::get_timestamp)
+    .def("set_timestamp", &DAPHNEFrame::set_timestamp)
     .def("get_channel", &DAPHNEFrame::get_channel)
-    .def_static("sizeof", []() { return sizeof(DAPHNEFrame); });
+    .def("set_channel", &DAPHNEFrame::set_channel)
+    .def("set_geoid", &DAPHNEFrame::set_geoid)
+    .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEFrame::version; })
+    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
+      return DAPHNEFrame::s_bits_per_adc;
+    })
+    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) {
+      return DAPHNEFrame::s_bits_per_word;
+    })
+    .def_property_readonly_static("s_num_adcs", [](py::object /*self*/) { return DAPHNEFrame::s_num_adcs; })
+    .def_property_readonly_static("s_num_adc_words", [](py::object /*self*/) {
+      return DAPHNEFrame::s_num_adc_words;
+    })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return DAPHNEFrame::s_expected_bytes;
+    })
+    .def_static("sizeof", []() { return sizeof(DAPHNEFrame); })
+    .def("get_bytes", [](DAPHNEFrame* fr) -> py::bytes {
+      return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEFrame)); // NOLINT
+    });
 
   py::class_<DAPHNEFrame::Header>(m, "DAPHNEFrameHeader")
     .def_property(
@@ -74,9 +94,18 @@ register_daphne(py::module& m)
     .def_property(
       "baseline",
       [](DAPHNEFrame::Header& self) -> uint16_t { return self.baseline; },
-      [](DAPHNEFrame::Header& self, uint16_t baseline) { self.baseline = baseline; });
+      [](DAPHNEFrame::Header& self, uint16_t baseline) { self.baseline = baseline; })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return sizeof(DAPHNEFrame::Header);
+    });
 
   py::class_<DAPHNEFrame::PeakDescriptorData>(m, "DAPHNEFramePeakDescriptorData")
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return DAPHNEFrame::PeakDescriptorData::s_expected_bytes;
+    })
+    .def_property_readonly_static("max_peaks", [](py::object /*self*/) {
+      return DAPHNEFrame::PeakDescriptorData::max_peaks;
+    })
     .def("is_found", &DAPHNEFrame::PeakDescriptorData::is_found)
     .def("set_found", &DAPHNEFrame::PeakDescriptorData::set_found)
 
@@ -88,6 +117,9 @@ register_daphne(py::module& m)
 
     .def("get_samples_over_baseline", &DAPHNEFrame::PeakDescriptorData::get_samples_over_baseline)
     .def("set_samples_over_baseline", &DAPHNEFrame::PeakDescriptorData::set_samples_over_baseline)
+
+    .def("get_sample_max", &DAPHNEFrame::PeakDescriptorData::get_sample_max)
+    .def("set_sample_max", &DAPHNEFrame::PeakDescriptorData::set_sample_max)
 
     .def("get_adc_max", &DAPHNEFrame::PeakDescriptorData::get_adc_max)
     .def("set_adc_max", &DAPHNEFrame::PeakDescriptorData::set_adc_max)
@@ -220,52 +252,6 @@ register_daphne(py::module& m)
       [](DAPHNEFrame::PeakDescriptorData& self) -> uint16_t { return self.samples_over_baseline_4; },
       [](DAPHNEFrame::PeakDescriptorData& self, uint16_t val) { self.samples_over_baseline_4 = val; });
 
-  py::class_<DAPHNEStreamFrame::Header>(m, "DAPHNEStreamHeader")
-    .def_property(
-      "channel_0",
-      [](DAPHNEStreamFrame::Header& self) -> uint32_t { return self.channel_0; },
-      [](DAPHNEStreamFrame::Header& self, uint32_t channel_0) { self.channel_0 = channel_0; })
-    .def_property(
-      "channel_1",
-      [](DAPHNEStreamFrame::Header& self) -> uint32_t { return self.channel_1; },
-      [](DAPHNEStreamFrame::Header& self, uint32_t channel_1) { self.channel_1 = channel_1; })
-    .def_property(
-      "channel_2",
-      [](DAPHNEStreamFrame::Header& self) -> uint32_t { return self.channel_2; },
-      [](DAPHNEStreamFrame::Header& self, uint32_t channel_2) { self.channel_2 = channel_2; })
-    .def_property(
-      "channel_3",
-      [](DAPHNEStreamFrame::Header& self) -> uint32_t { return self.channel_3; },
-      [](DAPHNEStreamFrame::Header& self, uint32_t channel_3) { self.channel_3 = channel_3; });
-
-  py::class_<DAPHNEStreamFrame>(m, "DAPHNEStreamFrame", py::buffer_protocol())
-    .def(py::init())
-    .def(py::init([](py::capsule capsule) {
-      auto wfp = *static_cast<DAPHNEStreamFrame*>(capsule.get_pointer());
-      return wfp;
-    }))
-    .def(
-      "get_daqheader",
-      [](DAPHNEStreamFrame& self) -> const detdataformats::DAQHeader& { return self.get_daqheader(); },
-      py::return_value_policy::reference_internal)
-    .def(
-      "get_header",
-      [](DAPHNEStreamFrame& self) -> const DAPHNEStreamFrame::Header& { return self.get_header(); },
-      py::return_value_policy::reference_internal)
-    //.def("get_trailer", [](DAPHNEStreamFrame& self) -> const DAPHNEStreamFrame::PeakDescriptorData& {return
-    //self.trailer;}, py::return_value_policy::reference_internal)
-    .def("get_timestamp", &DAPHNEStreamFrame::get_timestamp)
-    .def("set_timestamp", &DAPHNEStreamFrame::set_timestamp)
-    .def("get_adc", &DAPHNEStreamFrame::get_adc)
-    .def("set_adc", &DAPHNEStreamFrame::set_adc)
-    .def("get_channel0", &DAPHNEStreamFrame::get_channel0)
-    .def("get_channel1", &DAPHNEStreamFrame::get_channel1)
-    .def("get_channel2", &DAPHNEStreamFrame::get_channel2)
-    .def("get_channel3", &DAPHNEStreamFrame::get_channel3)
-    .def_static("sizeof", []() { return sizeof(DAPHNEStreamFrame); })
-    .def("get_bytes", [](DAPHNEStreamFrame* fr) -> py::bytes {
-      return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEStreamFrame)); // NOLINT
-    });
 } // NOLINT function length
 
 // NOLINTEND(build/unsigned)

@@ -20,6 +20,8 @@ register_wibeth(pybind11::module&);
 void
 register_daphne(pybind11::module&);
 void
+register_daphnestream(pybind11::module&);
+void
 register_daphneeth(pybind11::module&);
 void
 register_daphneethstream(pybind11::module&);

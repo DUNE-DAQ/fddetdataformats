@@ -59,7 +59,7 @@ register_daphneeth(py::module& m)
       [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.version; },
       [](DAPHNEEthFrame::Header& self, uint32_t version) { self.version = version; })
     .def_property(
-      "trigger_sample_value",
+      "trig_sample",
       [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.trig_sample; },
       [](DAPHNEEthFrame::Header& self, uint32_t trig_sample) { self.trig_sample = trig_sample; })
     .def_property(
@@ -69,7 +69,10 @@ register_daphneeth(py::module& m)
     .def_property(
       "baseline",
       [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.baseline; },
-      [](DAPHNEEthFrame::Header& self, uint32_t baseline) { self.baseline = baseline; });
+      [](DAPHNEEthFrame::Header& self, uint32_t baseline) { self.baseline = baseline; })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return DAPHNEEthFrame::Header::s_expected_bytes;
+    });
 
   py::class_<DAPHNEEthFrame>(m, "DAPHNEEthFrame", py::buffer_protocol())
     .def(py::init())
@@ -100,6 +103,21 @@ register_daphneeth(py::module& m)
     .def("set_timestamp", &DAPHNEEthFrame::set_timestamp)
     .def("get_channel", &DAPHNEEthFrame::get_channel)
     .def("set_channel", &DAPHNEEthFrame::set_channel)
+    .def("set_geoid", &DAPHNEEthFrame::set_geoid)
+    .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEEthFrame::version; })
+    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
+      return DAPHNEEthFrame::s_bits_per_adc;
+    })
+    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) {
+      return DAPHNEEthFrame::s_bits_per_word;
+    })
+    .def_property_readonly_static("s_num_adcs", [](py::object /*self*/) { return DAPHNEEthFrame::s_num_adcs; })
+    .def_property_readonly_static("s_num_adc_words", [](py::object /*self*/) {
+      return DAPHNEEthFrame::s_num_adc_words;
+    })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return DAPHNEEthFrame::s_expected_bytes;
+    })
     .def_static("sizeof", []() { return sizeof(DAPHNEEthFrame); })
     .def("get_bytes", [](DAPHNEEthFrame* fr) -> py::bytes {
       return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEEthFrame)); // NOLINT reinterpret_cast
