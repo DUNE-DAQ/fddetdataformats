@@ -119,10 +119,6 @@ private:
 
   static_assert(std::endian::native == std::endian::little,
               "The TDEEthFrame bitfield layout assumes little-endian architecture");
-static_assert(std::is_trivially_copyable_v<TDEEthFrame>,
-              "TDEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
-static_assert(std::is_standard_layout_v<TDEEthFrame>,
-              "TDEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
   static_assert(AdaptableFrameConcept<TDEEthFrame>, "TDEEthFrame does not satisfy the AdaptableFrameConcept");
 

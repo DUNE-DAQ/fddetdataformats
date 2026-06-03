@@ -132,11 +132,6 @@ private:
 static_assert(std::endian::native == std::endian::little,
               "The WIBEthFrame bitfield layout assumes little-endian architecture");
 
-static_assert(std::is_trivially_copyable_v<WIBEthFrame>,
-              "WIBEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
-static_assert(std::is_standard_layout_v<WIBEthFrame>,
-              "WIBEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
-
   static_assert(AdaptableFrameConcept<WIBEthFrame>, "WIBEthFrame does not satisfy the AdaptableFrameConcept");
   
 } // namespace dunedaq::fddetdataformats

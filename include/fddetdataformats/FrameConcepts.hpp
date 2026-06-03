@@ -14,6 +14,10 @@
  *  the sum of the sizes of the members - this guards against compiler
  *  padding
  *
+ * -Satisfying std::is_trivially_copyable_v (for std::memcpy) and and
+ *  std::is_standard_layout_v (members appear in memory in declaration
+ *  order + offsetof can be used)
+ *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
@@ -91,7 +95,9 @@ concept AdaptableFrameConcept =
   HasDAQHeader<T> &&
   HasFrameHeader<T> &&
   HasGetTimestamp<T> &&
-  HasSetTimestamp<T>;
+  HasSetTimestamp<T> &&
+  std::is_standard_layout_v<T> &&
+  std::is_trivially_copyable_v<T>;
 
 } // namespace dunedaq::fddetdataformats
 
