@@ -15,6 +15,7 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNESTREAMFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNESTREAMFRAME_HPP_
 
+#include "fddetdataformats/FrameConcepts.hpp"
 #include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQHeader.hpp" // For unified DAQ header
@@ -110,10 +111,7 @@ private:
 static_assert(std::endian::native == std::endian::little,
               "The DAPHNEStreamFrame bitfield layout assumes little-endian architecture");
 
-static_assert(std::is_trivially_copyable_v<DAPHNEStreamFrame>,
-              "DAPHNEStreamFrame isn't trivially copyable and can't be safely std::memcpy'd");
-static_assert(std::is_standard_layout_v<DAPHNEStreamFrame>,
-              "DAPHNEStreamFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+  static_assert(AdaptableFrameConcept<DAPHNEStreamFrame>, "DAPHNEStreamFrame does not satisfy the AdaptableFrameConcept");
 
 } // namespace dunedaq::fddetdataformats
 
