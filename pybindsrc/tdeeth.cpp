@@ -1,5 +1,5 @@
 /**
- * @file wibeth.cpp Python bindings for the TDEEthFrame format
+ * @file tdeeth.cpp Python bindings for the TDEEthFrame format
  *
  * This is part of the DUNE DAQ Software Suite, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -15,6 +15,8 @@ namespace py = pybind11;
 
 namespace dunedaq::fddetdataformats::python {
 
+// NOLINTBEGIN(build/unsigned)
+  
 void
 register_tdeeth(py::module& m)
 {
@@ -102,7 +104,7 @@ register_tdeeth(py::module& m)
     .def("get_bytes", [](TDEEthFrame* fr) -> py::bytes {
       return py::bytes(reinterpret_cast<char*>(fr), sizeof(TDEEthFrame)); // NOLINT reinterpret_cast
     });
-}
+} // NOLINT (defensible use of "overly long" function)
 
 // NOLINTEND(build/unsigned)
 

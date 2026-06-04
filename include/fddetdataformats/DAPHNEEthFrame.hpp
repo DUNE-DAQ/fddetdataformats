@@ -1,7 +1,7 @@
 /**
  * @file DAPHNEEthFrame.hpp
  *
- * Contains declaration of DAPHNEEthFrame, a class for accessing raw WIB eth frames, as used in ProtoDUNE-SP-II
+ * Contains declaration of DAPHNEEthFrame, a class for accessing raw DAPHNE eth frames, as used in ProtoDUNE-SP-II
  *
  * The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  * https://edms.cern.ch/document/2088726/XXX (XXX a stand-in for the doc version, e.g. 5)
@@ -33,9 +33,9 @@ namespace dunedaq::fddetdataformats {
 // NOLINTBEGIN(build/unsigned)
 
 /**
- *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
+ *  @brief Class for accessing raw DAPHNE eth frames, as used in ProtoDUNE-II
  *
- *  The canonical definition of the WIB format is given in EDMS document 2088713:
+ *  The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  *  https://edms.cern.ch/document/2088726/XXX, (XXX a stand-in for the doc version, e.g. 5)
  */
 class DAPHNEEthFrame
@@ -57,7 +57,7 @@ public:
     static constexpr size_t s_expected_bytes { 7 * sizeof(word_t) };
     
     // The following bitfields constitute what could be considered "word_t w0;"
-    word_t trig_sample : 14;
+    word_t trigger_sample_value : 14;
     word_t rsv_0 : 2;
     word_t threshold : 14;
     word_t rsv_1 : 2;

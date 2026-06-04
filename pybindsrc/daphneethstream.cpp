@@ -115,7 +115,7 @@ register_daphneethstream(py::module& m)
     .def("get_bytes", [](DAPHNEEthStreamFrame* fr) -> py::bytes {
       return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEEthStreamFrame)); // NOLINT reinterpret_cast
     });
-}
+} // NOLINT (defensible use of "overly long" function)
 
 // NOLINTEND(build/unsigned)
 

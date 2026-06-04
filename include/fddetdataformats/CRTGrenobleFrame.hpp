@@ -46,27 +46,26 @@ public:
     // "/ 8" below -> 8 bits to a byte
     static constexpr int s_expected_size { (8 + 8 + 8 + 8 + 16 + 12 + 3 + 1) / 8 }; 
 
-    unsigned int seconds : 8;
-    unsigned int minutes : 8;
-    unsigned int hours : 8;
-    unsigned int year : 8;
+    uint32_t seconds : 8;
+    uint32_t minutes : 8;
+    uint32_t hours : 8;
+    uint32_t year : 8;
 
-    unsigned int day : 16;
-    unsigned int new_date_cnt : 12;
-    unsigned int irigb_dec_ver : 3;
-    unsigned int irigb_valid : 1;
+    uint32_t day : 16;
+    uint32_t new_date_cnt : 12;
+    uint32_t irigb_dec_ver : 3;
+    uint32_t irigb_valid : 1;
   };
   static_assert(sizeof(TGpsDateStruct) == TGpsDateStruct::s_expected_size);
 
   struct STChannel
   {
-    static constexpr int s_expected_size { sizeof(int) + sizeof(unsigned short) +
-      sizeof(float) + sizeof(unsigned short) };
+    static constexpr int s_expected_size { sizeof(int) + sizeof(uint16_t) + sizeof(float) + sizeof(uint16_t) }; // NOLINT(runtime/int,google-runtime-int)
 
     int qTot = 0;            ///< Total charge.
-    unsigned short n_zc = 0; ///< CFD time.
+    uint16_t n_zc = 0; ///< CFD time.
     float cfd = 0.;          ///< CFD value
-    unsigned short flag = 0; ///< Flag containing trigger, trigger sum and overflow information.
+    uint16_t flag = 0; ///< Flag containing trigger, trigger sum and overflow information.
   };
 
 #warning "CRTGrenobleFrame::STChannel has padding inserted"
@@ -74,14 +73,14 @@ public:
 
   struct STEvent
   {
-    static constexpr int s_expected_size { 3 * sizeof(unsigned int) + TGpsDateStruct::s_expected_size + 2 * sizeof(unsigned int) + STChannel::s_expected_size * s_num_channels };
+    static constexpr int s_expected_size { 3 * sizeof(uint32_t) + TGpsDateStruct::s_expected_size + 2 * sizeof(uint32_t) + STChannel::s_expected_size * s_num_channels };
     
-    unsigned int eventID = 0;      ///< Event ID.
-    unsigned int dateInSec = 0;    ///< Event date in seconds.
-    unsigned int timestamp = 0;    ///< Timestamp (4 ns) -> used to compute dt between events.
+    uint32_t eventID = 0;      ///< Event ID.
+    uint32_t dateInSec = 0;    ///< Event date in seconds.
+    uint32_t timestamp = 0;    ///< Timestamp (4 ns) -> used to compute dt between events.
     TGpsDateStruct gpsDate;        ///< TGPS date
-    unsigned int pps_interval = 0; ///< IRIG-B subdivision in a second, expressed in 100 ns clock ticks.
-    unsigned int FIFO_AF_duration =
+    uint32_t pps_interval = 0; ///< IRIG-B subdivision in a second, expressed in 100 ns clock ticks.
+    uint32_t FIFO_AF_duration =
       0; ///< FIFO AF duration (4 ns) -> integration of Almost full fifo since last accepted trigger
 
     struct STChannel channels[s_num_channels];

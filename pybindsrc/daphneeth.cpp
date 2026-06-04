@@ -1,5 +1,5 @@
 /**
- * @file wibeth.cpp Python bindings for the DAPHNEEthFrame format
+ * @file daphneeth.cpp Python bindings for the DAPHNEEthFrame format
  *
  * This is part of the DUNE DAQ Software Suite, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -59,9 +59,9 @@ register_daphneeth(py::module& m)
       [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.version; },
       [](DAPHNEEthFrame::Header& self, uint32_t version) { self.version = version; })
     .def_property(
-      "trig_sample",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.trig_sample; },
-      [](DAPHNEEthFrame::Header& self, uint32_t trig_sample) { self.trig_sample = trig_sample; })
+      "trigger_sample_value",
+      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.trigger_sample_value; },
+      [](DAPHNEEthFrame::Header& self, uint32_t trigger_sample_value) { self.trigger_sample_value = trigger_sample_value; })
     .def_property(
       "threshold",
       [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.threshold; },
@@ -123,7 +123,7 @@ register_daphneeth(py::module& m)
     .def("get_bytes", [](DAPHNEEthFrame* fr) -> py::bytes {
       return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEEthFrame)); // NOLINT reinterpret_cast
     });
-}
+} // NOLINT (defensible use of "overly long" function)
 
 // NOLINTEND(build/unsigned)
 
