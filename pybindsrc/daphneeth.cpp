@@ -104,6 +104,7 @@ register_daphneeth(py::module& m)
     .def("get_channel", &DAPHNEEthFrame::get_channel)
     .def("set_channel", &DAPHNEEthFrame::set_channel)
     .def("set_geoid", &DAPHNEEthFrame::set_geoid)
+    .def("__lt__", [](const DAPHNEEthFrame& lhs, const DAPHNEEthFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEEthFrame::version; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
       return DAPHNEEthFrame::s_bits_per_adc;

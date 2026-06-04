@@ -72,6 +72,31 @@ def test_bytes_roundtrip() -> int:
     return 0
 
 
+def test_less_than_operator() -> int:
+    earlier = DAPHNEFrame()
+    later = DAPHNEFrame()
+    earlier.set_timestamp(100)
+    later.set_timestamp(200)
+    if not (earlier < later):
+        print("FAIL: __lt__ expected earlier < later by timestamp")
+        return 1
+    if later < earlier:
+        print("FAIL: __lt__ expected later !< earlier by timestamp")
+        return 1
+
+    same_ts_low_ch = DAPHNEFrame()
+    same_ts_high_ch = DAPHNEFrame()
+    same_ts_low_ch.set_timestamp(300)
+    same_ts_high_ch.set_timestamp(300)
+    same_ts_low_ch.set_channel(1)
+    same_ts_high_ch.set_channel(2)
+    if not (same_ts_low_ch < same_ts_high_ch):
+        print("FAIL: __lt__ expected channel tie-breaker low < high")
+        return 1
+    print("PASS: __lt__ ordering by timestamp then channel")
+    return 0
+
+
 def test_timestamp() -> int:
     frame = DAPHNEFrame()
     test_ts = 0xAABBCCDDEEFF
@@ -290,6 +315,7 @@ def main() -> int:
         test_construction_and_size,
         test_static_members,
         test_bytes_roundtrip,
+        test_less_than_operator,
         test_timestamp,
         test_channel,
         test_daqheader_accessible,

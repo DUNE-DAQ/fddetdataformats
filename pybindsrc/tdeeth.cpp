@@ -73,6 +73,7 @@ register_tdeeth(py::module& m)
     .def("get_channel", &TDEEthFrame::get_channel)
     .def("set_channel", &TDEEthFrame::set_channel)
     .def("set_geoid", &TDEEthFrame::set_geoid)
+    .def("__lt__", [](const TDEEthFrame& lhs, const TDEEthFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
       return TDEEthFrame::s_bits_per_adc;
     })

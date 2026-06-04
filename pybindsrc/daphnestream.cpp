@@ -65,6 +65,7 @@ register_daphnestream(py::module& m)
     .def("set_timestamp", &DAPHNEStreamFrame::set_timestamp)
     .def("get_adc", &DAPHNEStreamFrame::get_adc)
     .def("set_adc", &DAPHNEStreamFrame::set_adc)
+    .def("__lt__", [](const DAPHNEStreamFrame& lhs, const DAPHNEStreamFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
       return DAPHNEStreamFrame::s_bits_per_adc;
     })

@@ -73,6 +73,21 @@ def test_bytes_roundtrip() -> int:
     return 0
 
 
+def test_less_than_operator() -> int:
+    earlier = DAPHNEStreamFrame()
+    later = DAPHNEStreamFrame()
+    earlier.set_timestamp(100)
+    later.set_timestamp(200)
+    if not (earlier < later):
+        print("FAIL: __lt__ expected earlier < later")
+        return 1
+    if later < earlier:
+        print("FAIL: __lt__ expected later !< earlier")
+        return 1
+    print("PASS: __lt__ ordering by timestamp")
+    return 0
+
+
 def test_timestamp() -> int:
     frame = DAPHNEStreamFrame()
     test_ts = 0x998877665544
@@ -207,6 +222,7 @@ def main() -> int:
         test_construction_and_size,
         test_static_members,
         test_bytes_roundtrip,
+        test_less_than_operator,
         test_timestamp,
         test_channel,
         test_daqheader_accessible,

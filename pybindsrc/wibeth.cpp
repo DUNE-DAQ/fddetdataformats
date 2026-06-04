@@ -120,6 +120,7 @@ register_wibeth(py::module& m)
     .def("get_channel", &WIBEthFrame::get_channel)
     .def("set_channel", &WIBEthFrame::set_channel)
     .def("set_geoid", &WIBEthFrame::set_geoid)
+    .def("__lt__", [](const WIBEthFrame& lhs, const WIBEthFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
       return WIBEthFrame::s_bits_per_adc;
     })

@@ -51,6 +51,7 @@ register_daphne(py::module& m)
     .def("get_channel", &DAPHNEFrame::get_channel)
     .def("set_channel", &DAPHNEFrame::set_channel)
     .def("set_geoid", &DAPHNEFrame::set_geoid)
+    .def("__lt__", [](const DAPHNEFrame& lhs, const DAPHNEFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEFrame::version; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
       return DAPHNEFrame::s_bits_per_adc;
