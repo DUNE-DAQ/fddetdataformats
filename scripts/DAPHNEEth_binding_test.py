@@ -121,7 +121,7 @@ def test_header_properties() -> int:
 
     hdr.channel = 5
     hdr.version = 1
-    hdr.trig_sample = 123
+    hdr.trigger_sample_value = 123
     hdr.threshold = 456
     hdr.baseline = 789
     hdr.w1 = 11
@@ -137,8 +137,8 @@ def test_header_properties() -> int:
     if hdr.version != 1:
         print("FAIL: header.version mismatch")
         return 1
-    if hdr.trig_sample != 123:
-        print("FAIL: header.trig_sample mismatch")
+    if hdr.trigger_sample_value != 123:
+        print("FAIL: header.trigger_sample_value mismatch")
         return 1
     if hdr.threshold != 456:
         print("FAIL: header.threshold mismatch")
