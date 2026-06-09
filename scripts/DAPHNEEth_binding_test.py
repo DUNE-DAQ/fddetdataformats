@@ -107,17 +107,26 @@ def test_channel() -> int:
 
 def test_daqheader_accessible() -> int:
     frame = DAPHNEEthFrame()
-    hdr = frame.get_daqheader()
+    hdr = frame.daq_header
     if hdr is None:
+        print("FAIL: daq_header returned None")
+        return 1
+    hdr_alias = frame.get_daqheader()
+    if hdr_alias is None:
         print("FAIL: get_daqheader() returned None")
         return 1
-    print("PASS: get_daqheader() accessible")
+    print("PASS: daq_header accessible")
     return 0
 
 
 def test_header_properties() -> int:
     frame = DAPHNEEthFrame()
-    hdr = frame.get_header()
+    hdr = frame.header
+    hdr_alias = frame.get_daphneheader()
+
+    if hdr_alias is None:
+        print("FAIL: get_daphneheader() returned None")
+        return 1
 
     hdr.channel = 5
     hdr.version = 1
@@ -149,6 +158,9 @@ def test_header_properties() -> int:
     if (hdr.w1, hdr.w2, hdr.w3, hdr.w4, hdr.w5, hdr.w6) != (11, 22, 33, 44, 55, 66):
         print("FAIL: w1..w6 mismatch")
         return 1
+    if hdr_alias.w6 != 66:
+        print(f"FAIL: get_daphneheader alias mismatch, got {hdr_alias.w6}")
+        return 1
 
     print("PASS: DAPHNEEthHeader properties")
     return 0
@@ -159,18 +171,20 @@ def test_set_geoid() -> int:
     crate_id = 5
     slot_id = 3
     stream_id = 12
-    frame.set_geoid(crate_id, slot_id, stream_id)
-    hdr = frame.get_daqheader()
+    hdr = frame.daq_header
+    hdr.crate_id = crate_id
+    hdr.slot_id = slot_id
+    hdr.stream_id = stream_id
     if hdr.crate_id != crate_id:
-        print(f"FAIL: set_geoid crate_id mismatch, got {hdr.crate_id}")
+        print(f"FAIL: crate_id mismatch, got {hdr.crate_id}")
         return 1
     if hdr.slot_id != slot_id:
-        print(f"FAIL: set_geoid slot_id mismatch, got {hdr.slot_id}")
+        print(f"FAIL: slot_id mismatch, got {hdr.slot_id}")
         return 1
     if hdr.stream_id != stream_id:
-        print(f"FAIL: set_geoid stream_id mismatch, got {hdr.stream_id}")
+        print(f"FAIL: stream_id mismatch, got {hdr.stream_id}")
         return 1
-    print("PASS: set_geoid updates DAQEthHeader geoid fields")
+    print("PASS: DAQEthHeader geoid fields can be set directly")
     return 0
 
 

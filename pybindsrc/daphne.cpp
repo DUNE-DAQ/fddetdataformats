@@ -34,15 +34,22 @@ register_daphne(py::module& m)
     }))
     .def(
       "get_daqheader",
-      [](DAPHNEFrame& self) -> const detdataformats::DAQHeader& { return self.get_daqheader(); },
+      [](DAPHNEFrame& self) -> const detdataformats::DAQHeader& { return self.daq_header; },
       py::return_value_policy::reference_internal)
     .def(
       "get_header",
-      [](DAPHNEFrame& self) -> const DAPHNEFrame::Header& { return self.get_header(); },
+      [](DAPHNEFrame& self) -> const DAPHNEFrame::Header& { return self.header; },
       py::return_value_policy::reference_internal)
-    .def(
-      "get_peaks_data",
-      [](DAPHNEFrame& self) -> const DAPHNEFrame::PeakDescriptorData& { return self.get_peaks_data(); },
+    .def_property_readonly(
+      "daq_header",
+      [](DAPHNEFrame& self) -> detdataformats::DAQHeader& { return self.daq_header; },
+      py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "header",
+      [](DAPHNEFrame& self) -> DAPHNEFrame::Header& { return self.header; },
+      py::return_value_policy::reference_internal)
+    .def("peaks_data",
+      [](DAPHNEFrame& self) -> DAPHNEFrame::PeakDescriptorData& { return self.peaks_data; },
       py::return_value_policy::reference_internal)
     .def("get_adc", static_cast<uint16_t (DAPHNEFrame::*)(const int) const>(&DAPHNEFrame::get_adc))
     .def("set_adc", &DAPHNEFrame::set_adc)
@@ -50,7 +57,6 @@ register_daphne(py::module& m)
     .def("set_timestamp", &DAPHNEFrame::set_timestamp)
     .def("get_channel", &DAPHNEFrame::get_channel)
     .def("set_channel", &DAPHNEFrame::set_channel)
-    .def("set_geoid", &DAPHNEFrame::set_geoid)
     .def("__lt__", [](const DAPHNEFrame& lhs, const DAPHNEFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEFrame::version; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {

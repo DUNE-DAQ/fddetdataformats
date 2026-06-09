@@ -123,11 +123,15 @@ def test_channel() -> int:
 
 def test_daqheader_accessible() -> int:
     frame = DAPHNEFrame()
-    hdr = frame.get_daqheader()
+    hdr = frame.daq_header
     if hdr is None:
+        print("FAIL: daq_header returned None")
+        return 1
+    hdr_alias = frame.get_daqheader()
+    if hdr_alias is None:
         print("FAIL: get_daqheader() returned None")
         return 1
-    print("PASS: get_daqheader() accessible")
+    print("PASS: daq_header accessible")
     return 0
 
 
@@ -136,26 +140,33 @@ def test_set_geoid() -> int:
     crate_id = 8
     slot_id = 5
     link_id = 12
-    frame.set_geoid(crate_id, slot_id, link_id)
+    hdr = frame.daq_header
+    hdr.crate_id = crate_id
+    hdr.slot_id = slot_id
+    hdr.link_id = link_id
 
-    hdr = frame.get_daqheader()
     if hdr.crate_id != crate_id:
-        print(f"FAIL: set_geoid crate_id mismatch, got {hdr.crate_id}")
+        print(f"FAIL: crate_id mismatch, got {hdr.crate_id}")
         return 1
     if hdr.slot_id != slot_id:
-        print(f"FAIL: set_geoid slot_id mismatch, got {hdr.slot_id}")
+        print(f"FAIL: slot_id mismatch, got {hdr.slot_id}")
         return 1
     if hdr.link_id != link_id:
-        print(f"FAIL: set_geoid link_id mismatch, got {hdr.link_id}")
+        print(f"FAIL: link_id mismatch, got {hdr.link_id}")
         return 1
 
-    print("PASS: DAPHNEFrame set_geoid updates DAQHeader geoid fields")
+    print("PASS: DAPHNEFrame DAQHeader geoid fields can be set directly")
     return 0
 
 
 def test_header_properties() -> int:
     frame = DAPHNEFrame()
-    header = frame.get_header()
+    header = frame.header
+    header_alias = frame.get_header()
+
+    if header_alias is None:
+        print("FAIL: get_header() returned None")
+        return 1
 
     header.channel = 17
     if frame.get_channel() != 17:
@@ -185,6 +196,9 @@ def test_header_properties() -> int:
     header.baseline = 900
     if header.baseline != 900:
         print(f"FAIL: header.baseline mismatch, got {header.baseline}")
+        return 1
+    if header_alias.baseline != 900:
+        print(f"FAIL: get_header alias mismatch, got {header_alias.baseline}")
         return 1
 
     print("PASS: DAPHNEFrameHeader properties")
@@ -259,7 +273,7 @@ def test_adc_out_of_range() -> int:
 
 def test_peaks_data() -> int:
     frame = DAPHNEFrame()
-    peaks = frame.get_peaks_data()
+    peaks = frame.peaks_data()
 
     peaks.set_found(1, 0)
     if peaks.is_found(0) != 1:

@@ -53,13 +53,13 @@ register_daphnestream(py::module& m)
       auto wfp = *static_cast<DAPHNEStreamFrame*>(info.ptr);
       return wfp;
     }))
-    .def(
-      "get_daqheader",
-      [](DAPHNEStreamFrame& self) -> const detdataformats::DAQHeader& { return self.get_daqheader(); },
+    .def_property_readonly(
+      "daq_header",
+      [](DAPHNEStreamFrame& self) -> detdataformats::DAQHeader& { return self.daq_header; },
       py::return_value_policy::reference_internal)
-    .def(
-      "get_header",
-      [](DAPHNEStreamFrame& self) -> const DAPHNEStreamFrame::Header& { return self.get_header(); },
+    .def_property_readonly(
+      "header",
+      [](DAPHNEStreamFrame& self) -> DAPHNEStreamFrame::Header& { return self.header; },
       py::return_value_policy::reference_internal)
     .def("get_timestamp", &DAPHNEStreamFrame::get_timestamp)
     .def("set_timestamp", &DAPHNEStreamFrame::set_timestamp)

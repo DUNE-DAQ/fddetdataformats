@@ -13,7 +13,7 @@ TDEEthFrame::get_adc(int i_channel, int i_sample) const
     dunedaq::fddetdataformats::get_adc_2d<TDEEthFrame::word_t,
                                           TDEEthFrame::s_time_samples_per_frame,
                                           TDEEthFrame::s_num_adc_words_per_ts,
-                                          TDEEthFrame::s_bits_per_adc>(i_sample, i_channel, m_adc_words));
+                                          TDEEthFrame::s_bits_per_adc>(i_sample, i_channel, adc_words));
 }
 
 inline void
@@ -22,7 +22,7 @@ TDEEthFrame::set_adc(int i_channel, int i_sample, uint16_t adc_val)
   dunedaq::fddetdataformats::set_adc_2d<TDEEthFrame::word_t,
                                         TDEEthFrame::s_time_samples_per_frame,
                                         TDEEthFrame::s_num_adc_words_per_ts,
-                                        TDEEthFrame::s_bits_per_adc>(i_sample, i_channel, adc_val, m_adc_words);
+                                        TDEEthFrame::s_bits_per_adc>(i_sample, i_channel, adc_val, adc_words);
 }
 
 } // namespace dunedaq::fddetdataformats

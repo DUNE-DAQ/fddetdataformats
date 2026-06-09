@@ -87,15 +87,23 @@ register_daphneeth(py::module& m)
     }))
     .def(
       "get_daqheader",
-      [](DAPHNEEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.get_daqheader(); },
+      [](DAPHNEEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.daq_header; },
       py::return_value_policy::reference_internal)
     .def(
       "get_daphneheader",
-      [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& { return self.get_header(); },
+      [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& { return self.header; },
       py::return_value_policy::reference_internal)
     .def(
       "get_header",
-      [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& { return self.get_header(); },
+      [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& { return self.header; },
+      py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "daq_header",
+      [](DAPHNEEthFrame& self) -> detdataformats::DAQEthHeader& { return self.daq_header; },
+      py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "header",
+      [](DAPHNEEthFrame& self) -> DAPHNEEthFrame::Header& { return self.header; },
       py::return_value_policy::reference_internal)
     .def("get_adc", &DAPHNEEthFrame::get_adc)
     .def("set_adc", &DAPHNEEthFrame::set_adc)
@@ -103,7 +111,6 @@ register_daphneeth(py::module& m)
     .def("set_timestamp", &DAPHNEEthFrame::set_timestamp)
     .def("get_channel", &DAPHNEEthFrame::get_channel)
     .def("set_channel", &DAPHNEEthFrame::set_channel)
-    .def("set_geoid", &DAPHNEEthFrame::set_geoid)
     .def("__lt__", [](const DAPHNEEthFrame& lhs, const DAPHNEEthFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEEthFrame::version; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {

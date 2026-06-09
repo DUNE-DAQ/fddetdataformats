@@ -102,11 +102,15 @@ def test_channel() -> int:
 
 def test_daqheader_accessible() -> int:
     frame = WIBEthFrame()
-    hdr = frame.get_daqheader()
+    hdr = frame.daq_header
     if hdr is None:
+        print("FAIL: daq_header returned None")
+        return 1
+    hdr_alias = frame.get_daqheader()
+    if hdr_alias is None:
         print("FAIL: get_daqheader() returned None")
         return 1
-    print("PASS: get_daqheader() accessible")
+    print("PASS: daq_header accessible")
     return 0
 
 
@@ -115,28 +119,30 @@ def test_set_geoid() -> int:
     crate_id = 9
     slot_id = 7
     stream_id = 42
-    frame.set_geoid(crate_id, slot_id, stream_id)
-    hdr = frame.get_daqheader()
+    hdr = frame.daq_header
+    hdr.crate_id = crate_id
+    hdr.slot_id = slot_id
+    hdr.stream_id = stream_id
     if hdr.crate_id != crate_id:
-        print(f"FAIL: set_geoid crate_id mismatch, got {hdr.crate_id}")
+        print(f"FAIL: crate_id mismatch, got {hdr.crate_id}")
         return 1
     if hdr.slot_id != slot_id:
-        print(f"FAIL: set_geoid slot_id mismatch, got {hdr.slot_id}")
+        print(f"FAIL: slot_id mismatch, got {hdr.slot_id}")
         return 1
     if hdr.stream_id != stream_id:
-        print(f"FAIL: set_geoid stream_id mismatch, got {hdr.stream_id}")
+        print(f"FAIL: stream_id mismatch, got {hdr.stream_id}")
         return 1
-    print("PASS: set_geoid updates DAQEthHeader geoid fields")
+    print("PASS: DAQEthHeader geoid fields can be set directly")
     return 0
 
 
 def test_header_properties() -> int:
     frame = WIBEthFrame()
-    hdr = frame.get_wibheader()
-    hdr_alias = frame.get_header()
+    hdr = frame.header
+    hdr_alias = frame.get_wibheader()
 
     if hdr_alias is None:
-        print("FAIL: get_header() returned None")
+        print("FAIL: get_wibheader() returned None")
         return 1
 
     hdr.channel = 4
@@ -188,8 +194,11 @@ def test_header_properties() -> int:
     if hdr.extra_data != 0x1122334455667788:
         print(f"FAIL: WIBEthHeader.extra_data mismatch, got {hdr.extra_data:#x}")
         return 1
+    if hdr_alias.extra_data != 0x1122334455667788:
+        print(f"FAIL: get_wibheader alias mismatch, got {hdr_alias.extra_data:#x}")
+        return 1
 
-    print("PASS: WIBEthHeader property read/write and get_header alias")
+    print("PASS: WIBEthHeader property read/write and get_wibheader alias")
     return 0
 
 

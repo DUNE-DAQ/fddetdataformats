@@ -1,7 +1,7 @@
 /**
  * @file DAPHNEEthFrame.hpp
  *
- * Contains declaration of DAPHNEEthFrame, a class for accessing raw DAPHNE eth frames, as used in ProtoDUNE-SP-II
+ * Contains declaration of DAPHNEEthFrame, a struct for accessing raw DAPHNE eth frames, as used in ProtoDUNE-SP-II
  *
  * The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  * https://edms.cern.ch/document/2088726/XXX (XXX a stand-in for the doc version, e.g. 5)
@@ -33,14 +33,13 @@ namespace dunedaq::fddetdataformats {
 // NOLINTBEGIN(build/unsigned)
 
 /**
- *  @brief Class for accessing raw DAPHNE eth frames, as used in ProtoDUNE-II
+ *  @brief Struct for accessing raw DAPHNE eth frames, as used in ProtoDUNE-II
  *
  *  The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  *  https://edms.cern.ch/document/2088726/XXX, (XXX a stand-in for the doc version, e.g. 5)
  */
-class DAPHNEEthFrame
+struct DAPHNEEthFrame
 {
-public:
   // The definition of the format is in terms of 64-bit words
   using word_t = uint64_t;
 
@@ -76,15 +75,6 @@ public:
   static_assert(sizeof(Header) == Header::s_expected_bytes);
 
   static constexpr size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + Header::s_expected_bytes + s_num_adc_words * sizeof(word_t);
-
-  
-  const detdataformats::DAQEthHeader& get_daqheader() const {
-    return m_daq_header;
-  }
-
-  const Header& get_header() const {
-    return m_header;
-  }
   
   /**
    * @brief Get the ith ADC value in the frame
@@ -99,29 +89,24 @@ public:
   void set_adc(int i, uint16_t val); // NOLINT
 
   /// @brief Get the starting 64-bit timestamp of the frame
-  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
   /// @brief Set the starting 64-bit timestamp of the frame
-  void set_timestamp(const uint64_t new_timestamp) { m_daq_header.timestamp = new_timestamp; }
+  void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
 
   /// @brief Get the channel identifier of the frame
-  uint8_t get_channel() const { return m_header.channel; }
+  uint8_t get_channel() const { return header.channel; }
 
   /// @brief Set the channel identifier of the frame
-  void set_channel(const uint8_t new_channel) { m_header.channel = new_channel; }
-
-  void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
-    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, m_daq_header);
-  }
+  void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
 
   bool operator<(const DAPHNEEthFrame& other) const {
     return std::tuple(this->get_timestamp(), this->get_channel()) < std::tuple(other.get_timestamp(), other.get_channel());
   }
   
-private:
-  detdataformats::DAQEthHeader m_daq_header;
-  Header m_header;
-  word_t m_adc_words[s_num_adc_words]; // NOLINT
+  detdataformats::DAQEthHeader daq_header;
+  Header header;
+  word_t adc_words[s_num_adc_words]; // NOLINT
 };
 
   static_assert(std::endian::native == std::endian::little,

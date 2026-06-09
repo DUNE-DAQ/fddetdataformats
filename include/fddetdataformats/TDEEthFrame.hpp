@@ -32,14 +32,13 @@ namespace dunedaq::fddetdataformats {
 // NOLINTBEGIN(build/unsigned)
 
 /**
- *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
+ *  @brief Struct for accessing raw WIB eth frames, as used in ProtoDUNE-II
  *
  *  The canonical definition of the WIB format is given in EDMS document 2088713:
  *  https://edms.cern.ch/document/2088713
  */
-class TDEEthFrame
+struct TDEEthFrame
 {
-public:
   // The definition of the format is in terms of 64-bit words
   using word_t = uint64_t;
 
@@ -67,14 +66,6 @@ public:
   static constexpr size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + TDEEthHeader::s_expected_bytes + s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t);
 
   
-  const detdataformats::DAQEthHeader& get_daqheader() const {
-    return m_daq_header;
-  }
-
-  const TDEEthHeader& get_header() const {
-    return m_header;
-  }
-  
   /**
    * @brief Get the i_channel-th ADC value in the i_sample-th time sample
    *
@@ -88,33 +79,24 @@ public:
   void set_adc(int i_channel, int i_sample, uint16_t val);
 
   /// @brief Get the starting 64-bit timestamp of the frame
-  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
   /// @brief Set the starting 64-bit timestamp of the frame
-  void set_timestamp(const uint64_t new_timestamp) { m_daq_header.timestamp = new_timestamp; }
+  void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
 
   /// @brief Get the channel identifier of the frame
-  uint8_t get_channel() const { return m_header.channel; }
+  uint8_t get_channel() const { return header.channel; }
 
   /// @brief Set the channel identifier of the frame
-  void set_channel(const uint8_t new_channel) { m_header.channel = new_channel; }
-
-  void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
-    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, m_daq_header);
-  }
-  
-  const word_t* get_adc_words() const {
-    return &m_adc_words[0][0];
-  }
+  void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
 
   bool operator<(const TDEEthFrame& other) const {
     return this->get_timestamp() < other.get_timestamp();
   }
   
-private:  
-  detdataformats::DAQEthHeader m_daq_header;
-  TDEEthHeader m_header;
-  word_t m_adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
+  detdataformats::DAQEthHeader daq_header;
+  TDEEthHeader header;
+  word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
 };
 
   static_assert(std::endian::native == std::endian::little,

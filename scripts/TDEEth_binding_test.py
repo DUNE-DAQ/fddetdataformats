@@ -98,11 +98,15 @@ def test_channel() -> int:
 
 def test_daqheader_accessible() -> int:
     frame = TDEEthFrame()
-    hdr = frame.get_daqheader()
+    hdr = frame.daq_header
     if hdr is None:
+        print("FAIL: daq_header returned None")
+        return 1
+    hdr_alias = frame.get_daqheader()
+    if hdr_alias is None:
         print("FAIL: get_daqheader() returned None")
         return 1
-    print("PASS: get_daqheader() accessible")
+    print("PASS: daq_header accessible")
     return 0
 
 
@@ -111,53 +115,61 @@ def test_set_geoid() -> int:
     crate_id = 11
     slot_id = 12
     stream_id = 33
-    frame.set_geoid(crate_id, slot_id, stream_id)
+    frame.daq_header.crate_id = crate_id
+    frame.daq_header.slot_id = slot_id
+    frame.daq_header.stream_id = stream_id
 
-    hdr = frame.get_daqheader()
-    if hdr.crate_id != crate_id:
-        print(f"FAIL: set_geoid crate_id mismatch, got {hdr.crate_id}")
+    if frame.daq_header.crate_id != crate_id:
+        print(f"FAIL: crate_id mismatch, got {frame.daq_header.crate_id}")
         return 1
-    if hdr.slot_id != slot_id:
-        print(f"FAIL: set_geoid slot_id mismatch, got {hdr.slot_id}")
+    if frame.daq_header.slot_id != slot_id:
+        print(f"FAIL: slot_id mismatch, got {frame.daq_header.slot_id}")
         return 1
-    if hdr.stream_id != stream_id:
-        print(f"FAIL: set_geoid stream_id mismatch, got {hdr.stream_id}")
+    if frame.daq_header.stream_id != stream_id:
+        print(f"FAIL: stream_id mismatch, got {frame.daq_header.stream_id}")
         return 1
 
-    print("PASS: set_geoid updates DAQEthHeader geoid fields")
+    print("PASS: DAQEthHeader geoid fields set and read back via frame.daq_header")
     return 0
 
 
 def test_header_properties() -> int:
     frame = TDEEthFrame()
-    hdr = frame.get_tdeheader()
+    hdr_alias = frame.get_tdeheader()
 
-    hdr.channel = 42
-    if hdr.channel != 42:
-        print(f"FAIL: TDEEthHeader.channel: set 42, got {hdr.channel}")
+    if hdr_alias is None:
+        print("FAIL: get_tdeheader() returned None")
         return 1
 
-    hdr.version = 3
-    if hdr.version != 3:
-        print(f"FAIL: TDEEthHeader.version: set 3, got {hdr.version}")
+    frame.header.channel = 42
+    if frame.header.channel != 42:
+        print(f"FAIL: TDEEthHeader.channel: set 42, got {frame.header.channel}")
         return 1
 
-    hdr.tde_header = 0x1F
-    if hdr.tde_header != 0x1F:
-        print(f"FAIL: TDEEthHeader.tde_header: set 0x1F, got {hdr.tde_header:#x}")
+    frame.header.version = 3
+    if frame.header.version != 3:
+        print(f"FAIL: TDEEthHeader.version: set 3, got {frame.header.version}")
         return 1
 
-    hdr.tde_errors = 0xAB
-    if hdr.tde_errors != 0xAB:
-        print(f"FAIL: TDEEthHeader.tde_errors: set 0xAB, got {hdr.tde_errors:#x}")
+    frame.header.tde_header = 0x1F
+    if frame.header.tde_header != 0x1F:
+        print(f"FAIL: TDEEthHeader.tde_header: set 0x1F, got {frame.header.tde_header:#x}")
         return 1
 
-    hdr.TAItime = 0xFEDCBA9876543210
-    if hdr.TAItime != 0xFEDCBA9876543210:
-        print(f"FAIL: TDEEthHeader.TAItime: set 0xFEDCBA9876543210, got {hdr.TAItime:#x}")
+    frame.header.tde_errors = 0xAB
+    if frame.header.tde_errors != 0xAB:
+        print(f"FAIL: TDEEthHeader.tde_errors: set 0xAB, got {frame.header.tde_errors:#x}")
         return 1
 
-    print("PASS: TDEEthHeader property read/write (channel, version, tde_header, tde_errors, TAItime)")
+    frame.header.TAItime = 0xFEDCBA9876543210
+    if frame.header.TAItime != 0xFEDCBA9876543210:
+        print(f"FAIL: TDEEthHeader.TAItime: set 0xFEDCBA9876543210, got {frame.header.TAItime:#x}")
+        return 1
+    if hdr_alias.TAItime != 0xFEDCBA9876543210:
+        print(f"FAIL: get_tdeheader alias mismatch, got {hdr_alias.TAItime:#x}")
+        return 1
+
+    print("PASS: TDEEthHeader property read/write and get_tdeheader alias")
     return 0
 
 

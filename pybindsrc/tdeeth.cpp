@@ -58,15 +58,19 @@ register_tdeeth(py::module& m)
     }))
     .def(
       "get_daqheader",
-      [](TDEEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.get_daqheader(); },
+      [](TDEEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.daq_header; },
       py::return_value_policy::reference_internal)
     .def(
       "get_tdeheader",
-      [](TDEEthFrame& self) -> const TDEEthFrame::TDEEthHeader& { return self.get_header(); },
+      [](TDEEthFrame& self) -> const TDEEthFrame::TDEEthHeader& { return self.header; },
       py::return_value_policy::reference_internal)
-    .def(
-      "get_header",
-      [](TDEEthFrame& self) -> const TDEEthFrame::TDEEthHeader& { return self.get_header(); },
+    .def_property_readonly(
+      "daq_header",
+      [](TDEEthFrame& self) -> detdataformats::DAQEthHeader& { return self.daq_header; },
+      py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "header",
+      [](TDEEthFrame& self) -> TDEEthFrame::TDEEthHeader& { return self.header; },
       py::return_value_policy::reference_internal)
     .def("get_adc", &TDEEthFrame::get_adc)
     .def("set_adc", &TDEEthFrame::set_adc)
@@ -74,7 +78,6 @@ register_tdeeth(py::module& m)
     .def("set_timestamp", &TDEEthFrame::set_timestamp)
     .def("get_channel", &TDEEthFrame::get_channel)
     .def("set_channel", &TDEEthFrame::set_channel)
-    .def("set_geoid", &TDEEthFrame::set_geoid)
     .def("__lt__", [](const TDEEthFrame& lhs, const TDEEthFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
       return TDEEthFrame::s_bits_per_adc;

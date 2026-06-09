@@ -10,7 +10,7 @@ DAPHNEEthFrame::get_adc(int i) const
 
   return static_cast<uint16_t>(dunedaq::fddetdataformats::get_adc_1d<DAPHNEEthFrame::word_t,
                                                                      DAPHNEEthFrame::s_num_adc_words,
-                                                                     DAPHNEEthFrame::s_bits_per_adc>(i, m_adc_words));
+                                                                     DAPHNEEthFrame::s_bits_per_adc>(i, adc_words));
 }
 
 inline void
@@ -19,7 +19,7 @@ DAPHNEEthFrame::set_adc(int i, uint16_t val)
 
   dunedaq::fddetdataformats::set_adc_1d<DAPHNEEthFrame::word_t,
                                         DAPHNEEthFrame::s_num_adc_words,
-                                        DAPHNEEthFrame::s_bits_per_adc>(i, val, m_adc_words);
+                                        DAPHNEEthFrame::s_bits_per_adc>(i, val, adc_words);
 }
 
 } // namespace dunedaq::fddetdataformats

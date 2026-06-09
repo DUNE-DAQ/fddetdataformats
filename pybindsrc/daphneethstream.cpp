@@ -70,15 +70,23 @@ register_daphneethstream(py::module& m)
     }))
     .def(
       "get_daqheader",
-      [](DAPHNEEthStreamFrame& self) -> const detdataformats::DAQEthHeader& { return self.get_daqheader(); },
+      [](DAPHNEEthStreamFrame& self) -> const detdataformats::DAQEthHeader& { return self.daq_header; },
       py::return_value_policy::reference_internal)
     .def(
       "get_daphneheader",
-      [](DAPHNEEthStreamFrame& self) -> const DAPHNEEthStreamFrame::Header& { return self.get_header(); },
+      [](DAPHNEEthStreamFrame& self) -> const DAPHNEEthStreamFrame::Header& { return self.header; },
       py::return_value_policy::reference_internal)
     .def(
       "get_header",
-      [](DAPHNEEthStreamFrame& self) -> const DAPHNEEthStreamFrame::Header& { return self.get_header(); },
+      [](DAPHNEEthStreamFrame& self) -> const DAPHNEEthStreamFrame::Header& { return self.header; },
+      py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "daq_header",
+      [](DAPHNEEthStreamFrame& self) -> detdataformats::DAQEthHeader& { return self.daq_header; },
+      py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "header",
+      [](DAPHNEEthStreamFrame& self) -> DAPHNEEthStreamFrame::Header& { return self.header; },
       py::return_value_policy::reference_internal)
     .def("get_adc", &DAPHNEEthStreamFrame::get_adc)
     .def("set_adc", &DAPHNEEthStreamFrame::set_adc)
@@ -87,7 +95,6 @@ register_daphneethstream(py::module& m)
     .def("__lt__", [](const DAPHNEEthStreamFrame& lhs, const DAPHNEEthStreamFrame& rhs) { return lhs < rhs; })
     .def("get_channel", &DAPHNEEthStreamFrame::get_channel)
     .def("set_channel", &DAPHNEEthStreamFrame::set_channel)
-    .def("set_geoid", &DAPHNEEthStreamFrame::set_geoid)
     .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEEthStreamFrame::version; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
       return DAPHNEEthStreamFrame::s_bits_per_adc;

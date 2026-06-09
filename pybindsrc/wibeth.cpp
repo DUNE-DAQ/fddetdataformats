@@ -103,15 +103,19 @@ register_wibeth(py::module& m)
     }))
     .def(
       "get_daqheader",
-      [](WIBEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.get_daqheader(); },
+      [](WIBEthFrame& self) -> const detdataformats::DAQEthHeader& { return self.daq_header; },
       py::return_value_policy::reference_internal)
     .def(
       "get_wibheader",
-      [](WIBEthFrame& self) -> const WIBEthFrame::WIBEthHeader& { return self.get_header(); },
+      [](WIBEthFrame& self) -> const WIBEthFrame::WIBEthHeader& { return self.header; },
       py::return_value_policy::reference_internal)
-    .def(
-      "get_header",
-      [](WIBEthFrame& self) -> const WIBEthFrame::WIBEthHeader& { return self.get_header(); },
+    .def_property_readonly(
+      "daq_header",
+      [](WIBEthFrame& self) -> detdataformats::DAQEthHeader& { return self.daq_header; },
+      py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "header",
+      [](WIBEthFrame& self) -> WIBEthFrame::WIBEthHeader& { return self.header; },
       py::return_value_policy::reference_internal)
     .def("get_adc", &WIBEthFrame::get_adc)
     .def("set_adc", &WIBEthFrame::set_adc)
@@ -119,7 +123,6 @@ register_wibeth(py::module& m)
     .def("set_timestamp", &WIBEthFrame::set_timestamp)
     .def("get_channel", &WIBEthFrame::get_channel)
     .def("set_channel", &WIBEthFrame::set_channel)
-    .def("set_geoid", &WIBEthFrame::set_geoid)
     .def("__lt__", [](const WIBEthFrame& lhs, const WIBEthFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
       return WIBEthFrame::s_bits_per_adc;

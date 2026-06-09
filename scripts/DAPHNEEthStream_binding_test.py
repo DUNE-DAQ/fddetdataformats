@@ -130,11 +130,15 @@ def test_channel() -> int:
 
 def test_daqheader_accessible() -> int:
     frame = DAPHNEEthStreamFrame()
-    hdr = frame.get_daqheader()
+    hdr = frame.daq_header
     if hdr is None:
+        print("FAIL: daq_header returned None")
+        return 1
+    hdr_alias = frame.get_daqheader()
+    if hdr_alias is None:
         print("FAIL: get_daqheader() returned None")
         return 1
-    print("PASS: get_daqheader() accessible")
+    print("PASS: daq_header accessible")
     return 0
 
 
@@ -143,20 +147,22 @@ def test_set_geoid() -> int:
     crate_id = 6
     slot_id = 4
     stream_id = 21
-    frame.set_geoid(crate_id, slot_id, stream_id)
+    hdr = frame.daq_header
+    hdr.crate_id = crate_id
+    hdr.slot_id = slot_id
+    hdr.stream_id = stream_id
 
-    hdr = frame.get_daqheader()
     if hdr.crate_id != crate_id:
-        print(f"FAIL: set_geoid crate_id mismatch, got {hdr.crate_id}")
+        print(f"FAIL: crate_id mismatch, got {hdr.crate_id}")
         return 1
     if hdr.slot_id != slot_id:
-        print(f"FAIL: set_geoid slot_id mismatch, got {hdr.slot_id}")
+        print(f"FAIL: slot_id mismatch, got {hdr.slot_id}")
         return 1
     if hdr.stream_id != stream_id:
-        print(f"FAIL: set_geoid stream_id mismatch, got {hdr.stream_id}")
+        print(f"FAIL: stream_id mismatch, got {hdr.stream_id}")
         return 1
 
-    print("PASS: set_geoid updates DAQEthHeader geoid fields")
+    print("PASS: DAQEthHeader geoid fields can be set directly")
     return 0
 
 
@@ -167,7 +173,11 @@ def test_channelword_properties() -> int:
     frame.set_channel(2, 35)
     frame.set_channel(3, 36)
 
-    words = frame.get_header().channel_words
+    words = frame.header.channel_words
+    header_alias = frame.get_daphneheader()
+    if header_alias is None:
+        print("FAIL: get_daphneheader() returned None")
+        return 1
     if len(words) != NUM_CHANNELS:
         print(f"FAIL: expected {NUM_CHANNELS} channel words, got {len(words)}")
         return 1
@@ -187,7 +197,11 @@ def test_channelword_properties() -> int:
 
 def test_header_channel_words_property() -> int:
     frame = DAPHNEEthStreamFrame()
-    hdr = frame.get_header()
+    hdr = frame.header
+    hdr_alias = frame.get_header()
+    if hdr_alias is None:
+        print("FAIL: get_header() returned None")
+        return 1
 
     words = hdr.channel_words
     if len(words) != NUM_CHANNELS:

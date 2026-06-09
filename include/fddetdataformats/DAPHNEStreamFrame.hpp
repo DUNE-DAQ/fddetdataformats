@@ -1,7 +1,7 @@
 /**
  * @file DAPHNEStreamFrame.hpp
  *
- *  Contains declaration of DAPHNEStreamFrame, a class for accessing
+ *  Contains declaration of DAPHNEStreamFrame, a struct for accessing
  *  raw DAPHNE streaming version frames, as produced by the DAPHNE boards
  *
  *  The canonical definition of the PDS DAPHNE format is given in EDMS document 2088726:
@@ -31,9 +31,8 @@ namespace dunedaq::fddetdataformats {
 
 // NOLINTBEGIN(build/unsigned)
 
-class DAPHNEStreamFrame
+struct DAPHNEStreamFrame
 {
-public:
   // The definition of the format is in terms of 32-bit words
   using word_t = uint32_t;
 
@@ -60,22 +59,14 @@ public:
   static constexpr int s_expected_bytes { sizeof(detdataformats::DAQHeader) + sizeof(Header) +
     sizeof(word_t) * s_num_adc_words +
     sizeof(Trailer) };
-
-  const detdataformats::DAQHeader& get_daqheader() const {
-    return m_daq_header;
-  }
-
-  const Header& get_header() const {
-    return m_header;
-  }
   
-  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
   /// @brief Set the 64-bit timestamp of the frame
   void set_timestamp(const uint64_t new_timestamp)
   {
-    m_daq_header.timestamp_1 = new_timestamp;
-    m_daq_header.timestamp_2 = new_timestamp >> 32;
+    daq_header.timestamp_1 = new_timestamp;
+    daq_header.timestamp_2 = new_timestamp >> 32;
   }
 
   /// @brief Get the @p i ADC value of @p chn in the frame
@@ -84,23 +75,22 @@ public:
   /// @brief Set the @p i ADC value of @p chn in the frame to @p val
   void set_adc(int i, int i_channel, uint16_t val);
 
-  uint8_t get_channel0() const { return m_header.channel_0; }
+  uint8_t get_channel0() const { return header.channel_0; }
 
-  uint8_t get_channel1() const { return m_header.channel_1; }
+  uint8_t get_channel1() const { return header.channel_1; }
 
-  uint8_t get_channel2() const { return m_header.channel_2; }
+  uint8_t get_channel2() const { return header.channel_2; }
 
-  uint8_t get_channel3() const { return m_header.channel_3; }
+  uint8_t get_channel3() const { return header.channel_3; }
 
   bool operator<(const DAPHNEStreamFrame& other) const {
     return this->get_timestamp() < other.get_timestamp();
   }
   
-private:
-  detdataformats::DAQHeader m_daq_header;
-  Header m_header;
-  word_t m_adc_words[s_num_adc_words]; // NOLINT (a false accusation from the linter that s_num_adc_words is a variable)
-  Trailer m_trailer;
+  detdataformats::DAQHeader daq_header;
+  Header header;
+  word_t adc_words[s_num_adc_words]; // NOLINT (a false accusation from the linter that s_num_adc_words is a variable)
+  Trailer trailer;
 
 };
 

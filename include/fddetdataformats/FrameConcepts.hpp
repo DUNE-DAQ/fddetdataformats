@@ -5,7 +5,7 @@
  *
  * -Having getters and setters for timestamps and ADC values
  *
- * -Having const-access getters to the underlying DAQ header and frame-specific header
+ * -Having direct (public) access to the underlying DAQ header and frame-specific header
  *
  * -Having an "<" operator implemented
  *
@@ -44,17 +44,17 @@ concept HasSetADC = std::is_member_function_pointer_v<decltype(&T::set_adc)>;
 template <typename T>
 concept HasDAQHeader =
     requires(const T t) {
-  t.get_daqheader();
+  t.daq_header;
     } &&
     (
-     std::same_as<decltype(std::declval<T>().get_daqheader()), const dunedaq::detdataformats::DAQEthHeader&> ||
-     std::same_as<decltype(std::declval<T>().get_daqheader()), const dunedaq::detdataformats::DAQHeader&>
+     std::same_as<decltype(std::declval<T>().daq_header), dunedaq::detdataformats::DAQEthHeader> ||
+     std::same_as<decltype(std::declval<T>().daq_header), dunedaq::detdataformats::DAQHeader>
     );
 
   template <typename T>
   concept HasFrameHeader =
     requires(const T t) {
-    t.get_header();
+    t.header;
   }; // NOLINT(readability/braces)
 
   // Instead of std::totally_ordered, this just literally only requires the "<" operator

@@ -54,8 +54,8 @@ def test_static_members() -> int:
 def test_bytes_roundtrip() -> int:
     frame = DAPHNEStreamFrame()
     frame.set_timestamp(0x1234ABCD)
-    frame.get_header().channel_0 = 7
-    frame.get_header().channel_1 = 8
+    frame.header.channel_0 = 7
+    frame.header.channel_1 = 8
     raw = frame.get_bytes()
     if len(raw) != DAPHNEStreamFrame.sizeof():
         print(f"FAIL: get_bytes() length {len(raw)} != sizeof() {DAPHNEStreamFrame.sizeof()}")
@@ -102,7 +102,7 @@ def test_timestamp() -> int:
 
 def test_channel() -> int:
     frame = DAPHNEStreamFrame()
-    hdr = frame.get_header()
+    hdr = frame.header
     hdr.channel_0 = 30
     hdr.channel_1 = 31
     hdr.channel_2 = 32
@@ -118,17 +118,17 @@ def test_channel() -> int:
 
 def test_daqheader_accessible() -> int:
     frame = DAPHNEStreamFrame()
-    hdr = frame.get_daqheader()
+    hdr = frame.daq_header
     if hdr is None:
-        print("FAIL: get_daqheader() returned None")
+        print("FAIL: daq_header returned None")
         return 1
-    print("PASS: get_daqheader() accessible")
+    print("PASS: daq_header accessible")
     return 0
 
 
 def test_header_properties() -> int:
     frame = DAPHNEStreamFrame()
-    hdr = frame.get_header()
+    hdr = frame.header
 
     hdr.channel_0 = 10
     hdr.channel_1 = 11

@@ -1,7 +1,7 @@
 /**
  * @file CRTGrenobleFrame.hpp
  *
- * Contains declaration of CRTGrenobleFrame, a class for accessing/holding raw CRT data from the 'Grenoble' panels
+ * Contains declaration of CRTGrenobleFrame, a struct for accessing/holding raw CRT data from the 'Grenoble' panels
  * ProtoDUNE-II VD
  *
  * n.b. CRTGrenobleFrame does *not* satisfy the AdaptableFrameConcept; its
@@ -30,10 +30,9 @@ namespace dunedaq::fddetdataformats {
 
 // NOLINTBEGIN(build/unsigned)
 
-///  @brief Class for accessing/holding raw CRT data from the 'Grenoble' panels ProtoDUNE-II VD
-class CRTGrenobleFrame
+///  @brief Struct for accessing/holding raw CRT data from the 'Grenoble' panels ProtoDUNE-II VD
+struct CRTGrenobleFrame
 {
-public:
   // The definition of the format is in terms of 64-bit words
   using word_t = uint64_t;
 
@@ -90,22 +89,13 @@ public:
 
   static constexpr int s_expected_bytes { sizeof(detdataformats::DAQEthHeader) + CRTGrenobleFrame::STEvent::s_expected_size };
   
-  const detdataformats::DAQEthHeader& get_daqheader() const {
-    return m_daq_header;
-  }
-
-  // CRTGrenobleReaderModule needs full access to the daq_header for fake data purposes
-  detdataformats::DAQEthHeader& get_daqheader() {
-    return m_daq_header;
-  }
-
   /// @brief Get the adc value for channel i_ch
   int get_adc(const int i_ch) const
   {
     if (i_ch < 0 || i_ch >= s_num_channels)
       throw std::out_of_range("ADC channel index out of range");
 
-    return m_event.channels[i_ch].qTot;
+    return event.channels[i_ch].qTot;
   }
 
   /// @brief Set the adc value for channel i_ch to @p val
@@ -114,22 +104,17 @@ public:
     if (i_ch < 0 || i_ch >= s_num_channels)
       throw std::out_of_range("ADC channel index out of range");
 
-    m_event.channels[i_ch].qTot = val; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    event.channels[i_ch].qTot = val; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
   }
 
   /// @brief Get the starting 64-bit timestamp of the frame
-  uint64_t get_timestamp() const { return m_daq_header.get_timestamp(); }
+  uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
   /// @brief Set the starting 64-bit timestamp of the frame
-  void set_timestamp(const uint64_t new_timestamp) { m_daq_header.timestamp = new_timestamp; }
+  void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
 
-  void set_geoid(uint16_t crate_id, uint16_t slot_id, uint16_t stream_id) {
-    dunedaq::fddetdataformats::set_geoid(crate_id, slot_id, stream_id, m_daq_header);
-  }
-
-private:
-  detdataformats::DAQEthHeader m_daq_header; // Formally private, but has a non-const accessor
-  STEvent m_event;
+  detdataformats::DAQEthHeader daq_header; // Formally private, but has a non-const accessor
+  STEvent event;
   
 }; // CRTGrenobleFrame
 #warning "CRTGrenobleFrame has padding inserted"
