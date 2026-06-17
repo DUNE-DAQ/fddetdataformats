@@ -56,7 +56,7 @@ struct DAPHNEStreamFrame
   };
   static_assert(sizeof(Trailer) == 4);
 
-  static constexpr int s_expected_bytes { sizeof(detdataformats::DAQHeader) + sizeof(Header) +
+  static constexpr std::size_t s_expected_bytes { sizeof(detdataformats::DAQHeader) + sizeof(Header) +
     sizeof(word_t) * s_num_adc_words +
     sizeof(Trailer) };
   

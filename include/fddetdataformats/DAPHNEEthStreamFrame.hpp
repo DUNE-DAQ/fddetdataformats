@@ -1,8 +1,7 @@
 /**
  * @file DAPHNEEthStreamFrame.hpp
  *
- * Contains declaration of DAPHNEEthStreamFrame, a struct for accessing raw DAPHNE eth stream frames, as used in
- * ProtoDUNE-SP-II
+ * Contains declaration of DAPHNEEthStreamFrame, a struct for accessing raw DAPHNE eth stream frames
  *
  * The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  * https://edms.cern.ch/document/2088726/XXX (XXX a stand-in for the doc version, e.g. 5)
@@ -33,7 +32,7 @@ namespace dunedaq::fddetdataformats {
 // NOLINTBEGIN(build/unsigned)
 
 /**
- *  @brief Struct for accessing raw DAPHNE eth stream frames, as used in ProtoDUNE-II
+ *  @brief Struct for accessing raw DAPHNE eth stream frames
  *
  * The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  * https://edms.cern.ch/document/2088726/XXX (XXX a stand-in for the doc version, e.g. 5)
@@ -68,7 +67,7 @@ struct DAPHNEEthStreamFrame
   };
   static_assert(sizeof(Header) == sizeof(ChannelWord) * s_num_channels);
 
-  static constexpr int s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + sizeof(Header) +
+  static constexpr std::size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + sizeof(Header) +
     sizeof(word_t) * s_num_adc_words;
 
   /// @brief Get the @p i_adc-th ADC value of @p i_channel-th channel in the frame

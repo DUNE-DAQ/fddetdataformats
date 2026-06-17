@@ -1,10 +1,11 @@
 /**
  * @file TDEEthFrame.hpp
  *
- * Contains declaration of TDEEthFrame, a class for accessing raw WIB v2 frames, as used in ProtoDUNE-SP-II
+ * Contains declaration of TDEEthFrame, a class for accessing raw TDE
+ * eth frames, as used in ProtoDUNE-SP-II
  *
- * The canonical definition of the WIB format is given in EDMS document 2088713:
- * https://edms.cern.ch/document/2088713
+ * The canonical definition of the WIB format is given in EDMS document 2618999:
+ * https://edms.cern.ch/document/2618999/XXX, XXX the version (2 the latest publically accessible)
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -32,7 +33,7 @@ namespace dunedaq::fddetdataformats {
 // NOLINTBEGIN(build/unsigned)
 
 /**
- *  @brief Struct for accessing raw WIB eth frames, as used in ProtoDUNE-II
+ *  @brief Struct for accessing raw TDE eth frames, as used in ProtoDUNE-II
  *
  *  The canonical definition of the WIB format is given in EDMS document 2088713:
  *  https://edms.cern.ch/document/2088713
@@ -59,7 +60,7 @@ struct TDEEthFrame
     uint64_t tde_header : 10;
     uint64_t version : 4;
     uint64_t channel : 8;
-    uint64_t TAItime { std::numeric_limits<uint64_t>::max() };
+    uint64_t TAItime : 64;
   };
   static_assert(sizeof(TDEEthHeader) == TDEEthHeader::s_expected_bytes);
 

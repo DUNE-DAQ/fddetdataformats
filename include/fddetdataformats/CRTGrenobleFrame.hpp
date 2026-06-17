@@ -87,7 +87,7 @@ struct CRTGrenobleFrame
 #warning "CRTGrenobleFrame::STEvent has padding inserted"
   // static_assert(sizeof(STEvent) == STEvent::s_expected_size);
 
-  static constexpr int s_expected_bytes { sizeof(detdataformats::DAQEthHeader) + CRTGrenobleFrame::STEvent::s_expected_size };
+  static constexpr std::size_t s_expected_bytes { sizeof(detdataformats::DAQEthHeader) + CRTGrenobleFrame::STEvent::s_expected_size };
   
   /// @brief Get the adc value for channel i_ch
   int get_adc(const int i_ch) const

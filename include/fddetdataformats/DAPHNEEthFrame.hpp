@@ -1,7 +1,7 @@
 /**
  * @file DAPHNEEthFrame.hpp
  *
- * Contains declaration of DAPHNEEthFrame, a struct for accessing raw DAPHNE eth frames, as used in ProtoDUNE-SP-II
+ * Contains declaration of DAPHNEEthFrame, a struct for accessing raw DAPHNE eth frames
  *
  * The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  * https://edms.cern.ch/document/2088726/XXX (XXX a stand-in for the doc version, e.g. 5)
@@ -33,7 +33,7 @@ namespace dunedaq::fddetdataformats {
 // NOLINTBEGIN(build/unsigned)
 
 /**
- *  @brief Struct for accessing raw DAPHNE eth frames, as used in ProtoDUNE-II
+ *  @brief Struct for accessing raw DAPHNE eth frames
  *
  *  The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  *  https://edms.cern.ch/document/2088726/XXX, (XXX a stand-in for the doc version, e.g. 5)

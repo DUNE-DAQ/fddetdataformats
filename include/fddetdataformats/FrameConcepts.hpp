@@ -3,9 +3,7 @@
  *
  * Contains declaration of various concepts to which a DAQ frame should adhere, including:
  *
- * -Having getters and setters for timestamps and ADC values
- *
- * -Having direct (public) access to the underlying DAQ header and frame-specific header
+ * -Having getters and setters for timestamps
  *
  * -Having an "<" operator implemented
  *
@@ -85,15 +83,23 @@ concept HasSetTimestamp =
   {
     { t.set_timestamp(ts) } -> std::same_as<void>;
   };
-  
+
+  // TODO: John Freeman (jcfree@fnal.gov), Jun-17-2026
+
+  // In the next two months, figure out a concept parallel to
+  // AdaptableFrameConcept which can be made specific to the type
+  // adapters in fdreadoutlibs (as opposed to, e.g.,
+  // TriggerPrimitiveTypeAdapter.hpp in trigger). This can include
+  // concepts commented out below like "has an ADC getter", etc.)
+
 template <typename T>
 concept AdaptableFrameConcept =
   HasNoCompilerPadding<T> &&
   HasLessThan<T> &&
-  HasGetADC<T> &&
-  HasSetADC<T> &&
-  HasDAQHeader<T> &&
-  HasFrameHeader<T> &&
+  //  HasGetADC<T> &&
+  //  HasSetADC<T> &&
+  //  HasDAQHeader<T> &&
+  //  HasFrameHeader<T> &&
   HasGetTimestamp<T> &&
   HasSetTimestamp<T> &&
   std::is_standard_layout_v<T> &&

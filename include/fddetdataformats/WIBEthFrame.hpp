@@ -52,7 +52,7 @@ struct WIBEthFrame
 
   struct WIBEthHeader
   {
-    static constexpr int s_expected_bytes {8 + 8}; // 8 bytes for the bitfield section, 8 for the extra_data 
+    static constexpr std::size_t s_expected_bytes {8 + 8}; // 8 bytes for the bitfield section, 8 for the extra_data
       
     word_t colddata_timestamp_0 : 15;
     word_t pad_0 : 1;

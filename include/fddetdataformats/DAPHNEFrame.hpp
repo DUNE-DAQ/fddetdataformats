@@ -1,7 +1,8 @@
 /**
  * @file DAPHNEFrame.hpp
  *
- *  Contains declaration of DAPHNEFrame, a struct for accessing raw DAPHNE frames, as produced by the DAPHNE boards
+ *  Contains declaration of DAPHNEFrame, a struct for accessing raw
+ *  DAPHNE frames from "v2" DAPHNE boards (FELIX-based readout)
  *
  *  The canonical definition of the PDS DAPHNE format is given in EDMS document 2088726:
  *  https://edms.cern.ch/document/2088726/3
@@ -52,7 +53,7 @@ struct DAPHNEFrame
 
   struct PeakDescriptorData
   {
-    static constexpr int s_expected_bytes { 13 * sizeof(uint32_t) };
+    static constexpr std::size_t s_expected_bytes { 13 * sizeof(uint32_t) };
 
     // Word 1: peak 0 odd
     // Declared in reverse order (LSB first) so that:
@@ -239,7 +240,7 @@ struct DAPHNEFrame
   };
   static_assert(sizeof(PeakDescriptorData) == PeakDescriptorData::s_expected_bytes);
 
-  static constexpr int s_expected_bytes { sizeof(detdataformats::DAQHeader) + sizeof(Header) +
+  static constexpr std::size_t s_expected_bytes { sizeof(detdataformats::DAQHeader) + sizeof(Header) +
     s_num_adc_words * sizeof(word_t) + PeakDescriptorData::s_expected_bytes };
   
   /**

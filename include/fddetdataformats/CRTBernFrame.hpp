@@ -45,7 +45,7 @@ struct CRTBernFrame
 
   struct CRTBernData
   {
-    static constexpr int s_expected_bytes { 2 + 2 + 2 + 4 + 4 + 2 * s_num_channels + 4 };
+    static constexpr std::size_t s_expected_bytes { 2 + 2 + 2 + 4 + 4 + 2 * s_num_channels + 4 };
 
     uint16_t flags = 0;
     uint16_t lostcpu = 0;
@@ -58,7 +58,7 @@ struct CRTBernFrame
   #warning "CRTBernData has padding inserted"
   //static_assert(sizeof(CRTBernData) == CRTBernData::s_expected_bytes);
 
-  static constexpr int s_expected_bytes { sizeof(detdataformats::DAQEthHeader) + sizeof(uint16_t) +
+  static constexpr std::size_t s_expected_bytes { sizeof(detdataformats::DAQEthHeader) + sizeof(uint16_t) +
     CRTBernData::s_expected_bytes};
   
   /// @brief Get the adc value for channel i_ch
