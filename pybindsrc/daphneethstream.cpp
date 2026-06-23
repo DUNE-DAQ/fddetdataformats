@@ -33,7 +33,10 @@ register_daphneethstream(py::module& m)
     .def_property(
       "channel",
       [](DAPHNEEthStreamFrame::ChannelWord& self) -> uint64_t { return self.channel; },
-      [](DAPHNEEthStreamFrame::ChannelWord& self, uint64_t channel) { self.channel = channel; });
+      [](DAPHNEEthStreamFrame::ChannelWord& self, uint64_t channel) { self.channel = channel; })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return sizeof(DAPHNEEthStreamFrame::ChannelWord);
+    });
 
   py::class_<DAPHNEEthStreamFrame::Header>(m, "DAPHNEEthStreamHeader")
     .def_property(
@@ -49,7 +52,10 @@ register_daphneethstream(py::module& m)
         for (int i = 0; i < 4 && i < static_cast<int>(len(channel_words)); i++) {
           self.channel_words[i] = channel_words[i].cast<DAPHNEEthStreamFrame::ChannelWord>();
         }
-      });
+      })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return sizeof(DAPHNEEthStreamFrame::Header);
+    });
 
   py::class_<DAPHNEEthStreamFrame>(m, "DAPHNEEthStreamFrame", py::buffer_protocol())
     .def(py::init())
@@ -74,12 +80,40 @@ register_daphneethstream(py::module& m)
       "get_header",
       [](DAPHNEEthStreamFrame& self) -> const DAPHNEEthStreamFrame::Header& { return self.header; },
       py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "daq_header",
+      [](DAPHNEEthStreamFrame& self) -> detdataformats::DAQEthHeader& { return self.daq_header; },
+      py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "header",
+      [](DAPHNEEthStreamFrame& self) -> DAPHNEEthStreamFrame::Header& { return self.header; },
+      py::return_value_policy::reference_internal)
     .def("get_adc", &DAPHNEEthStreamFrame::get_adc)
     .def("set_adc", &DAPHNEEthStreamFrame::set_adc)
     .def("get_timestamp", &DAPHNEEthStreamFrame::get_timestamp)
     .def("set_timestamp", &DAPHNEEthStreamFrame::set_timestamp)
+    .def("__lt__", [](const DAPHNEEthStreamFrame& lhs, const DAPHNEEthStreamFrame& rhs) { return lhs < rhs; })
     .def("get_channel", &DAPHNEEthStreamFrame::get_channel)
     .def("set_channel", &DAPHNEEthStreamFrame::set_channel)
+    .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEEthStreamFrame::version; })
+    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
+      return DAPHNEEthStreamFrame::s_bits_per_adc;
+    })
+    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) {
+      return DAPHNEEthStreamFrame::s_bits_per_word;
+    })
+    .def_property_readonly_static("s_adcs_per_channel", [](py::object /*self*/) {
+      return DAPHNEEthStreamFrame::s_adcs_per_channel;
+    })
+    .def_property_readonly_static("s_num_channels", [](py::object /*self*/) {
+      return DAPHNEEthStreamFrame::s_num_channels;
+    })
+    .def_property_readonly_static("s_num_adc_words", [](py::object /*self*/) {
+      return DAPHNEEthStreamFrame::s_num_adc_words;
+    })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return DAPHNEEthStreamFrame::s_expected_bytes;
+    })
     .def("get_channel0", &DAPHNEEthStreamFrame::get_channel0)
     .def("get_channel1", &DAPHNEEthStreamFrame::get_channel1)
     .def("get_channel2", &DAPHNEEthStreamFrame::get_channel2)
@@ -88,7 +122,7 @@ register_daphneethstream(py::module& m)
     .def("get_bytes", [](DAPHNEEthStreamFrame* fr) -> py::bytes {
       return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEEthStreamFrame)); // NOLINT reinterpret_cast
     });
-}
+} // NOLINT (defensible use of "overly long" function)
 
 // NOLINTEND(build/unsigned)
 

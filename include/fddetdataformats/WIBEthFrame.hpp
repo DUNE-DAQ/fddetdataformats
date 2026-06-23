@@ -14,7 +14,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_WIBETHFRAME_HPP_
 
-#include "Utils.hpp"
+#include "fddetdataformats/FrameConcepts.hpp"
+#include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
 
@@ -30,14 +31,14 @@ namespace dunedaq::fddetdataformats {
 // NOLINTBEGIN(build/unsigned)
 
 /**
- *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
+ *  @brief struct for accessing raw WIB eth frames, as used in ProtoDUNE-II
  *
  *  The canonical definition of the WIB format is given in EDMS document 2088713:
  *  https://edms.cern.ch/document/2088713
  */
-class WIBEthFrame
+struct WIBEthFrame
 {
-public:
+
   // The definition of the format is in terms of 64-bit words
   using word_t = uint64_t;
 
@@ -51,6 +52,8 @@ public:
 
   struct WIBEthHeader
   {
+    static constexpr std::size_t s_expected_bytes {8 + 8}; // 8 bytes for the bitfield section, 8 for the extra_data
+      
     word_t colddata_timestamp_0 : 15;
     word_t pad_0 : 1;
     word_t colddata_timestamp_1 : 15;
@@ -69,11 +72,11 @@ public:
     word_t channel : 8;
     word_t extra_data;
   };
-  static_assert(sizeof(WIBEthHeader) == 8 + 8); // 8 bytes for the bitfield section, 8 for the extra_data
+  static_assert(sizeof(WIBEthHeader) == WIBEthHeader::s_expected_bytes);
 
-  detdataformats::DAQEthHeader daq_header;
-  WIBEthHeader header;
-  word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
+  static constexpr size_t s_expected_bytes { sizeof(detdataformats::DAQEthHeader) +
+    WIBEthHeader::s_expected_bytes +
+    s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t) };
 
   /**
    * @brief Get the i_channel-th ADC value in the i_sample-th time sample
@@ -98,19 +101,22 @@ public:
 
   /// @brief Set the channel identifier of the frame
   void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
+
+  bool operator<(const WIBEthFrame& other) const {
+    return this->get_timestamp() < other.get_timestamp();
+  }
+
+  detdataformats::DAQEthHeader daq_header;
+  WIBEthHeader header;
+  word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
+
 };
-static_assert(sizeof(WIBEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(WIBEthFrame::WIBEthHeader) +
-                                       sizeof(WIBEthFrame::word_t) * WIBEthFrame::s_time_samples_per_frame *
-                                         WIBEthFrame::s_num_adc_words_per_ts);
 
 static_assert(std::endian::native == std::endian::little,
               "The WIBEthFrame bitfield layout assumes little-endian architecture");
 
-static_assert(std::is_trivially_copyable_v<WIBEthFrame>,
-              "WIBEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
-static_assert(std::is_standard_layout_v<WIBEthFrame>,
-              "WIBEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
-
+  static_assert(AdaptableFrameConcept<WIBEthFrame>, "WIBEthFrame does not satisfy the AdaptableFrameConcept");
+  
 } // namespace dunedaq::fddetdataformats
 
 #include "detail/WIBEthFrame.hxx"

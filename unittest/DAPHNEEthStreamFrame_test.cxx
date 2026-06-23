@@ -31,30 +31,30 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthStreamFrame_ADCDataMutators)
   std::vector<std::vector<uint16_t>> adcs(DAPHNEEthStreamFrame::s_adcs_per_channel,
                                           std::vector<uint16_t>(DAPHNEEthStreamFrame::s_num_channels));
 
-  for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
-    for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
+  for (int channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
+    for (int adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
       adcs[adc_index][channel] = dist(rng);
     }
   }
 
   DAPHNEEthStreamFrame frame{};
 
-  for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
-    for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
-      frame.set_adc(channel, adc_index, adcs[adc_index][channel]);
+  for (int channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
+    for (int adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
+      frame.set_adc(adc_index, channel, adcs[adc_index][channel]);
     }
   }
 
-  for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
-    for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
+  for (int channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
+    for (int adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
       BOOST_REQUIRE_EQUAL(frame.get_adc(adc_index, channel), adcs[adc_index][channel]);
     }
   }
 
   frame.set_adc(0, 0, adcs[0][0]);
 
-  for (uint32_t channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
-    for (uint32_t adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
+  for (int channel = 0; channel < DAPHNEEthStreamFrame::s_num_channels; ++channel) {
+    for (int adc_index = 0; adc_index < DAPHNEEthStreamFrame::s_adcs_per_channel; ++adc_index) {
       BOOST_REQUIRE_EQUAL(frame.get_adc(adc_index, channel), adcs[adc_index][channel]);
     }
   }
@@ -71,10 +71,10 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthStreamFrame_IndexAndValueBounds)
   BOOST_CHECK_THROW(frame.get_adc(static_cast<uint32_t>(-1), 0), std::out_of_range);
   BOOST_CHECK_THROW(frame.get_adc(0, static_cast<uint32_t>(-1)), std::out_of_range);
 
-  BOOST_CHECK_THROW(frame.set_adc(DAPHNEEthStreamFrame::s_num_channels, 0, 123), std::out_of_range);
-  BOOST_CHECK_THROW(frame.set_adc(0, DAPHNEEthStreamFrame::s_adcs_per_channel, 123), std::out_of_range);
-  BOOST_CHECK_THROW(frame.set_adc(static_cast<uint32_t>(-1), 0, 123), std::out_of_range);
+  BOOST_CHECK_THROW(frame.set_adc(0, DAPHNEEthStreamFrame::s_num_channels, 123), std::out_of_range);
+  BOOST_CHECK_THROW(frame.set_adc(DAPHNEEthStreamFrame::s_adcs_per_channel, 0, 123), std::out_of_range);
   BOOST_CHECK_THROW(frame.set_adc(0, static_cast<uint32_t>(-1), 123), std::out_of_range);
+  BOOST_CHECK_THROW(frame.set_adc(static_cast<uint32_t>(-1), 0, 123), std::out_of_range);
   BOOST_CHECK_THROW(frame.set_adc(0, 0, static_cast<uint16_t>(1 << DAPHNEEthStreamFrame::s_bits_per_adc)),
                     std::out_of_range);
 
@@ -89,27 +89,27 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthStreamFrame_BitPackingBoundaryIsolation)
   DAPHNEEthStreamFrame frame{};
   constexpr auto max_adc = static_cast<uint16_t>((1u << DAPHNEEthStreamFrame::s_bits_per_adc) - 1u);
 
-  constexpr uint32_t boundary_sample = 1;
+  constexpr uint32_t boundary_adc = 1;
   constexpr uint32_t boundary_channel = 0;
 
-  frame.set_adc(3, 0, 0x0000u);
-  frame.set_adc(boundary_channel, boundary_sample, 0x0000u);
-  frame.set_adc(1, boundary_sample, 0x0000u);
+  frame.set_adc(0, 3, 0x0000u);
+  frame.set_adc(boundary_adc, boundary_channel, 0x0000u);
+  frame.set_adc(boundary_adc, 1, 0x0000u);
 
-  frame.set_adc(boundary_channel, boundary_sample, 0x2AAAu);
+  frame.set_adc(boundary_adc, boundary_channel, 0x2AAAu);
   BOOST_CHECK_EQUAL(frame.get_adc(0, 3), 0x0000u);
-  BOOST_CHECK_EQUAL(frame.get_adc(boundary_sample, boundary_channel), 0x2AAAu);
-  BOOST_CHECK_EQUAL(frame.get_adc(boundary_sample, 1), 0x0000u);
+  BOOST_CHECK_EQUAL(frame.get_adc(boundary_adc, boundary_channel), 0x2AAAu);
+  BOOST_CHECK_EQUAL(frame.get_adc(boundary_adc, 1), 0x0000u);
 
-  frame.set_adc(3, 0, max_adc);
+  frame.set_adc(0, 3, max_adc);
   BOOST_CHECK_EQUAL(frame.get_adc(0, 3), max_adc);
-  BOOST_CHECK_EQUAL(frame.get_adc(boundary_sample, boundary_channel), 0x2AAAu);
-  BOOST_CHECK_EQUAL(frame.get_adc(boundary_sample, 1), 0x0000u);
+  BOOST_CHECK_EQUAL(frame.get_adc(boundary_adc, boundary_channel), 0x2AAAu);
+  BOOST_CHECK_EQUAL(frame.get_adc(boundary_adc, 1), 0x0000u);
 
-  frame.set_adc(1, boundary_sample, 0x1555u);
+  frame.set_adc(boundary_adc, 1, 0x1555u);
   BOOST_CHECK_EQUAL(frame.get_adc(0, 3), max_adc);
-  BOOST_CHECK_EQUAL(frame.get_adc(boundary_sample, boundary_channel), 0x2AAAu);
-  BOOST_CHECK_EQUAL(frame.get_adc(boundary_sample, 1), 0x1555u);
+  BOOST_CHECK_EQUAL(frame.get_adc(boundary_adc, boundary_channel), 0x2AAAu);
+  BOOST_CHECK_EQUAL(frame.get_adc(boundary_adc, 1), 0x1555u);
 }
 
 BOOST_AUTO_TEST_CASE(DAPHNEEthStreamFrame_MetadataMutators)

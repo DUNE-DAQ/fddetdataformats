@@ -1,7 +1,7 @@
 /**
  * @file DAPHNEEthFrame.hpp
  *
- * Contains declaration of DAPHNEEthFrame, a class for accessing raw WIB eth frames, as used in ProtoDUNE-SP-II
+ * Contains declaration of DAPHNEEthFrame, a struct for accessing raw DAPHNE eth frames
  *
  * The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  * https://edms.cern.ch/document/2088726/XXX (XXX a stand-in for the doc version, e.g. 5)
@@ -14,7 +14,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEETHFRAME_HPP_
 
-#include "Utils.hpp"
+#include "fddetdataformats/FrameConcepts.hpp"
+#include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
 
@@ -23,6 +24,8 @@
 #include <cstdint>   // For uint32_t etc
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
+#include <tuple>
 #include <stdexcept> // For std::out_of_range
 
 namespace dunedaq::fddetdataformats {
@@ -30,14 +33,13 @@ namespace dunedaq::fddetdataformats {
 // NOLINTBEGIN(build/unsigned)
 
 /**
- *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
+ *  @brief Struct for accessing raw DAPHNE eth frames
  *
- *  The canonical definition of the WIB format is given in EDMS document 2088713:
+ *  The canonical definition of the DAPHNE format is given in EDMS document 2088726:
  *  https://edms.cern.ch/document/2088726/XXX, (XXX a stand-in for the doc version, e.g. 5)
  */
-class DAPHNEEthFrame
+struct DAPHNEEthFrame
 {
-public:
   // The definition of the format is in terms of 64-bit words
   using word_t = uint64_t;
 
@@ -51,8 +53,10 @@ public:
 
   struct Header
   {
+    static constexpr size_t s_expected_bytes { 7 * sizeof(word_t) };
+    
     // The following bitfields constitute what could be considered "word_t w0;"
-    word_t trig_sample : 14;
+    word_t trigger_sample_value : 14;
     word_t rsv_0 : 2;
     word_t threshold : 14;
     word_t rsv_1 : 2;
@@ -68,12 +72,10 @@ public:
     word_t w5;
     word_t w6;
   };
-  static_assert(sizeof(Header) == 7 * sizeof(word_t));
+  static_assert(sizeof(Header) == Header::s_expected_bytes);
 
-  detdataformats::DAQEthHeader daq_header;
-  Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT
-
+  static constexpr size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + Header::s_expected_bytes + s_num_adc_words * sizeof(word_t);
+  
   /**
    * @brief Get the ith ADC value in the frame
    *
@@ -97,17 +99,20 @@ public:
 
   /// @brief Set the channel identifier of the frame
   void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
-};
-static_assert(sizeof(DAPHNEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(DAPHNEEthFrame::Header) +
-                                          sizeof(DAPHNEEthFrame::word_t) * DAPHNEEthFrame::s_num_adc_words);
 
-static_assert(std::endian::native == std::endian::little,
+  bool operator<(const DAPHNEEthFrame& other) const {
+    return std::tuple(this->get_timestamp(), this->get_channel()) < std::tuple(other.get_timestamp(), other.get_channel());
+  }
+  
+  detdataformats::DAQEthHeader daq_header;
+  Header header;
+  word_t adc_words[s_num_adc_words]; // NOLINT
+};
+
+  static_assert(std::endian::native == std::endian::little,
               "The DAPHNEEthFrame bitfield layout assumes little-endian architecture");
 
-static_assert(std::is_trivially_copyable_v<DAPHNEEthFrame>,
-              "DAPHNEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
-static_assert(std::is_standard_layout_v<DAPHNEEthFrame>,
-              "DAPHNEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+  static_assert(AdaptableFrameConcept<DAPHNEEthFrame>, "DAPHNEEthFrame does not satisfy the AdaptableFrameConcept");
 
 } // namespace dunedaq::fddetdataformats
 

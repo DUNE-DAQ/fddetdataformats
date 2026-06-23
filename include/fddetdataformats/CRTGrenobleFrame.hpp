@@ -1,8 +1,12 @@
 /**
  * @file CRTGrenobleFrame.hpp
  *
- * Contains declaration of CRTGrenobleFrame, a class for accessing/holding raw CRT data from the 'Grenoble' panels
+ * Contains declaration of CRTGrenobleFrame, a struct for accessing/holding raw CRT data from the 'Grenoble' panels
  * ProtoDUNE-II VD
+ *
+ * n.b. CRTGrenobleFrame does *not* satisfy the AdaptableFrameConcept; its
+ * size exceeds the sum of its members (i.e., the compiler inserts
+ * padding)
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -10,6 +14,8 @@
  */
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_CRTGRENOBLEFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_CRTGRENOBLEFRAME_HPP_
+
+#include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
 
@@ -24,10 +30,9 @@ namespace dunedaq::fddetdataformats {
 
 // NOLINTBEGIN(build/unsigned)
 
-///  @brief Class for accessing/holding raw CRT data from the 'Grenoble' panels ProtoDUNE-II VD
-class CRTGrenobleFrame
+///  @brief Struct for accessing/holding raw CRT data from the 'Grenoble' panels ProtoDUNE-II VD
+struct CRTGrenobleFrame
 {
-public:
   // The definition of the format is in terms of 64-bit words
   using word_t = uint64_t;
 
@@ -37,50 +42,53 @@ public:
 
   struct TGpsDateStruct
   {
-    unsigned int seconds : 8;
-    unsigned int minutes : 8;
-    unsigned int hours : 8;
-    unsigned int year : 8;
+    // "/ 8" below -> 8 bits to a byte
+    static constexpr int s_expected_size { (8 + 8 + 8 + 8 + 16 + 12 + 3 + 1) / 8 }; 
 
-    unsigned int day : 16;
-    unsigned int new_date_cnt : 12;
-    unsigned int irigb_dec_ver : 3;
-    unsigned int irigb_valid : 1;
+    uint32_t seconds : 8;
+    uint32_t minutes : 8;
+    uint32_t hours : 8;
+    uint32_t year : 8;
+
+    uint32_t day : 16;
+    uint32_t new_date_cnt : 12;
+    uint32_t irigb_dec_ver : 3;
+    uint32_t irigb_valid : 1;
   };
-  static_assert(sizeof(TGpsDateStruct) == 8);
+  static_assert(sizeof(TGpsDateStruct) == TGpsDateStruct::s_expected_size);
 
   struct STChannel
   {
+    static constexpr int s_expected_size { sizeof(int) + sizeof(uint16_t) + sizeof(float) + sizeof(uint16_t) }; // NOLINT(runtime/int,google-runtime-int)
+
     int qTot = 0;            ///< Total charge.
-    unsigned short n_zc = 0; ///< CFD time.
+    uint16_t n_zc = 0; ///< CFD time.
     float cfd = 0.;          ///< CFD value
-    unsigned short flag = 0; ///< Flag containing trigger, trigger sum and overflow information.
+    uint16_t flag = 0; ///< Flag containing trigger, trigger sum and overflow information.
   };
 
 #warning "CRTGrenobleFrame::STChannel has padding inserted"
-  //      static_assert(sizeof(STChannel) == sizeof(int) + sizeof(unsigned short) + sizeof(float) + sizeof(unsigned
-  //      short));
+  //      static_assert(sizeof(STChannel) == STChannel::s_expected_size);
 
   struct STEvent
   {
-    unsigned int eventID = 0;      ///< Event ID.
-    unsigned int dateInSec = 0;    ///< Event date in seconds.
-    unsigned int timestamp = 0;    ///< Timestamp (4 ns) -> used to compute dt between events.
+    static constexpr int s_expected_size { 3 * sizeof(uint32_t) + TGpsDateStruct::s_expected_size + 2 * sizeof(uint32_t) + STChannel::s_expected_size * s_num_channels };
+    
+    uint32_t eventID = 0;      ///< Event ID.
+    uint32_t dateInSec = 0;    ///< Event date in seconds.
+    uint32_t timestamp = 0;    ///< Timestamp (4 ns) -> used to compute dt between events.
     TGpsDateStruct gpsDate;        ///< TGPS date
-    unsigned int pps_interval = 0; ///< IRIG-B subdivision in a second, expressed in 100 ns clock ticks.
-    unsigned int FIFO_AF_duration =
+    uint32_t pps_interval = 0; ///< IRIG-B subdivision in a second, expressed in 100 ns clock ticks.
+    uint32_t FIFO_AF_duration =
       0; ///< FIFO AF duration (4 ns) -> integration of Almost full fifo since last accepted trigger
 
     struct STChannel channels[s_num_channels];
   };
-
 #warning "CRTGrenobleFrame::STEvent has padding inserted"
-  // static_assert(sizeof(STEvent) == 3 * sizeof(unsigned int) + sizeof(TGpsDateStruct) + 2 * sizeof(unsigned int) +
-  // sizeof(STChannel) * s_num_channels);
+  // static_assert(sizeof(STEvent) == STEvent::s_expected_size);
 
-  detdataformats::DAQEthHeader daq_header;
-  STEvent event;
-
+  static constexpr std::size_t s_expected_bytes { sizeof(detdataformats::DAQEthHeader) + CRTGrenobleFrame::STEvent::s_expected_size };
+  
   /// @brief Get the adc value for channel i_ch
   int get_adc(const int i_ch) const
   {
@@ -105,9 +113,12 @@ public:
   /// @brief Set the starting 64-bit timestamp of the frame
   void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
 
+  detdataformats::DAQEthHeader daq_header; // Formally private, but has a non-const accessor
+  STEvent event;
+  
 }; // CRTGrenobleFrame
 #warning "CRTGrenobleFrame has padding inserted"
-// static_assert(sizeof(CRTGrenobleFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(CRTGrenobleFrame::STEvent));
+// static_assert(sizeof(CRTGrenobleFrame) == CRTGrenobleFrame::s_expected_size);
 
 static_assert(std::endian::native == std::endian::little,
               "The CRTGrenobleFrame bitfield layout assumes little-endian architecture");

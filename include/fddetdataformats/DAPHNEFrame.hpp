@@ -1,7 +1,8 @@
 /**
  * @file DAPHNEFrame.hpp
  *
- *  Contains declaration of DAPHNEFrame, a class for accessing raw DAPHNE frames, as produced by the DAPHNE boards
+ *  Contains declaration of DAPHNEFrame, a struct for accessing raw
+ *  DAPHNE frames from "v2" DAPHNE boards (FELIX-based readout)
  *
  *  The canonical definition of the PDS DAPHNE format is given in EDMS document 2088726:
  *  https://edms.cern.ch/document/2088726/3
@@ -14,7 +15,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_DAPHNEFRAME_HPP_
 
-#include "Utils.hpp"
+#include "fddetdataformats/FrameConcepts.hpp"
+#include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQHeader.hpp"
 #include <algorithm> // For std::min
@@ -28,9 +30,8 @@ namespace dunedaq::fddetdataformats {
 
 // NOLINTBEGIN(build/unsigned)
 
-class DAPHNEFrame
+struct DAPHNEFrame
 {
-public:
   // The definition of the format is in terms of 32-bit words
   using word_t = uint32_t;
 
@@ -52,6 +53,7 @@ public:
 
   struct PeakDescriptorData
   {
+    static constexpr std::size_t s_expected_bytes { 13 * sizeof(uint32_t) };
 
     // Word 1: peak 0 odd
     // Declared in reverse order (LSB first) so that:
@@ -236,13 +238,11 @@ public:
       return reinterpret_cast<word_t*>(this); // NOLINT
     }
   };
-  static_assert(sizeof(PeakDescriptorData) == 13 * sizeof(uint32_t));
+  static_assert(sizeof(PeakDescriptorData) == PeakDescriptorData::s_expected_bytes);
 
-  detdataformats::DAQHeader daq_header;
-  Header header;
-  word_t adc_words[s_num_adc_words]; // NOLINT
-  PeakDescriptorData peaks_data;
-
+  static constexpr std::size_t s_expected_bytes { sizeof(detdataformats::DAQHeader) + sizeof(Header) +
+    s_num_adc_words * sizeof(word_t) + PeakDescriptorData::s_expected_bytes };
+  
   /**
    * @brief Get the ith ADC value in the frame
    *
@@ -260,18 +260,32 @@ public:
 
   /// @brief Get the 64-bit timestamp of the frame
   uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
+
+  void set_timestamp(uint64_t ts) {
+    daq_header.timestamp_1 = ts;
+    daq_header.timestamp_2 = ts >> 32;
+  }
+  
+  bool operator<(const DAPHNEFrame& other) const {
+
+    if (this->get_timestamp() != other.get_timestamp()) {
+      return this->get_timestamp() < other.get_timestamp();
+    } else {
+      return this->get_channel() < other.get_channel();
+    }
+  }
+
+  detdataformats::DAQHeader daq_header;
+  Header header;
+  word_t adc_words[s_num_adc_words]; // NOLINT
+  PeakDescriptorData peaks_data;
 };
-static_assert(sizeof(DAPHNEFrame) == sizeof(detdataformats::DAQHeader) + sizeof(DAPHNEFrame::Header) +
-                                       sizeof(DAPHNEFrame::word_t) * DAPHNEFrame::s_num_adc_words +
-                                       sizeof(DAPHNEFrame::PeakDescriptorData));
 
 static_assert(std::endian::native == std::endian::little,
               "The DAPHNEFrame bitfield layout assumes little-endian architecture");
-static_assert(std::is_trivially_copyable_v<DAPHNEFrame>,
-              "DAPHNEFrame isn't trivially copyable and can't be safely std::memcpy'd");
-static_assert(std::is_standard_layout_v<DAPHNEFrame>,
-              "DAPHNEFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
 
+  static_assert(AdaptableFrameConcept<DAPHNEFrame>, "DAPHNEFrame does not satisfy the AdaptableFrameConcept");
+  
 } // namespace dunedaq::fddetdataformats
 
 #include "detail/DAPHNEFrame.hxx"

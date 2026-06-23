@@ -30,18 +30,14 @@ register_wibeth(py::module& m)
       "version",
       [](WIBEthFrame::WIBEthHeader& self) -> uint32_t { return self.version; },
       [](WIBEthFrame::WIBEthHeader& self, uint32_t version) { self.version = version; })
-    // .def_property("reserved",
-    // [](WIBEthFrame::WIBEthHeader& self) -> uint32_t {return self.reserved;},
-    // [](WIBEthFrame::WIBEthHeader& self, uint32_t reserved) {self.reserved = reserved;}
-    // )
     .def_property(
       "cd",
       [](WIBEthFrame::WIBEthHeader& self) -> uint32_t { return self.cd; },
-      [](WIBEthFrame::WIBEthHeader& self, uint32_t cd) { self.version = cd; })
+      [](WIBEthFrame::WIBEthHeader& self, uint32_t cd) { self.cd = cd; })
     .def_property(
       "context",
       [](WIBEthFrame::WIBEthHeader& self) -> uint32_t { return self.context; },
-      [](WIBEthFrame::WIBEthHeader& self, uint32_t context) { self.version = context; })
+      [](WIBEthFrame::WIBEthHeader& self, uint32_t context) { self.context = context; })
     .def_property(
       "ready",
       [](WIBEthFrame::WIBEthHeader& self) -> uint32_t { return self.ready; },
@@ -77,7 +73,9 @@ register_wibeth(py::module& m)
     .def_property(
       "colddata_timestamp_1",
       [](WIBEthFrame::WIBEthHeader& self) -> uint32_t { return self.colddata_timestamp_1; },
-      [](WIBEthFrame::WIBEthHeader& self, uint32_t colddata_timestamp_1) { self.lol = colddata_timestamp_1; })
+      [](WIBEthFrame::WIBEthHeader& self, uint32_t colddata_timestamp_1) {
+        self.colddata_timestamp_1 = colddata_timestamp_1;
+      })
     .def_property(
       "colddata_timestamp_0",
       [](WIBEthFrame::WIBEthHeader& self) -> uint32_t { return self.colddata_timestamp_0; },
@@ -87,7 +85,10 @@ register_wibeth(py::module& m)
     .def_property(
       "extra_data",
       [](WIBEthFrame::WIBEthHeader& self) -> uint64_t { return self.extra_data; },
-      [](WIBEthFrame::WIBEthHeader& self, uint64_t extra_data) { self.extra_data = extra_data; });
+      [](WIBEthFrame::WIBEthHeader& self, uint64_t extra_data) { self.extra_data = extra_data; })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return WIBEthFrame::WIBEthHeader::s_expected_bytes;
+    });
 
   py::class_<WIBEthFrame>(m, "WIBEthFrame", py::buffer_protocol())
     .def(py::init())
@@ -108,12 +109,45 @@ register_wibeth(py::module& m)
       "get_wibheader",
       [](WIBEthFrame& self) -> const WIBEthFrame::WIBEthHeader& { return self.header; },
       py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "daq_header",
+      [](WIBEthFrame& self) -> detdataformats::DAQEthHeader& { return self.daq_header; },
+      py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "header",
+      [](WIBEthFrame& self) -> WIBEthFrame::WIBEthHeader& { return self.header; },
+      py::return_value_policy::reference_internal)
     .def("get_adc", &WIBEthFrame::get_adc)
     .def("set_adc", &WIBEthFrame::set_adc)
     .def("get_timestamp", &WIBEthFrame::get_timestamp)
     .def("set_timestamp", &WIBEthFrame::set_timestamp)
     .def("get_channel", &WIBEthFrame::get_channel)
     .def("set_channel", &WIBEthFrame::set_channel)
+    .def("__lt__", [](const WIBEthFrame& lhs, const WIBEthFrame& rhs) { return lhs < rhs; })
+    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
+      return WIBEthFrame::s_bits_per_adc;
+    })
+    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) {
+      return WIBEthFrame::s_bits_per_word;
+    })
+    .def_property_readonly_static("s_time_samples_per_frame", [](py::object /*self*/) {
+      return WIBEthFrame::s_time_samples_per_frame;
+    })
+    .def_property_readonly_static("s_channels_per_half_femb", [](py::object /*self*/) {
+      return WIBEthFrame::s_channels_per_half_femb;
+    })
+    .def_property_readonly_static("s_half_fembs_per_frame", [](py::object /*self*/) {
+      return WIBEthFrame::s_half_fembs_per_frame;
+    })
+    .def_property_readonly_static("s_num_channels", [](py::object /*self*/) {
+      return WIBEthFrame::s_num_channels;
+    })
+    .def_property_readonly_static("s_num_adc_words_per_ts", [](py::object /*self*/) {
+      return WIBEthFrame::s_num_adc_words_per_ts;
+    })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return WIBEthFrame::s_expected_bytes;
+    })
     .def_static("sizeof", []() { return sizeof(WIBEthFrame); })
     .def("get_bytes", [](WIBEthFrame* fr) -> py::bytes {
       return py::bytes(reinterpret_cast<char*>(fr), sizeof(WIBEthFrame)); // NOLINT reinterpret_cast

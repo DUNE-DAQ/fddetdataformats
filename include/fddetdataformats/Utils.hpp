@@ -13,6 +13,9 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_UTILS_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_UTILS_HPP_
 
+#include "detdataformats/DAQHeader.hpp"
+#include "detdataformats/DAQEthHeader.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <format>

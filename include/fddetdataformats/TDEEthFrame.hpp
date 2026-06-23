@@ -1,10 +1,11 @@
 /**
  * @file TDEEthFrame.hpp
  *
- * Contains declaration of TDEEthFrame, a class for accessing raw WIB v2 frames, as used in ProtoDUNE-SP-II
+ * Contains declaration of TDEEthFrame, a class for accessing raw TDE
+ * eth frames, as used in ProtoDUNE-SP-II
  *
- * The canonical definition of the WIB format is given in EDMS document 2088713:
- * https://edms.cern.ch/document/2088713
+ * The canonical definition of the WIB format is given in EDMS document 2618999:
+ * https://edms.cern.ch/document/2618999/XXX, XXX the version (2 the latest publically accessible)
  *
  * This is part of the DUNE DAQ Application Framework, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -14,7 +15,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_TDEETHFRAME_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_TDEETHFRAME_HPP_
 
-#include "Utils.hpp"
+#include "fddetdataformats/FrameConcepts.hpp"
+#include "fddetdataformats/Utils.hpp"
 
 #include "detdataformats/DAQEthHeader.hpp"
 
@@ -23,6 +25,7 @@
 #include <cstdint>   // For uint32_t etc
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 #include <stdexcept> // For std::out_of_range
 
 namespace dunedaq::fddetdataformats {
@@ -30,14 +33,13 @@ namespace dunedaq::fddetdataformats {
 // NOLINTBEGIN(build/unsigned)
 
 /**
- *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
+ *  @brief Struct for accessing raw TDE eth frames, as used in ProtoDUNE-II
  *
  *  The canonical definition of the WIB format is given in EDMS document 2088713:
  *  https://edms.cern.ch/document/2088713
  */
-class TDEEthFrame
+struct TDEEthFrame
 {
-public:
   // The definition of the format is in terms of 64-bit words
   using word_t = uint64_t;
 
@@ -51,6 +53,8 @@ public:
 
   struct TDEEthHeader
   {
+    static constexpr size_t s_expected_bytes { 8 + 8 }; // bitfields + TAItime
+
     uint64_t reserved : 26;
     uint64_t tde_errors : 16;
     uint64_t tde_header : 10;
@@ -58,12 +62,11 @@ public:
     uint64_t channel : 8;
     uint64_t TAItime : 64;
   };
-  static_assert(sizeof(TDEEthHeader) == 16);
+  static_assert(sizeof(TDEEthHeader) == TDEEthHeader::s_expected_bytes);
 
-  detdataformats::DAQEthHeader daq_header;
-  TDEEthHeader header;
-  word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
+  static constexpr size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + TDEEthHeader::s_expected_bytes + s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t);
 
+  
   /**
    * @brief Get the i_channel-th ADC value in the i_sample-th time sample
    *
@@ -87,17 +90,20 @@ public:
 
   /// @brief Set the channel identifier of the frame
   void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
-};
-static_assert(sizeof(TDEEthFrame) == sizeof(detdataformats::DAQEthHeader) + sizeof(TDEEthFrame::TDEEthHeader) +
-                                       sizeof(TDEEthFrame::word_t) * TDEEthFrame::s_time_samples_per_frame *
-                                         TDEEthFrame::s_num_adc_words_per_ts);
 
-static_assert(std::endian::native == std::endian::little,
+  bool operator<(const TDEEthFrame& other) const {
+    return this->get_timestamp() < other.get_timestamp();
+  }
+  
+  detdataformats::DAQEthHeader daq_header;
+  TDEEthHeader header;
+  word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
+};
+
+  static_assert(std::endian::native == std::endian::little,
               "The TDEEthFrame bitfield layout assumes little-endian architecture");
-static_assert(std::is_trivially_copyable_v<TDEEthFrame>,
-              "TDEEthFrame isn't trivially copyable and can't be safely std::memcpy'd");
-static_assert(std::is_standard_layout_v<TDEEthFrame>,
-              "TDEEthFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+
+  static_assert(AdaptableFrameConcept<TDEEthFrame>, "TDEEthFrame does not satisfy the AdaptableFrameConcept");
 
 } // namespace dunedaq::fddetdataformats
 

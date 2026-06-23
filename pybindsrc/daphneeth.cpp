@@ -1,5 +1,5 @@
 /**
- * @file wibeth.cpp Python bindings for the DAPHNEEthFrame format
+ * @file daphneeth.cpp Python bindings for the DAPHNEEthFrame format
  *
  * This is part of the DUNE DAQ Software Suite, copyright 2020.
  * Licensing/copyright details are in the COPYING file that you should have
@@ -60,8 +60,8 @@ register_daphneeth(py::module& m)
       [](DAPHNEEthFrame::Header& self, uint32_t version) { self.version = version; })
     .def_property(
       "trigger_sample_value",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.trig_sample; },
-      [](DAPHNEEthFrame::Header& self, uint32_t trig_sample) { self.trig_sample = trig_sample; })
+      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.trigger_sample_value; },
+      [](DAPHNEEthFrame::Header& self, uint32_t trigger_sample_value) { self.trigger_sample_value = trigger_sample_value; })
     .def_property(
       "threshold",
       [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.threshold; },
@@ -69,7 +69,10 @@ register_daphneeth(py::module& m)
     .def_property(
       "baseline",
       [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.baseline; },
-      [](DAPHNEEthFrame::Header& self, uint32_t baseline) { self.baseline = baseline; });
+      [](DAPHNEEthFrame::Header& self, uint32_t baseline) { self.baseline = baseline; })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return DAPHNEEthFrame::Header::s_expected_bytes;
+    });
 
   py::class_<DAPHNEEthFrame>(m, "DAPHNEEthFrame", py::buffer_protocol())
     .def(py::init())
@@ -94,17 +97,40 @@ register_daphneeth(py::module& m)
       "get_header",
       [](DAPHNEEthFrame& self) -> const DAPHNEEthFrame::Header& { return self.header; },
       py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "daq_header",
+      [](DAPHNEEthFrame& self) -> detdataformats::DAQEthHeader& { return self.daq_header; },
+      py::return_value_policy::reference_internal)
+    .def_property_readonly(
+      "header",
+      [](DAPHNEEthFrame& self) -> DAPHNEEthFrame::Header& { return self.header; },
+      py::return_value_policy::reference_internal)
     .def("get_adc", &DAPHNEEthFrame::get_adc)
     .def("set_adc", &DAPHNEEthFrame::set_adc)
     .def("get_timestamp", &DAPHNEEthFrame::get_timestamp)
     .def("set_timestamp", &DAPHNEEthFrame::set_timestamp)
     .def("get_channel", &DAPHNEEthFrame::get_channel)
     .def("set_channel", &DAPHNEEthFrame::set_channel)
+    .def("__lt__", [](const DAPHNEEthFrame& lhs, const DAPHNEEthFrame& rhs) { return lhs < rhs; })
+    .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEEthFrame::version; })
+    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
+      return DAPHNEEthFrame::s_bits_per_adc;
+    })
+    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) {
+      return DAPHNEEthFrame::s_bits_per_word;
+    })
+    .def_property_readonly_static("s_num_adcs", [](py::object /*self*/) { return DAPHNEEthFrame::s_num_adcs; })
+    .def_property_readonly_static("s_num_adc_words", [](py::object /*self*/) {
+      return DAPHNEEthFrame::s_num_adc_words;
+    })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return DAPHNEEthFrame::s_expected_bytes;
+    })
     .def_static("sizeof", []() { return sizeof(DAPHNEEthFrame); })
     .def("get_bytes", [](DAPHNEEthFrame* fr) -> py::bytes {
       return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEEthFrame)); // NOLINT reinterpret_cast
     });
-}
+} // NOLINT (defensible use of "overly long" function)
 
 // NOLINTEND(build/unsigned)
 
