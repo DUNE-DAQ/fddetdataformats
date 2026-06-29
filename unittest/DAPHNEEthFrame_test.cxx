@@ -4,7 +4,7 @@
  * This is part of the DUNE DAQ Application Framework, copyright 2022.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
- */
+**/
 
 #include "fddetdataformats/DAPHNEEthFrame.hpp"
 
@@ -12,6 +12,7 @@
 
 #include "boost/test/unit_test.hpp"
 
+#include <algorithm>
 #include <random>
 #include <vector>
 
@@ -108,6 +109,53 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthFrame_MetadataMutators)
 
   frame.set_channel(255);
   BOOST_CHECK_EQUAL(frame.get_channel(), 255);
+}
+
+BOOST_AUTO_TEST_CASE(DAPHNEEthFrame_PeakDescriptorMutators)
+{
+  constexpr int N_PEAKS = dunedaq::fddetdataformats::DAPHNEEthFrame::s_max_peaks;
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<uint16_t> adc_dist(1, (1 << 14) - 1);
+  std::uniform_int_distribution<uint16_t> u10bit(0, 0x3FF);
+  std::uniform_int_distribution<uint16_t> u9bit(0, 0x1FF);
+  std::uniform_int_distribution<uint16_t> u4bit(0, 0xF);
+  std::uniform_int_distribution<uint32_t> u23bit(0, 0x7FFFFF);
+  std::uniform_int_distribution<uint16_t> u14bit(0, 0x3FFF);
+  std::uniform_int_distribution<uint8_t> u1bit(0, 1);
+
+  dunedaq::fddetdataformats::DAPHNEEthFrame frame{};
+
+  BOOST_CHECK_THROW(frame.get_peaks_data().set_found(true, N_PEAKS), std::out_of_range);
+
+
+  for (int peak = 0; peak < N_PEAKS; ++peak) {
+    uint8_t num_subpeaks = u4bit(gen);
+    uint8_t found = u1bit(gen);
+    uint32_t adc_integral = u23bit(gen);
+    uint16_t adc_max = u14bit(gen);
+    uint16_t sample_peak = u9bit(gen);
+    uint16_t tob = u9bit(gen);
+    uint16_t sample_start = u10bit(gen);
+
+    frame.get_peaks_data().set_num_subpeaks(num_subpeaks, peak);
+    frame.get_peaks_data().set_found(found, peak);
+    frame.get_peaks_data().set_adc_integral(adc_integral, peak);
+    frame.get_peaks_data().set_adc_max(adc_max, peak);
+    frame.get_peaks_data().set_sample_max(sample_peak, peak);
+    frame.get_peaks_data().set_samples_over_baseline(tob, peak);
+    frame.get_peaks_data().set_sample_start(sample_start, peak);
+  
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_num_subpeaks(peak), num_subpeaks);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().is_found(peak), found);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_adc_integral(peak), adc_integral);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_adc_max(peak), adc_max);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_sample_max(peak), sample_peak);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_samples_over_baseline(peak), tob);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_sample_start(peak), sample_start);
+  }
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()
