@@ -74,7 +74,7 @@ struct DAPHNEEthFrame
 
     static constexpr size_t s_expected_bytes { (DAPHNEEthFrame::s_max_peaks + 1) * sizeof(word_t) };
 
-    PeakDescriptor peaks[DAPHNEEthFrame::s_max_peaks];
+    PeakDescriptor peaks[DAPHNEEthFrame::s_max_peaks]; //NOLINT
 
     // Time_Start fields span two 32-bit words packed into one 64-bit word.
     // Word 11 (bits [31:0]): samples_start for indices 2, 1, 0
@@ -90,51 +90,51 @@ struct DAPHNEEthFrame
 
     /// @brief Get the Num_SubPeaks value for peak @p ipdx
     inline uint8_t get_num_subpeaks(int ipdx) const
-    { check_range_npeaks_(ipdx); return peaks[ipdx].num_subpeaks; }
+    { check_range_npeaks_(ipdx); return peaks[ipdx].num_subpeaks; } //NOLINT
 
     /// @brief Set the Num_SubPeaks value for peak @p ipdx
     inline void set_num_subpeaks(uint8_t val, int ipdx)
-    { check_range_npeaks_(ipdx); peaks[ipdx].num_subpeaks = val; }
+    { check_range_npeaks_(ipdx); peaks[ipdx].num_subpeaks = val; } //NOLINT
 
     /// @brief Get the Found flag for peak @p ipdx
     inline bool is_found(int ipdx) const
-    { check_range_npeaks_(ipdx); return peaks[ipdx].found; }
+    { check_range_npeaks_(ipdx); return peaks[ipdx].found; } //NOLINT
 
     /// @brief Set the Found flag for peak @p ipdx
     inline void set_found(uint8_t val, int ipdx)
-    { check_range_npeaks_(ipdx); peaks[ipdx].found = val; }
+    { check_range_npeaks_(ipdx); peaks[ipdx].found = val; } //NOLINT
 
     /// @brief Get the ADC_Integral value for peak @p ipdx
     inline uint32_t get_adc_integral(int ipdx) const
-    { check_range_npeaks_(ipdx); return peaks[ipdx].adc_integral; }
+    { check_range_npeaks_(ipdx); return peaks[ipdx].adc_integral; } //NOLINT
 
     /// @brief Set the ADC_Integral value for peak @p ipdx
     inline void set_adc_integral(uint32_t val, int ipdx)
-    { check_range_npeaks_(ipdx); peaks[ipdx].adc_integral = val; }
+    { check_range_npeaks_(ipdx); peaks[ipdx].adc_integral = val; } //NOLINT
 
     /// @brief Get the ADC_Max value for peak @p ipdx
     inline uint16_t get_adc_max(int ipdx) const
-    { check_range_npeaks_(ipdx); return peaks[ipdx].adc_max; }
+    { check_range_npeaks_(ipdx); return peaks[ipdx].adc_max; } //NOLINT
 
     /// @brief Set the ADC_Max value for peak @p ipdx
     inline void set_adc_max(uint16_t val, int ipdx)
-    { check_range_npeaks_(ipdx); peaks[ipdx].adc_max = val; }
+    { check_range_npeaks_(ipdx); peaks[ipdx].adc_max = val; } //NOLINT
 
     /// @brief Get the Time_Peak value for peak @p ipdx
     inline uint16_t get_sample_max(int ipdx) const
-    { check_range_npeaks_(ipdx); return peaks[ipdx].sample_max; }
+    { check_range_npeaks_(ipdx); return peaks[ipdx].sample_max; } //NOLINT
 
     /// @brief Set the Time_Peak value for peak @p ipdx
     inline void set_sample_max(uint16_t val, int ipdx)
-    { check_range_npeaks_(ipdx); peaks[ipdx].sample_max = val; }
+    { check_range_npeaks_(ipdx); peaks[ipdx].sample_max = val; } //NOLINT
 
     /// @brief Get the Time_Over_Baseline value for peak @p ipdx
     inline uint16_t get_samples_over_baseline(int ipdx) const
-    { check_range_npeaks_(ipdx); return peaks[ipdx].samples_over_baseline; }
+    { check_range_npeaks_(ipdx); return peaks[ipdx].samples_over_baseline; } //NOLINT
 
     /// @brief Set the Time_Over_Baseline value for peak @p ipdx
     inline void set_samples_over_baseline(uint16_t val, int ipdx)
-    { check_range_npeaks_(ipdx); peaks[ipdx].samples_over_baseline = val; }
+    { check_range_npeaks_(ipdx); peaks[ipdx].samples_over_baseline = val; } //NOLINT
 
     /// @brief Get the Time_Start value for peak @p ipdx
     inline uint16_t get_sample_start(int ipdx) const;
@@ -250,7 +250,6 @@ DAPHNEEthFrame::PeakDescriptorData::set_sample_start(uint16_t val, int ipdx)
   else if(ipdx==4)
     samples_start_4=val & 0x3FFu;
   
-  return;
 }
 
 } // namespace dunedaq::fddetdataformats
