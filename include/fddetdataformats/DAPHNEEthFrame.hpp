@@ -51,8 +51,6 @@ struct DAPHNEEthFrame
   static constexpr int s_num_adcs = 1024;
   static constexpr int s_num_adc_words = s_num_adcs * s_bits_per_adc / s_bits_per_word;
   static constexpr int s_max_peaks = 5;
-  static constexpr int s_peak_descriptor_words = 12;
-  static constexpr int s_packed_peak_descriptor_words = 6;
 
   /// @brief Single peak descriptor: two 32-bit words packed into one 64-bit word
   struct PeakDescriptor {
