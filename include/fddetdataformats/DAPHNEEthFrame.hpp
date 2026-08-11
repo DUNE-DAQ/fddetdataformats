@@ -78,10 +78,10 @@ struct DAPHNEEthFrame
 
     // Time_Start fields span two 32-bit words packed into one 64-bit word.
     // Word 11 (bits [31:0]): samples_start for indices 2, 1, 0
+    word_t reserved_5 : 2;           // Reserved       [1:0]
     word_t samples_start_2 : 10;     // Time_Start(2)  [11:2]
     word_t samples_start_1 : 10;     // Time_Start(1)  [21:12]
     word_t samples_start_0 : 10;     // Time_Start(0)  [31:22]
-    word_t reserved_5 : 2;           // Reserved       [1:0]
 
     // Word 12 (bits [63:32]): samples_start for indices 4, 3
     word_t reserved_6 : 12;          // Reserved       [11:0]

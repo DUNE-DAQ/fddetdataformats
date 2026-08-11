@@ -13,6 +13,8 @@
 #include "boost/test/unit_test.hpp"
 
 #include <algorithm>
+#include <array>
+#include <cstring>
 #include <random>
 #include <vector>
 
@@ -156,6 +158,32 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthFrame_PeakDescriptorMutators)
     BOOST_CHECK_EQUAL(frame.get_peaks_data().get_sample_start(peak), sample_start);
   }
 
+}
+
+BOOST_AUTO_TEST_CASE(DAPHNEEthFrame_PeakDescriptorTimeStartPacking)
+{
+  using dunedaq::fddetdataformats::DAPHNEEthFrame;
+
+  DAPHNEEthFrame frame{};
+  const std::array<uint16_t, DAPHNEEthFrame::s_max_peaks> sample_starts = {
+    0x155u, 0x2AAu, 0x3ABu, 0x123u, 0x234u
+  };
+
+  for (int peak = 0; peak < DAPHNEEthFrame::s_max_peaks; ++peak) {
+    frame.get_peaks_data().set_sample_start(sample_starts.at(peak), peak);
+  }
+
+  std::array<DAPHNEEthFrame::word_t, DAPHNEEthFrame::s_max_peaks + 1> raw_words{};
+  std::memcpy(raw_words.data(), &frame.get_peaks_data(), sizeof(frame.get_peaks_data()));
+
+  const auto expected_time_start_word =
+    (static_cast<DAPHNEEthFrame::word_t>(sample_starts.at(2) & 0x3FFu) << 2) |
+    (static_cast<DAPHNEEthFrame::word_t>(sample_starts.at(1) & 0x3FFu) << 12) |
+    (static_cast<DAPHNEEthFrame::word_t>(sample_starts.at(0) & 0x3FFu) << 22) |
+    (static_cast<DAPHNEEthFrame::word_t>(sample_starts.at(4) & 0x3FFu) << 44) |
+    (static_cast<DAPHNEEthFrame::word_t>(sample_starts.at(3) & 0x3FFu) << 54);
+
+  BOOST_CHECK_EQUAL(raw_words.at(DAPHNEEthFrame::s_max_peaks), expected_time_start_word);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
