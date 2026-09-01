@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 
 import sys
-from fddetdataformats import DAPHNEEthFrame, DAPHNEEthHeader
+from fddetdataformats import (
+    DAPHNEEthFrame,
+    DAPHNEEthHeader,
+    DAPHNEEthFramePeakDescriptor,
+    DAPHNEEthFramePeakDescriptorData,
+)
 
 
 NUM_CHANNELS = 1
@@ -28,20 +33,38 @@ def test_static_members() -> int:
         return 1
     if DAPHNEEthFrame.s_num_adcs != ADCS_PER_CHANNEL:
         print(
-            "FAIL: DAPHNEEthFrame.s_num_adcs expected "
-            f"{ADCS_PER_CHANNEL}, got {DAPHNEEthFrame.s_num_adcs}"
+            f"FAIL: DAPHNEEthFrame.s_num_adcs expected {ADCS_PER_CHANNEL}, "
+            f"got {DAPHNEEthFrame.s_num_adcs}"
         )
         return 1
     if DAPHNEEthFrame.s_bits_per_adc != 14:
         print(f"FAIL: DAPHNEEthFrame.s_bits_per_adc expected 14, got {DAPHNEEthFrame.s_bits_per_adc}")
         return 1
     if DAPHNEEthFrame.s_expected_bytes != DAPHNEEthFrame.sizeof():
-        print(f"FAIL: DAPHNEEthFrame.s_expected_bytes {DAPHNEEthFrame.s_expected_bytes} != sizeof {DAPHNEEthFrame.sizeof()}")
+        print(
+            f"FAIL: DAPHNEEthFrame.s_expected_bytes {DAPHNEEthFrame.s_expected_bytes} "
+            f"!= sizeof {DAPHNEEthFrame.sizeof()}"
+        )
+        return 1
+    if DAPHNEEthFrame.s_max_peaks != 5:
+        print(f"FAIL: DAPHNEEthFrame.s_max_peaks expected 5, got {DAPHNEEthFrame.s_max_peaks}")
         return 1
     if DAPHNEEthHeader.s_expected_bytes <= 0:
         print(f"FAIL: DAPHNEEthHeader.s_expected_bytes invalid: {DAPHNEEthHeader.s_expected_bytes}")
         return 1
-    print("PASS: DAPHNEEthFrame/DAPHNEEthHeader static members")
+    if DAPHNEEthFramePeakDescriptor.s_expected_bytes <= 0:
+        print(
+            f"FAIL: DAPHNEEthFramePeakDescriptor.s_expected_bytes invalid: "
+            f"{DAPHNEEthFramePeakDescriptor.s_expected_bytes}"
+        )
+        return 1
+    if DAPHNEEthFramePeakDescriptorData.s_expected_bytes <= 0:
+        print(
+            f"FAIL: DAPHNEEthFramePeakDescriptorData.s_expected_bytes invalid: "
+            f"{DAPHNEEthFramePeakDescriptorData.s_expected_bytes}"
+        )
+        return 1
+    print("PASS: DAPHNEEthFrame/DAPHNEEthHeader/PeakDescriptor static members")
     return 0
 
 
@@ -133,12 +156,6 @@ def test_header_properties() -> int:
     hdr.trigger_sample_value = 123
     hdr.threshold = 456
     hdr.baseline = 789
-    hdr.w1 = 11
-    hdr.w2 = 22
-    hdr.w3 = 33
-    hdr.w4 = 44
-    hdr.w5 = 55
-    hdr.w6 = 66
 
     if hdr.channel != 5 or frame.get_channel() != 5:
         print("FAIL: header.channel mismatch")
@@ -155,14 +172,181 @@ def test_header_properties() -> int:
     if hdr.baseline != 789:
         print("FAIL: header.baseline mismatch")
         return 1
-    if (hdr.w1, hdr.w2, hdr.w3, hdr.w4, hdr.w5, hdr.w6) != (11, 22, 33, 44, 55, 66):
-        print("FAIL: w1..w6 mismatch")
+
+    peaks = hdr.peaks_data
+    if peaks is None:
+        print("FAIL: header.peaks_data returned None")
         return 1
-    if hdr_alias.w6 != 66:
-        print(f"FAIL: get_daphneheader alias mismatch, got {hdr_alias.w6}")
+    if not isinstance(peaks, DAPHNEEthFramePeakDescriptorData):
+        print(f"FAIL: header.peaks_data is not DAPHNEEthFramePeakDescriptorData, got {type(peaks)}")
         return 1
 
     print("PASS: DAPHNEEthHeader properties")
+    return 0
+
+
+def test_peaks_data_accessible() -> int:
+    frame = DAPHNEEthFrame()
+
+    peaks_via_method = frame.get_peaks_data()
+    if peaks_via_method is None:
+        print("FAIL: get_peaks_data() returned None")
+        return 1
+    if not isinstance(peaks_via_method, DAPHNEEthFramePeakDescriptorData):
+        print(f"FAIL: get_peaks_data() returned unexpected type {type(peaks_via_method)}")
+        return 1
+
+    peaks_via_header = frame.header.peaks_data
+    if peaks_via_header is None:
+        print("FAIL: header.peaks_data returned None")
+        return 1
+    if not isinstance(peaks_via_header, DAPHNEEthFramePeakDescriptorData):
+        print(f"FAIL: header.peaks_data returned unexpected type {type(peaks_via_header)}")
+        return 1
+
+    # Both paths should refer to the same underlying data
+    peaks_via_method.set_adc_integral(12345, 0)
+    if peaks_via_header.get_adc_integral(0) != 12345:
+        print("FAIL: get_peaks_data() and header.peaks_data do not alias the same data")
+        return 1
+
+    print("PASS: peaks_data accessible via get_peaks_data() and header.peaks_data")
+    return 0
+
+
+def test_peak_descriptor_data_mutators() -> int:
+    frame = DAPHNEEthFrame()
+    n_peaks = DAPHNEEthFrame.s_max_peaks
+    peaks = frame.get_peaks_data()
+
+    # Field bit widths: num_subpeaks=4, adc_integral=23, adc_max=14,
+    # sample_max=9, samples_over_baseline=9, sample_start=10
+    test_vals = [
+        dict(found=True,  num_subpeaks=i,      adc_integral=100000 + i*1000,
+             adc_max=1000 + i*100, sample_max=200 + i*10,
+             samples_over_baseline=50 + i*5, sample_start=300 + i*7)
+        for i in range(n_peaks)
+    ]
+
+    for peak, v in enumerate(test_vals):
+        peaks.set_found(v["found"], peak)
+        peaks.set_num_subpeaks(v["num_subpeaks"], peak)
+        peaks.set_adc_integral(v["adc_integral"], peak)
+        peaks.set_adc_max(v["adc_max"], peak)
+        peaks.set_sample_max(v["sample_max"], peak)
+        peaks.set_samples_over_baseline(v["samples_over_baseline"], peak)
+        peaks.set_sample_start(v["sample_start"], peak)
+
+    for peak, v in enumerate(test_vals):
+        if peaks.is_found(peak) != v["found"]:
+            print(f"FAIL: is_found({peak}) expected {v['found']}, got {peaks.is_found(peak)}")
+            return 1
+        if peaks.get_num_subpeaks(peak) != v["num_subpeaks"]:
+            print(f"FAIL: get_num_subpeaks({peak}) expected {v['num_subpeaks']}, got {peaks.get_num_subpeaks(peak)}")
+            return 1
+        if peaks.get_adc_integral(peak) != v["adc_integral"]:
+            print(f"FAIL: get_adc_integral({peak}) expected {v['adc_integral']}, got {peaks.get_adc_integral(peak)}")
+            return 1
+        if peaks.get_adc_max(peak) != v["adc_max"]:
+            print(f"FAIL: get_adc_max({peak}) expected {v['adc_max']}, got {peaks.get_adc_max(peak)}")
+            return 1
+        if peaks.get_sample_max(peak) != v["sample_max"]:
+            print(f"FAIL: get_sample_max({peak}) expected {v['sample_max']}, got {peaks.get_sample_max(peak)}")
+            return 1
+        if peaks.get_samples_over_baseline(peak) != v["samples_over_baseline"]:
+            print(f"FAIL: get_samples_over_baseline({peak}) expected {v['samples_over_baseline']}, "
+                  f"got {peaks.get_samples_over_baseline(peak)}")
+            return 1
+        if peaks.get_sample_start(peak) != v["sample_start"]:
+            print(f"FAIL: get_sample_start({peak}) expected {v['sample_start']}, got {peaks.get_sample_start(peak)}")
+            return 1
+
+    print(f"PASS: PeakDescriptorData mutators for all {n_peaks} peaks")
+    return 0
+
+
+def test_peak_descriptor_independence() -> int:
+    frame = DAPHNEEthFrame()
+    n_peaks = DAPHNEEthFrame.s_max_peaks
+    peaks = frame.get_peaks_data()
+
+    for peak in range(n_peaks):
+        peaks.set_adc_integral(peak * 111, peak)
+
+    for peak in range(n_peaks):
+        got = peaks.get_adc_integral(peak)
+        if got != peak * 111:
+            print(f"FAIL: peak independence: peak {peak} adc_integral expected {peak * 111}, got {got}")
+            return 1
+
+    print("PASS: peak descriptor fields are independent across peak indices")
+    return 0
+
+
+def test_peak_descriptor_out_of_range() -> int:
+    frame = DAPHNEEthFrame()
+    n_peaks = DAPHNEEthFrame.s_max_peaks
+    peaks = frame.get_peaks_data()
+
+    for bad_idx in (n_peaks, n_peaks + 1, -1):
+        try:
+            peaks.is_found(bad_idx)
+            print(f"FAIL: is_found({bad_idx}) should have raised an exception")
+            return 1
+        except Exception:
+            pass
+        try:
+            peaks.set_adc_integral(0, bad_idx)
+            print(f"FAIL: set_adc_integral(0, {bad_idx}) should have raised an exception")
+            return 1
+        except Exception:
+            pass
+
+    print("PASS: PeakDescriptorData out-of-range indices raise exceptions")
+    return 0
+
+
+def test_peak_data_bytes_roundtrip() -> int:
+    frame = DAPHNEEthFrame()
+    n_peaks = DAPHNEEthFrame.s_max_peaks
+    peaks = frame.get_peaks_data()
+
+    for peak in range(n_peaks):
+        peaks.set_found(True, peak)
+        peaks.set_num_subpeaks(peak, peak)
+        peaks.set_adc_integral(500000 + peak * 7777, peak)
+        peaks.set_adc_max(2000 + peak * 111, peak)
+        peaks.set_sample_max(300 + peak * 13, peak)
+        peaks.set_samples_over_baseline(100 + peak * 17, peak)
+        peaks.set_sample_start(400 + peak * 11, peak)
+
+    clone = DAPHNEEthFrame(frame.get_bytes())
+    clone_peaks = clone.get_peaks_data()
+
+    for peak in range(n_peaks):
+        if not clone_peaks.is_found(peak):
+            print(f"FAIL: bytes roundtrip: is_found({peak}) expected True")
+            return 1
+        if clone_peaks.get_num_subpeaks(peak) != peak:
+            print(f"FAIL: bytes roundtrip: get_num_subpeaks({peak})")
+            return 1
+        if clone_peaks.get_adc_integral(peak) != 500000 + peak * 7777:
+            print(f"FAIL: bytes roundtrip: get_adc_integral({peak})")
+            return 1
+        if clone_peaks.get_adc_max(peak) != 2000 + peak * 111:
+            print(f"FAIL: bytes roundtrip: get_adc_max({peak})")
+            return 1
+        if clone_peaks.get_sample_max(peak) != 300 + peak * 13:
+            print(f"FAIL: bytes roundtrip: get_sample_max({peak})")
+            return 1
+        if clone_peaks.get_samples_over_baseline(peak) != 100 + peak * 17:
+            print(f"FAIL: bytes roundtrip: get_samples_over_baseline({peak})")
+            return 1
+        if clone_peaks.get_sample_start(peak) != 400 + peak * 11:
+            print(f"FAIL: bytes roundtrip: get_sample_start({peak})")
+            return 1
+
+    print("PASS: peak descriptor data survives bytes roundtrip")
     return 0
 
 
@@ -253,6 +437,7 @@ def test_adc_out_of_range() -> int:
     print("PASS: out-of-range ADC index raises exception as expected")
     return 0
 
+
 def main() -> int:
     tests = [
         test_construction_and_size,
@@ -264,6 +449,11 @@ def main() -> int:
         test_daqheader_accessible,
         test_set_geoid,
         test_header_properties,
+        test_peaks_data_accessible,
+        test_peak_descriptor_data_mutators,
+        test_peak_descriptor_independence,
+        test_peak_descriptor_out_of_range,
+        test_peak_data_bytes_roundtrip,
         test_adc_single,
         test_adc_max_value,
         test_adc_independence,

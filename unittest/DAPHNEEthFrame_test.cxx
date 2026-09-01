@@ -4,7 +4,7 @@
  * This is part of the DUNE DAQ Application Framework, copyright 2022.
  * Licensing/copyright details are in the COPYING file that you should have
  * received with this code.
- */
+**/
 
 #include "fddetdataformats/DAPHNEEthFrame.hpp"
 
@@ -12,6 +12,9 @@
 
 #include "boost/test/unit_test.hpp"
 
+#include <algorithm>
+#include <array>
+#include <cstring>
 #include <random>
 #include <vector>
 
@@ -108,6 +111,79 @@ BOOST_AUTO_TEST_CASE(DAPHNEEthFrame_MetadataMutators)
 
   frame.set_channel(255);
   BOOST_CHECK_EQUAL(frame.get_channel(), 255);
+}
+
+BOOST_AUTO_TEST_CASE(DAPHNEEthFrame_PeakDescriptorMutators)
+{
+  constexpr int N_PEAKS = dunedaq::fddetdataformats::DAPHNEEthFrame::s_max_peaks;
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<uint16_t> adc_dist(1, (1 << 14) - 1);
+  std::uniform_int_distribution<uint16_t> u10bit(0, 0x3FF);
+  std::uniform_int_distribution<uint16_t> u9bit(0, 0x1FF);
+  std::uniform_int_distribution<uint16_t> u4bit(0, 0xF);
+  std::uniform_int_distribution<uint32_t> u23bit(0, 0x7FFFFF);
+  std::uniform_int_distribution<uint16_t> u14bit(0, 0x3FFF);
+  std::uniform_int_distribution<uint8_t> u1bit(0, 1);
+
+  dunedaq::fddetdataformats::DAPHNEEthFrame frame{};
+
+  BOOST_CHECK_THROW(frame.get_peaks_data().set_found(true, N_PEAKS), std::out_of_range);
+
+
+  for (int peak = 0; peak < N_PEAKS; ++peak) {
+    uint8_t num_subpeaks = u4bit(gen);
+    uint8_t found = u1bit(gen);
+    uint32_t adc_integral = u23bit(gen);
+    uint16_t adc_max = u14bit(gen);
+    uint16_t sample_peak = u9bit(gen);
+    uint16_t tob = u9bit(gen);
+    uint16_t sample_start = u10bit(gen);
+
+    frame.get_peaks_data().set_num_subpeaks(num_subpeaks, peak);
+    frame.get_peaks_data().set_found(found, peak);
+    frame.get_peaks_data().set_adc_integral(adc_integral, peak);
+    frame.get_peaks_data().set_adc_max(adc_max, peak);
+    frame.get_peaks_data().set_sample_max(sample_peak, peak);
+    frame.get_peaks_data().set_samples_over_baseline(tob, peak);
+    frame.get_peaks_data().set_sample_start(sample_start, peak);
+  
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_num_subpeaks(peak), num_subpeaks);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().is_found(peak), found);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_adc_integral(peak), adc_integral);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_adc_max(peak), adc_max);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_sample_max(peak), sample_peak);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_samples_over_baseline(peak), tob);
+    BOOST_CHECK_EQUAL(frame.get_peaks_data().get_sample_start(peak), sample_start);
+  }
+
+}
+
+BOOST_AUTO_TEST_CASE(DAPHNEEthFrame_PeakDescriptorTimeStartPacking)
+{
+  using dunedaq::fddetdataformats::DAPHNEEthFrame;
+
+  DAPHNEEthFrame frame{};
+  const std::array<uint16_t, DAPHNEEthFrame::s_max_peaks> sample_starts = {
+    0x155u, 0x2AAu, 0x3ABu, 0x123u, 0x234u
+  };
+
+  for (int peak = 0; peak < DAPHNEEthFrame::s_max_peaks; ++peak) {
+    frame.get_peaks_data().set_sample_start(sample_starts.at(peak), peak);
+  }
+
+  std::array<DAPHNEEthFrame::word_t, DAPHNEEthFrame::s_max_peaks + 1> raw_words{};
+  std::memcpy(raw_words.data(), &frame.get_peaks_data(), sizeof(frame.get_peaks_data()));
+
+  const auto expected_time_start_word =
+    (static_cast<DAPHNEEthFrame::word_t>(sample_starts.at(2) & 0x3FFu) << 2) |
+    (static_cast<DAPHNEEthFrame::word_t>(sample_starts.at(1) & 0x3FFu) << 12) |
+    (static_cast<DAPHNEEthFrame::word_t>(sample_starts.at(0) & 0x3FFu) << 22) |
+    (static_cast<DAPHNEEthFrame::word_t>(sample_starts.at(4) & 0x3FFu) << 44) |
+    (static_cast<DAPHNEEthFrame::word_t>(sample_starts.at(3) & 0x3FFu) << 54);
+
+  BOOST_CHECK_EQUAL(raw_words.at(DAPHNEEthFrame::s_max_peaks), expected_time_start_word);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

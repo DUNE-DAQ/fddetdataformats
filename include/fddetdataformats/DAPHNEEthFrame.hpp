@@ -19,9 +19,9 @@
 
 #include "detdataformats/DAQEthHeader.hpp"
 
-#include <algorithm> // For std::min
-#include <cassert>   // For assert()
-#include <cstdint>   // For uint32_t etc
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <limits>
@@ -50,6 +50,104 @@ struct DAPHNEEthFrame
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);
   static constexpr int s_num_adcs = 1024;
   static constexpr int s_num_adc_words = s_num_adcs * s_bits_per_adc / s_bits_per_word;
+  static constexpr int s_max_peaks = 5;
+
+  /// @brief Single peak descriptor: two 32-bit words packed into one 64-bit word
+  struct PeakDescriptor {
+    static constexpr size_t s_expected_bytes { 1 * sizeof(word_t) };
+
+    // Odd word (bits [31:0])
+    word_t num_subpeaks : 4;          // Num_SubPeaks  [3:0]
+    word_t reserved : 4;             // Reserved      [7:4]
+    word_t adc_integral : 23;        // ADC_Integral  [30:8]
+    word_t found : 1;                // Found         [31]
+
+    // Even word (bits [63:32])
+    word_t adc_max : 14;             // ADC_Max               [13:0]
+    word_t sample_max : 9;           // Time_Peak             [22:14]
+    word_t samples_over_baseline : 9; // Time_Over_Baseline    [31:23]
+  };
+  static_assert(sizeof(PeakDescriptor) == PeakDescriptor::s_expected_bytes);
+
+  /// @brief Collection of peak descriptors and their associated time-start fields
+  struct PeakDescriptorData {
+
+    static constexpr size_t s_expected_bytes { (DAPHNEEthFrame::s_max_peaks + 1) * sizeof(word_t) };
+
+    PeakDescriptor peaks[DAPHNEEthFrame::s_max_peaks]; //NOLINT
+
+    // Time_Start fields span two 32-bit words packed into one 64-bit word.
+    // Word 11 (bits [31:0]): samples_start for indices 2, 1, 0
+    word_t reserved_5 : 2;           // Reserved       [1:0]
+    word_t samples_start_2 : 10;     // Time_Start(2)  [11:2]
+    word_t samples_start_1 : 10;     // Time_Start(1)  [21:12]
+    word_t samples_start_0 : 10;     // Time_Start(0)  [31:22]
+
+    // Word 12 (bits [63:32]): samples_start for indices 4, 3
+    word_t reserved_6 : 12;          // Reserved       [11:0]
+    word_t samples_start_4 : 10;     // Time_Start(4)  [21:12]
+    word_t samples_start_3 : 10;     // Time_Start(3)  [31:22]
+
+    /// @brief Get the Num_SubPeaks value for peak @p ipdx
+    inline uint8_t get_num_subpeaks(int ipdx) const
+    { check_range_npeaks_(ipdx); return peaks[ipdx].num_subpeaks; } //NOLINT
+
+    /// @brief Set the Num_SubPeaks value for peak @p ipdx
+    inline void set_num_subpeaks(uint8_t val, int ipdx)
+    { check_range_npeaks_(ipdx); peaks[ipdx].num_subpeaks = val; } //NOLINT
+
+    /// @brief Get the Found flag for peak @p ipdx
+    inline bool is_found(int ipdx) const
+    { check_range_npeaks_(ipdx); return peaks[ipdx].found; } //NOLINT
+
+    /// @brief Set the Found flag for peak @p ipdx
+    inline void set_found(uint8_t val, int ipdx)
+    { check_range_npeaks_(ipdx); peaks[ipdx].found = val; } //NOLINT
+
+    /// @brief Get the ADC_Integral value for peak @p ipdx
+    inline uint32_t get_adc_integral(int ipdx) const
+    { check_range_npeaks_(ipdx); return peaks[ipdx].adc_integral; } //NOLINT
+
+    /// @brief Set the ADC_Integral value for peak @p ipdx
+    inline void set_adc_integral(uint32_t val, int ipdx)
+    { check_range_npeaks_(ipdx); peaks[ipdx].adc_integral = val; } //NOLINT
+
+    /// @brief Get the ADC_Max value for peak @p ipdx
+    inline uint16_t get_adc_max(int ipdx) const
+    { check_range_npeaks_(ipdx); return peaks[ipdx].adc_max; } //NOLINT
+
+    /// @brief Set the ADC_Max value for peak @p ipdx
+    inline void set_adc_max(uint16_t val, int ipdx)
+    { check_range_npeaks_(ipdx); peaks[ipdx].adc_max = val; } //NOLINT
+
+    /// @brief Get the Time_Peak value for peak @p ipdx
+    inline uint16_t get_sample_max(int ipdx) const
+    { check_range_npeaks_(ipdx); return peaks[ipdx].sample_max; } //NOLINT
+
+    /// @brief Set the Time_Peak value for peak @p ipdx
+    inline void set_sample_max(uint16_t val, int ipdx)
+    { check_range_npeaks_(ipdx); peaks[ipdx].sample_max = val; } //NOLINT
+
+    /// @brief Get the Time_Over_Baseline value for peak @p ipdx
+    inline uint16_t get_samples_over_baseline(int ipdx) const
+    { check_range_npeaks_(ipdx); return peaks[ipdx].samples_over_baseline; } //NOLINT
+
+    /// @brief Set the Time_Over_Baseline value for peak @p ipdx
+    inline void set_samples_over_baseline(uint16_t val, int ipdx)
+    { check_range_npeaks_(ipdx); peaks[ipdx].samples_over_baseline = val; } //NOLINT
+
+    /// @brief Get the Time_Start value for peak @p ipdx
+    inline uint16_t get_sample_start(int ipdx) const;
+
+    /// @brief Set the Time_Start value for peak @p ipdx
+    inline void set_sample_start(uint16_t val, int ipdx);
+
+    private:
+
+    /// @brief Throw std::out_of_range if @p ipdx is not in [0, s_max_peaks)
+    inline void check_range_npeaks_(int ipdx) const;
+  };
+  static_assert(sizeof(PeakDescriptorData) == PeakDescriptorData::s_expected_bytes);
 
   struct Header
   {
@@ -65,12 +163,8 @@ struct DAPHNEEthFrame
     word_t version : 4;
     word_t channel : 8;
 
-    word_t w1;
-    word_t w2;
-    word_t w3;
-    word_t w4;
-    word_t w5;
-    word_t w6;
+    PeakDescriptorData peaks_data;
+
   };
   static_assert(sizeof(Header) == Header::s_expected_bytes);
 
@@ -104,6 +198,12 @@ struct DAPHNEEthFrame
     return std::tuple(this->get_timestamp(), this->get_channel()) < std::tuple(other.get_timestamp(), other.get_channel());
   }
   
+  /// @brief Get const reference to the peak descriptor data
+  const PeakDescriptorData& get_peaks_data() const { return header.peaks_data; }
+
+  /// @brief Get mutable reference to the peak descriptor data
+  PeakDescriptorData& get_peaks_data() { return header.peaks_data; }
+
   detdataformats::DAQEthHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT
@@ -113,6 +213,44 @@ struct DAPHNEEthFrame
               "The DAPHNEEthFrame bitfield layout assumes little-endian architecture");
 
   static_assert(AdaptableFrameConcept<DAPHNEEthFrame>, "DAPHNEEthFrame does not satisfy the AdaptableFrameConcept");
+
+
+
+inline uint16_t
+DAPHNEEthFrame::PeakDescriptorData::get_sample_start(int ipdx) const
+{
+  check_range_npeaks_(ipdx);
+
+  if(ipdx==0)
+    return samples_start_0;
+  else if(ipdx==1)
+    return samples_start_1;
+  else if(ipdx==2)
+    return samples_start_2;
+  else if(ipdx==3)
+    return samples_start_3;
+  else //if(ipdx==4)
+    return samples_start_4;
+
+}
+
+inline void
+DAPHNEEthFrame::PeakDescriptorData::set_sample_start(uint16_t val, int ipdx)
+{
+  check_range_npeaks_(ipdx);
+
+  if(ipdx==0)
+    samples_start_0=val & 0x3FFu;
+  else if(ipdx==1)
+    samples_start_1=val & 0x3FFu;
+  else if(ipdx==2)
+    samples_start_2=val & 0x3FFu;
+  else if(ipdx==3)
+    samples_start_3=val & 0x3FFu;
+  else if(ipdx==4)
+    samples_start_4=val & 0x3FFu;
+  
+}
 
 } // namespace dunedaq::fddetdataformats
 

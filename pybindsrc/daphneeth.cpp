@@ -21,35 +21,65 @@ void
 register_daphneeth(py::module& m)
 {
 
+  py::class_<DAPHNEEthFrame::PeakDescriptor>(m, "DAPHNEEthFramePeakDescriptor")
+
+    .def_property(
+      "found",
+      [](DAPHNEEthFrame::PeakDescriptor& self) -> bool { return self.found; },
+      [](DAPHNEEthFrame::PeakDescriptor& self, bool found) { self.found = found; })
+    .def_property(
+      "num_subpeaks",
+      [](DAPHNEEthFrame::PeakDescriptor& self) -> uint16_t { return self.num_subpeaks; },
+      [](DAPHNEEthFrame::PeakDescriptor& self, uint16_t num_subpeaks) { self.num_subpeaks = num_subpeaks; })
+    .def_property(
+      "adc_integral",
+      [](DAPHNEEthFrame::PeakDescriptor& self) -> uint32_t { return self.adc_integral; },
+      [](DAPHNEEthFrame::PeakDescriptor& self, uint32_t adc_integral) { self.adc_integral = adc_integral; })
+    .def_property(
+      "adc_max",
+      [](DAPHNEEthFrame::PeakDescriptor& self) -> uint16_t { return self.adc_max; },
+      [](DAPHNEEthFrame::PeakDescriptor& self, uint16_t adc_max) { self.adc_max = adc_max; })
+    .def_property(
+      "sample_max",
+      [](DAPHNEEthFrame::PeakDescriptor& self) -> uint16_t { return self.sample_max; },
+      [](DAPHNEEthFrame::PeakDescriptor& self, uint16_t sample_max) { self.sample_max = sample_max; })
+    .def_property(
+      "samples_over_baseline",
+      [](DAPHNEEthFrame::PeakDescriptor& self) -> uint16_t { return self.samples_over_baseline; },
+      [](DAPHNEEthFrame::PeakDescriptor& self, uint16_t samples_over_baseline) { self.samples_over_baseline = samples_over_baseline; })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return DAPHNEEthFrame::PeakDescriptor::s_expected_bytes;
+    });
+
+  py::class_<DAPHNEEthFrame::PeakDescriptorData>(m, "DAPHNEEthFramePeakDescriptorData")
+
+    .def("is_found", &DAPHNEEthFrame::PeakDescriptorData::is_found)
+    .def("set_found", &DAPHNEEthFrame::PeakDescriptorData::set_found)
+
+    .def("get_adc_integral", &DAPHNEEthFrame::PeakDescriptorData::get_adc_integral)
+    .def("set_adc_integral", &DAPHNEEthFrame::PeakDescriptorData::set_adc_integral)
+
+    .def("get_num_subpeaks", &DAPHNEEthFrame::PeakDescriptorData::get_num_subpeaks)
+    .def("set_num_subpeaks", &DAPHNEEthFrame::PeakDescriptorData::set_num_subpeaks)
+
+    .def("get_samples_over_baseline", &DAPHNEEthFrame::PeakDescriptorData::get_samples_over_baseline)
+    .def("set_samples_over_baseline", &DAPHNEEthFrame::PeakDescriptorData::set_samples_over_baseline)
+
+    .def("get_adc_max", &DAPHNEEthFrame::PeakDescriptorData::get_adc_max)
+    .def("set_adc_max", &DAPHNEEthFrame::PeakDescriptorData::set_adc_max)
+
+    .def("get_sample_max", &DAPHNEEthFrame::PeakDescriptorData::get_sample_max)
+    .def("set_sample_max", &DAPHNEEthFrame::PeakDescriptorData::set_sample_max)
+
+    .def("get_sample_start", &DAPHNEEthFrame::PeakDescriptorData::get_sample_start)
+    .def("set_sample_start", &DAPHNEEthFrame::PeakDescriptorData::set_sample_start)
+    
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
+      return DAPHNEEthFrame::PeakDescriptorData::s_expected_bytes;
+    });
+
   py::class_<DAPHNEEthFrame::Header>(m, "DAPHNEEthHeader")
-    // .def_property("w0",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w0;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t w0) {self.w0 = w0;}
-    //   )
-    .def_property(
-      "w1",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w1; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w1) { self.w1 = w1; })
-    .def_property(
-      "w2",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w2; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w2) { self.w2 = w2; })
-    .def_property(
-      "w3",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w3; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w3) { self.w3 = w3; })
-    .def_property(
-      "w4",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w4; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w4) { self.w4 = w4; })
-    .def_property(
-      "w5",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w5; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w5) { self.w5 = w5; })
-    .def_property(
-      "w6",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w6; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w6) { self.w6 = w6; })
+ 
     .def_property(
       "channel",
       [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.channel; },
@@ -70,6 +100,10 @@ register_daphneeth(py::module& m)
       "baseline",
       [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.baseline; },
       [](DAPHNEEthFrame::Header& self, uint32_t baseline) { self.baseline = baseline; })
+    .def_property_readonly(
+      "peaks_data",
+      [](DAPHNEEthFrame::Header& self) -> DAPHNEEthFrame::PeakDescriptorData& { return self.peaks_data; },
+      py::return_value_policy::reference_internal)
     .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
       return DAPHNEEthFrame::Header::s_expected_bytes;
     });
@@ -111,6 +145,9 @@ register_daphneeth(py::module& m)
     .def("set_timestamp", &DAPHNEEthFrame::set_timestamp)
     .def("get_channel", &DAPHNEEthFrame::get_channel)
     .def("set_channel", &DAPHNEEthFrame::set_channel)
+    .def("get_peaks_data",
+       [](DAPHNEEthFrame& self) -> DAPHNEEthFrame::PeakDescriptorData& { return self.get_peaks_data(); },
+       py::return_value_policy::reference_internal)
     .def("__lt__", [](const DAPHNEEthFrame& lhs, const DAPHNEEthFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEEthFrame::version; })
     .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
@@ -122,6 +159,9 @@ register_daphneeth(py::module& m)
     .def_property_readonly_static("s_num_adcs", [](py::object /*self*/) { return DAPHNEEthFrame::s_num_adcs; })
     .def_property_readonly_static("s_num_adc_words", [](py::object /*self*/) {
       return DAPHNEEthFrame::s_num_adc_words;
+    })
+    .def_property_readonly_static("s_max_peaks", [](py::object /*self*/) {
+      return DAPHNEEthFrame::s_max_peaks;
     })
     .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
       return DAPHNEEthFrame::s_expected_bytes;

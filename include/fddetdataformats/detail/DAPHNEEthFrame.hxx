@@ -22,4 +22,13 @@ DAPHNEEthFrame::set_adc(int i, uint16_t val)
                                         DAPHNEEthFrame::s_bits_per_adc>(i, val, adc_words);
 }
 
+inline void
+DAPHNEEthFrame::PeakDescriptorData::check_range_npeaks_(int ipdx) const
+{
+  if (ipdx < 0 || ipdx >= DAPHNEEthFrame::s_max_peaks) {
+    throw std::out_of_range("Peak index out of range.");
+  }
+
+}
+
 } // namespace dunedaq::fddetdataformats
