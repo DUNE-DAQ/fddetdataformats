@@ -56,10 +56,9 @@ struct DAPHNEStreamFrame
   };
   static_assert(sizeof(Trailer) == 4);
 
-  static constexpr std::size_t s_expected_bytes { sizeof(detdataformats::DAQHeader) + sizeof(Header) +
-    sizeof(word_t) * s_num_adc_words +
-    sizeof(Trailer) };
-  
+  static constexpr std::size_t s_expected_bytes{ sizeof(detdataformats::DAQHeader) + sizeof(Header) +
+                                                 sizeof(word_t) * s_num_adc_words + sizeof(Trailer) };
+
   uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
   /// @brief Set the 64-bit timestamp of the frame
@@ -83,21 +82,18 @@ struct DAPHNEStreamFrame
 
   uint8_t get_channel3() const { return header.channel_3; }
 
-  bool operator<(const DAPHNEStreamFrame& other) const {
-    return this->get_timestamp() < other.get_timestamp();
-  }
-  
+  bool operator<(const DAPHNEStreamFrame& other) const { return this->get_timestamp() < other.get_timestamp(); }
+
   detdataformats::DAQHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT (a false accusation from the linter that s_num_adc_words is a variable)
   Trailer trailer;
-
 };
 
 static_assert(std::endian::native == std::endian::little,
               "The DAPHNEStreamFrame bitfield layout assumes little-endian architecture");
 
-  static_assert(AdaptableFrameConcept<DAPHNEStreamFrame>, "DAPHNEStreamFrame does not satisfy the AdaptableFrameConcept");
+static_assert(AdaptableFrameConcept<DAPHNEStreamFrame>, "DAPHNEStreamFrame does not satisfy the AdaptableFrameConcept");
 
 } // namespace dunedaq::fddetdataformats
 

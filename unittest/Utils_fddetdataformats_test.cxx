@@ -104,7 +104,8 @@ BOOST_AUTO_TEST_CASE(Utils_fddetdataformats_ADCOperation_BasicChecks)
   constexpr int nsamples = nrows;
   constexpr int nchannels = bits_per_word * ncols / bits_per_adc;
 
-  constexpr wordtype_t inputarr2[nsamples][nchannels] = { // NOLINT(modernize-avoid-c-arrays)
+  constexpr wordtype_t inputarr2[nsamples][nchannels] = {
+    // NOLINT(modernize-avoid-c-arrays)
     { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
     { 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48 }
   };

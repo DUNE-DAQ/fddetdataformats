@@ -16,7 +16,7 @@ namespace py = pybind11;
 namespace dunedaq::fddetdataformats::python {
 
 // NOLINTBEGIN(build/unsigned)
-  
+
 void
 register_tdeeth(py::module& m)
 {
@@ -41,9 +41,8 @@ register_tdeeth(py::module& m)
       "TAItime",
       [](TDEEthFrame::TDEEthHeader& self) -> uint64_t { return self.TAItime; },
       [](TDEEthFrame::TDEEthHeader& self, uint64_t TAItime) { self.TAItime = TAItime; })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return TDEEthFrame::TDEEthHeader::s_expected_bytes;
-    });
+    .def_property_readonly_static("s_expected_bytes",
+                                  [](py::object /*self*/) { return TDEEthFrame::TDEEthHeader::s_expected_bytes; });
 
   py::class_<TDEEthFrame>(m, "TDEEthFrame", py::buffer_protocol())
     .def(py::init())
@@ -79,30 +78,18 @@ register_tdeeth(py::module& m)
     .def("get_channel", &TDEEthFrame::get_channel)
     .def("set_channel", &TDEEthFrame::set_channel)
     .def("__lt__", [](const TDEEthFrame& lhs, const TDEEthFrame& rhs) { return lhs < rhs; })
-    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
-      return TDEEthFrame::s_bits_per_adc;
-    })
-    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) {
-      return TDEEthFrame::s_bits_per_word;
-    })
-    .def_property_readonly_static("s_time_samples_per_frame", [](py::object /*self*/) {
-      return TDEEthFrame::s_time_samples_per_frame;
-    })
-    .def_property_readonly_static("s_channels_per_half_femb", [](py::object /*self*/) {
-      return TDEEthFrame::s_channels_per_half_femb;
-    })
-    .def_property_readonly_static("s_half_fembs_per_frame", [](py::object /*self*/) {
-      return TDEEthFrame::s_half_fembs_per_frame;
-    })
-    .def_property_readonly_static("s_num_channels", [](py::object /*self*/) {
-      return TDEEthFrame::s_num_channels;
-    })
-    .def_property_readonly_static("s_num_adc_words_per_ts", [](py::object /*self*/) {
-      return TDEEthFrame::s_num_adc_words_per_ts;
-    })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return TDEEthFrame::s_expected_bytes;
-    })
+    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) { return TDEEthFrame::s_bits_per_adc; })
+    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) { return TDEEthFrame::s_bits_per_word; })
+    .def_property_readonly_static("s_time_samples_per_frame",
+                                  [](py::object /*self*/) { return TDEEthFrame::s_time_samples_per_frame; })
+    .def_property_readonly_static("s_channels_per_half_femb",
+                                  [](py::object /*self*/) { return TDEEthFrame::s_channels_per_half_femb; })
+    .def_property_readonly_static("s_half_fembs_per_frame",
+                                  [](py::object /*self*/) { return TDEEthFrame::s_half_fembs_per_frame; })
+    .def_property_readonly_static("s_num_channels", [](py::object /*self*/) { return TDEEthFrame::s_num_channels; })
+    .def_property_readonly_static("s_num_adc_words_per_ts",
+                                  [](py::object /*self*/) { return TDEEthFrame::s_num_adc_words_per_ts; })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) { return TDEEthFrame::s_expected_bytes; })
     .def_static("sizeof", []() { return sizeof(TDEEthFrame); })
     .def("get_bytes", [](TDEEthFrame* fr) -> py::bytes {
       return py::bytes(reinterpret_cast<char*>(fr), sizeof(TDEEthFrame)); // NOLINT reinterpret_cast

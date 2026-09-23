@@ -25,8 +25,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <limits>
-#include <tuple>
 #include <stdexcept> // For std::out_of_range
+#include <tuple>
 
 namespace dunedaq::fddetdataformats {
 
@@ -53,8 +53,8 @@ struct DAPHNEEthFrame
 
   struct Header
   {
-    static constexpr size_t s_expected_bytes { 7 * sizeof(word_t) };
-    
+    static constexpr size_t s_expected_bytes{ 7 * sizeof(word_t) };
+
     // The following bitfields constitute what could be considered "word_t w0;"
     word_t trigger_sample_value : 14;
     word_t rsv_0 : 2;
@@ -74,8 +74,9 @@ struct DAPHNEEthFrame
   };
   static_assert(sizeof(Header) == Header::s_expected_bytes);
 
-  static constexpr size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + Header::s_expected_bytes + s_num_adc_words * sizeof(word_t);
-  
+  static constexpr size_t s_expected_bytes =
+    sizeof(detdataformats::DAQEthHeader) + Header::s_expected_bytes + s_num_adc_words * sizeof(word_t);
+
   /**
    * @brief Get the ith ADC value in the frame
    *
@@ -100,19 +101,21 @@ struct DAPHNEEthFrame
   /// @brief Set the channel identifier of the frame
   void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
 
-  bool operator<(const DAPHNEEthFrame& other) const {
-    return std::tuple(this->get_timestamp(), this->get_channel()) < std::tuple(other.get_timestamp(), other.get_channel());
+  bool operator<(const DAPHNEEthFrame& other) const
+  {
+    return std::tuple(this->get_timestamp(), this->get_channel()) <
+           std::tuple(other.get_timestamp(), other.get_channel());
   }
-  
+
   detdataformats::DAQEthHeader daq_header;
   Header header;
   word_t adc_words[s_num_adc_words]; // NOLINT
 };
 
-  static_assert(std::endian::native == std::endian::little,
+static_assert(std::endian::native == std::endian::little,
               "The DAPHNEEthFrame bitfield layout assumes little-endian architecture");
 
-  static_assert(AdaptableFrameConcept<DAPHNEEthFrame>, "DAPHNEEthFrame does not satisfy the AdaptableFrameConcept");
+static_assert(AdaptableFrameConcept<DAPHNEEthFrame>, "DAPHNEEthFrame does not satisfy the AdaptableFrameConcept");
 
 } // namespace dunedaq::fddetdataformats
 

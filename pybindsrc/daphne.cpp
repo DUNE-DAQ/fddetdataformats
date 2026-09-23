@@ -48,7 +48,8 @@ register_daphne(py::module& m)
       "header",
       [](DAPHNEFrame& self) -> DAPHNEFrame::Header& { return self.header; },
       py::return_value_policy::reference_internal)
-    .def("peaks_data",
+    .def(
+      "peaks_data",
       [](DAPHNEFrame& self) -> DAPHNEFrame::PeakDescriptorData& { return self.peaks_data; },
       py::return_value_policy::reference_internal)
     .def("get_adc", static_cast<uint16_t (DAPHNEFrame::*)(const int) const>(&DAPHNEFrame::get_adc))
@@ -59,19 +60,11 @@ register_daphne(py::module& m)
     .def("set_channel", &DAPHNEFrame::set_channel)
     .def("__lt__", [](const DAPHNEFrame& lhs, const DAPHNEFrame& rhs) { return lhs < rhs; })
     .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEFrame::version; })
-    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
-      return DAPHNEFrame::s_bits_per_adc;
-    })
-    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) {
-      return DAPHNEFrame::s_bits_per_word;
-    })
+    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) { return DAPHNEFrame::s_bits_per_adc; })
+    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) { return DAPHNEFrame::s_bits_per_word; })
     .def_property_readonly_static("s_num_adcs", [](py::object /*self*/) { return DAPHNEFrame::s_num_adcs; })
-    .def_property_readonly_static("s_num_adc_words", [](py::object /*self*/) {
-      return DAPHNEFrame::s_num_adc_words;
-    })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return DAPHNEFrame::s_expected_bytes;
-    })
+    .def_property_readonly_static("s_num_adc_words", [](py::object /*self*/) { return DAPHNEFrame::s_num_adc_words; })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) { return DAPHNEFrame::s_expected_bytes; })
     .def_static("sizeof", []() { return sizeof(DAPHNEFrame); })
     .def("get_bytes", [](DAPHNEFrame* fr) -> py::bytes {
       return py::bytes(reinterpret_cast<char*>(fr), sizeof(DAPHNEFrame)); // NOLINT
@@ -102,17 +95,13 @@ register_daphne(py::module& m)
       "baseline",
       [](DAPHNEFrame::Header& self) -> uint16_t { return self.baseline; },
       [](DAPHNEFrame::Header& self, uint16_t baseline) { self.baseline = baseline; })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return sizeof(DAPHNEFrame::Header);
-    });
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) { return sizeof(DAPHNEFrame::Header); });
 
   py::class_<DAPHNEFrame::PeakDescriptorData>(m, "DAPHNEFramePeakDescriptorData")
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return DAPHNEFrame::PeakDescriptorData::s_expected_bytes;
-    })
-    .def_property_readonly_static("max_peaks", [](py::object /*self*/) {
-      return DAPHNEFrame::PeakDescriptorData::max_peaks;
-    })
+    .def_property_readonly_static("s_expected_bytes",
+                                  [](py::object /*self*/) { return DAPHNEFrame::PeakDescriptorData::s_expected_bytes; })
+    .def_property_readonly_static("max_peaks",
+                                  [](py::object /*self*/) { return DAPHNEFrame::PeakDescriptorData::max_peaks; })
     .def("is_found", &DAPHNEFrame::PeakDescriptorData::is_found)
     .def("set_found", &DAPHNEFrame::PeakDescriptorData::set_found)
 

@@ -48,8 +48,6 @@ BOOST_AUTO_TEST_CASE(DAPHNEFrame_AllFieldsTest)
 
   for (int i = 0; i < n_adcs; ++i)
     BOOST_CHECK_EQUAL(frame.get_adc(i), adcs[i]);
-
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

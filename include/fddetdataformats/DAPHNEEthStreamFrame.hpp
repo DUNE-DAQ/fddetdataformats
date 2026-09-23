@@ -67,8 +67,8 @@ struct DAPHNEEthStreamFrame
   };
   static_assert(sizeof(Header) == sizeof(ChannelWord) * s_num_channels);
 
-  static constexpr std::size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + sizeof(Header) +
-    sizeof(word_t) * s_num_adc_words;
+  static constexpr std::size_t s_expected_bytes =
+    sizeof(detdataformats::DAQEthHeader) + sizeof(Header) + sizeof(word_t) * s_num_adc_words;
 
   /// @brief Get the @p i_adc-th ADC value of @p i_channel-th channel in the frame
   uint16_t get_adc(int i_adc, int i_channel) const;
@@ -100,9 +100,7 @@ struct DAPHNEEthStreamFrame
   /// @brief Get the channel 3 from the DAPHNE Stream frame header
   uint8_t get_channel3() const { return header.channel_words[3].channel; }
 
-  bool operator<(const DAPHNEEthStreamFrame& other) const {
-    return this->get_timestamp() < other.get_timestamp();
-  }
+  bool operator<(const DAPHNEEthStreamFrame& other) const { return this->get_timestamp() < other.get_timestamp(); }
 
   detdataformats::DAQEthHeader daq_header;
   Header header;
@@ -112,8 +110,9 @@ struct DAPHNEEthStreamFrame
 static_assert(std::endian::native == std::endian::little,
               "The DAPHNEEthStreamFrame bitfield layout assumes little-endian architecture");
 
-  static_assert(AdaptableFrameConcept<DAPHNEEthStreamFrame>, "DAPHNEEthStreamFrame does not satisfy the AdaptableFrameConcept");
-  
+static_assert(AdaptableFrameConcept<DAPHNEEthStreamFrame>,
+              "DAPHNEEthStreamFrame does not satisfy the AdaptableFrameConcept");
+
 } // namespace dunedaq::fddetdataformats
 
 #include "detail/DAPHNEEthStreamFrame.hxx"
