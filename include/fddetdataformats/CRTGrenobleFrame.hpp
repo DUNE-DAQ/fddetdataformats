@@ -43,7 +43,7 @@ struct CRTGrenobleFrame
   struct TGpsDateStruct
   {
     // "/ 8" below -> 8 bits to a byte
-    static constexpr int s_expected_size { (8 + 8 + 8 + 8 + 16 + 12 + 3 + 1) / 8 }; 
+    static constexpr int s_expected_size{ (8 + 8 + 8 + 8 + 16 + 12 + 3 + 1) / 8 };
 
     uint32_t seconds : 8;
     uint32_t minutes : 8;
@@ -59,11 +59,12 @@ struct CRTGrenobleFrame
 
   struct STChannel
   {
-    static constexpr int s_expected_size { sizeof(int) + sizeof(uint16_t) + sizeof(float) + sizeof(uint16_t) }; // NOLINT(runtime/int,google-runtime-int)
+    static constexpr int s_expected_size{ sizeof(int) + sizeof(uint16_t) + sizeof(float) +
+                                          sizeof(uint16_t) }; // NOLINT(runtime/int,google-runtime-int)
 
-    int qTot = 0;            ///< Total charge.
+    int qTot = 0;      ///< Total charge.
     uint16_t n_zc = 0; ///< CFD time.
-    float cfd = 0.;          ///< CFD value
+    float cfd = 0.;    ///< CFD value
     uint16_t flag = 0; ///< Flag containing trigger, trigger sum and overflow information.
   };
 
@@ -72,12 +73,13 @@ struct CRTGrenobleFrame
 
   struct STEvent
   {
-    static constexpr int s_expected_size { 3 * sizeof(uint32_t) + TGpsDateStruct::s_expected_size + 2 * sizeof(uint32_t) + STChannel::s_expected_size * s_num_channels };
-    
+    static constexpr int s_expected_size{ 3 * sizeof(uint32_t) + TGpsDateStruct::s_expected_size +
+                                          2 * sizeof(uint32_t) + STChannel::s_expected_size * s_num_channels };
+
     uint32_t eventID = 0;      ///< Event ID.
     uint32_t dateInSec = 0;    ///< Event date in seconds.
     uint32_t timestamp = 0;    ///< Timestamp (4 ns) -> used to compute dt between events.
-    TGpsDateStruct gpsDate;        ///< TGPS date
+    TGpsDateStruct gpsDate;    ///< TGPS date
     uint32_t pps_interval = 0; ///< IRIG-B subdivision in a second, expressed in 100 ns clock ticks.
     uint32_t FIFO_AF_duration =
       0; ///< FIFO AF duration (4 ns) -> integration of Almost full fifo since last accepted trigger
@@ -87,8 +89,9 @@ struct CRTGrenobleFrame
 #warning "CRTGrenobleFrame::STEvent has padding inserted"
   // static_assert(sizeof(STEvent) == STEvent::s_expected_size);
 
-  static constexpr std::size_t s_expected_bytes { sizeof(detdataformats::DAQEthHeader) + CRTGrenobleFrame::STEvent::s_expected_size };
-  
+  static constexpr std::size_t s_expected_bytes{ sizeof(detdataformats::DAQEthHeader) +
+                                                 CRTGrenobleFrame::STEvent::s_expected_size };
+
   /// @brief Get the adc value for channel i_ch
   int get_adc(const int i_ch) const
   {
@@ -115,7 +118,7 @@ struct CRTGrenobleFrame
 
   detdataformats::DAQEthHeader daq_header; // Formally private, but has a non-const accessor
   STEvent event;
-  
+
 }; // CRTGrenobleFrame
 #warning "CRTGrenobleFrame has padding inserted"
 // static_assert(sizeof(CRTGrenobleFrame) == CRTGrenobleFrame::s_expected_size);

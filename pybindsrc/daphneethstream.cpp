@@ -34,9 +34,8 @@ register_daphneethstream(py::module& m)
       "channel",
       [](DAPHNEEthStreamFrame::ChannelWord& self) -> uint64_t { return self.channel; },
       [](DAPHNEEthStreamFrame::ChannelWord& self, uint64_t channel) { self.channel = channel; })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return sizeof(DAPHNEEthStreamFrame::ChannelWord);
-    });
+    .def_property_readonly_static("s_expected_bytes",
+                                  [](py::object /*self*/) { return sizeof(DAPHNEEthStreamFrame::ChannelWord); });
 
   py::class_<DAPHNEEthStreamFrame::Header>(m, "DAPHNEEthStreamHeader")
     .def_property(
@@ -53,9 +52,8 @@ register_daphneethstream(py::module& m)
           self.channel_words[i] = channel_words[i].cast<DAPHNEEthStreamFrame::ChannelWord>();
         }
       })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return sizeof(DAPHNEEthStreamFrame::Header);
-    });
+    .def_property_readonly_static("s_expected_bytes",
+                                  [](py::object /*self*/) { return sizeof(DAPHNEEthStreamFrame::Header); });
 
   py::class_<DAPHNEEthStreamFrame>(m, "DAPHNEEthStreamFrame", py::buffer_protocol())
     .def(py::init())
@@ -96,24 +94,18 @@ register_daphneethstream(py::module& m)
     .def("get_channel", &DAPHNEEthStreamFrame::get_channel)
     .def("set_channel", &DAPHNEEthStreamFrame::set_channel)
     .def_property_readonly_static("version", [](py::object /*self*/) { return DAPHNEEthStreamFrame::version; })
-    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
-      return DAPHNEEthStreamFrame::s_bits_per_adc;
-    })
-    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) {
-      return DAPHNEEthStreamFrame::s_bits_per_word;
-    })
-    .def_property_readonly_static("s_adcs_per_channel", [](py::object /*self*/) {
-      return DAPHNEEthStreamFrame::s_adcs_per_channel;
-    })
-    .def_property_readonly_static("s_num_channels", [](py::object /*self*/) {
-      return DAPHNEEthStreamFrame::s_num_channels;
-    })
-    .def_property_readonly_static("s_num_adc_words", [](py::object /*self*/) {
-      return DAPHNEEthStreamFrame::s_num_adc_words;
-    })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return DAPHNEEthStreamFrame::s_expected_bytes;
-    })
+    .def_property_readonly_static("s_bits_per_adc",
+                                  [](py::object /*self*/) { return DAPHNEEthStreamFrame::s_bits_per_adc; })
+    .def_property_readonly_static("s_bits_per_word",
+                                  [](py::object /*self*/) { return DAPHNEEthStreamFrame::s_bits_per_word; })
+    .def_property_readonly_static("s_adcs_per_channel",
+                                  [](py::object /*self*/) { return DAPHNEEthStreamFrame::s_adcs_per_channel; })
+    .def_property_readonly_static("s_num_channels",
+                                  [](py::object /*self*/) { return DAPHNEEthStreamFrame::s_num_channels; })
+    .def_property_readonly_static("s_num_adc_words",
+                                  [](py::object /*self*/) { return DAPHNEEthStreamFrame::s_num_adc_words; })
+    .def_property_readonly_static("s_expected_bytes",
+                                  [](py::object /*self*/) { return DAPHNEEthStreamFrame::s_expected_bytes; })
     .def("get_channel0", &DAPHNEEthStreamFrame::get_channel0)
     .def("get_channel1", &DAPHNEEthStreamFrame::get_channel1)
     .def("get_channel2", &DAPHNEEthStreamFrame::get_channel2)

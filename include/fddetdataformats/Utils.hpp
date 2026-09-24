@@ -13,8 +13,8 @@
 #ifndef FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_UTILS_HPP_
 #define FDDETDATAFORMATS_INCLUDE_FDDETDATAFORMATS_UTILS_HPP_
 
-#include "detdataformats/DAQHeader.hpp"
 #include "detdataformats/DAQEthHeader.hpp"
+#include "detdataformats/DAQHeader.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -38,7 +38,9 @@ namespace dunedaq::fddetdataformats {
 
 template<typename WordType, int NWords, int BitsPerADC, int ADCSPerChannel, int NChannels>
 WordType
-get_adc_2d_as_1d(const int i_adc, const int i_channel, const WordType (&adc_matrix)[NWords])  // NOLINT(modernize-avoid-c-arrays)
+get_adc_2d_as_1d(const int i_adc,
+                 const int i_channel,
+                 const WordType (&adc_matrix)[NWords]) // NOLINT(modernize-avoid-c-arrays)
 {
 
   static_assert(std::is_integral_v<WordType> && std::is_unsigned_v<WordType>,
@@ -92,8 +94,11 @@ get_adc_2d_as_1d(const int i_adc, const int i_channel, const WordType (&adc_matr
 
 template<typename WordType, int NWords, int BitsPerADC, int ADCSPerChannel, int NChannels>
 void
-set_adc_2d_as_1d(const int i_adc, const int i_channel, const WordType adc_val, WordType (&adc_matrix)[NWords]) // NOLINT(modernize-avoid-c-arrays)
-{ 
+set_adc_2d_as_1d(const int i_adc,
+                 const int i_channel,
+                 const WordType adc_val,
+                 WordType (&adc_matrix)[NWords]) // NOLINT(modernize-avoid-c-arrays)
+{
   static_assert(std::is_integral_v<WordType> && std::is_unsigned_v<WordType>,
                 "WordType must be an unsigned integral type");
 
@@ -177,8 +182,10 @@ get_adc_1d(const int i_adc, const WordType (&adc_array)[NWords]) // NOLINT(moder
 
 template<typename WordType, int Rows, int Columns, int BitsPerADC>
 WordType
-get_adc_2d(const int i_sample, const int i_adc, const WordType (&adc_matrix)[Rows][Columns]) // NOLINT(modernize-avoid-c-arrays)
-{ 
+get_adc_2d(const int i_sample,
+           const int i_adc,
+           const WordType (&adc_matrix)[Rows][Columns]) // NOLINT(modernize-avoid-c-arrays)
+{
 
   if (i_sample < 0 || i_sample >= Rows) {
     throw std::out_of_range(
@@ -194,7 +201,7 @@ get_adc_2d(const int i_sample, const int i_adc, const WordType (&adc_matrix)[Row
 template<typename WordType, int NWords, int BitsPerADC>
 void
 set_adc_1d(const int i_adc, WordType adc_val, WordType (&adc_array)[NWords]) // NOLINT(modernize-avoid-c-arrays)
-{ 
+{
   static_assert(std::is_integral_v<WordType> && std::is_unsigned_v<WordType>,
                 "WordType must be an unsigned integral type");
 
@@ -214,7 +221,10 @@ set_adc_1d(const int i_adc, WordType adc_val, WordType (&adc_array)[NWords]) // 
 
 template<typename WordType, int Rows, int Columns, int BitsPerADC>
 void
-set_adc_2d(const int i_sample, const int i_adc, WordType adc_val, WordType (&adc_matrix)[Rows][Columns])  // NOLINT(modernize-avoid-c-arrays)
+set_adc_2d(const int i_sample,
+           const int i_adc,
+           WordType adc_val,
+           WordType (&adc_matrix)[Rows][Columns]) // NOLINT(modernize-avoid-c-arrays)
 {
   if (i_sample < 0 || i_sample >= Rows) {
     throw std::out_of_range(

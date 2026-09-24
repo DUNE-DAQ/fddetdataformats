@@ -45,7 +45,7 @@ struct CRTBernFrame
 
   struct CRTBernData
   {
-    static constexpr std::size_t s_expected_bytes { 2 + 2 + 2 + 4 + 4 + 2 * s_num_channels + 4 };
+    static constexpr std::size_t s_expected_bytes{ 2 + 2 + 2 + 4 + 4 + 2 * s_num_channels + 4 };
 
     uint16_t flags = 0;
     uint16_t lostcpu = 0;
@@ -55,12 +55,12 @@ struct CRTBernFrame
     uint16_t adc[s_num_channels] = { 0 }; // NOLINT
     uint32_t coinc = 0;
   };
-  #warning "CRTBernData has padding inserted"
-  //static_assert(sizeof(CRTBernData) == CRTBernData::s_expected_bytes);
+#warning "CRTBernData has padding inserted"
+  // static_assert(sizeof(CRTBernData) == CRTBernData::s_expected_bytes);
 
-  static constexpr std::size_t s_expected_bytes { sizeof(detdataformats::DAQEthHeader) + sizeof(uint16_t) +
-    CRTBernData::s_expected_bytes};
-  
+  static constexpr std::size_t s_expected_bytes{ sizeof(detdataformats::DAQEthHeader) + sizeof(uint16_t) +
+                                                 CRTBernData::s_expected_bytes };
+
   /// @brief Get the adc value for channel i_ch
   uint16_t get_adc(int i_ch) const
   {
@@ -128,16 +128,16 @@ struct CRTBernFrame
   CRTBernData data;
 
 }; // CRTBernFrame
-  #warning "CRTBernFrame has padding inserted"
-  // static_assert(sizeof(CRTBernFrame) == CRTBernFrame::s_expected_bytes)
+#warning "CRTBernFrame has padding inserted"
+   // static_assert(sizeof(CRTBernFrame) == CRTBernFrame::s_expected_bytes)
 
-  static_assert(std::endian::native == std::endian::little,
-		"The CRTBernFrame bitfield layout assumes little-endian architecture");
-  static_assert(std::is_trivially_copyable_v<CRTBernFrame>,
-		"CRTBernFrame isn't trivially copyable and can't be safely std::memcpy'd");
-  static_assert(std::is_standard_layout_v<CRTBernFrame>,
-		"CRTBernFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
-  
+static_assert(std::endian::native == std::endian::little,
+              "The CRTBernFrame bitfield layout assumes little-endian architecture");
+static_assert(std::is_trivially_copyable_v<CRTBernFrame>,
+              "CRTBernFrame isn't trivially copyable and can't be safely std::memcpy'd");
+static_assert(std::is_standard_layout_v<CRTBernFrame>,
+              "CRTBernFrame isn't standard layout; reinterpret_cast and offsetof can't safely be used with it");
+
 } // namespace dunedaq::fddetdataformats
 
 // NOLINTEND(build/unsigned)

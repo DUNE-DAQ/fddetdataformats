@@ -53,7 +53,7 @@ struct DAPHNEFrame
 
   struct PeakDescriptorData
   {
-    static constexpr std::size_t s_expected_bytes { 13 * sizeof(uint32_t) };
+    static constexpr std::size_t s_expected_bytes{ 13 * sizeof(uint32_t) };
 
     // Word 1: peak 0 odd
     // Declared in reverse order (LSB first) so that:
@@ -240,9 +240,10 @@ struct DAPHNEFrame
   };
   static_assert(sizeof(PeakDescriptorData) == PeakDescriptorData::s_expected_bytes);
 
-  static constexpr std::size_t s_expected_bytes { sizeof(detdataformats::DAQHeader) + sizeof(Header) +
-    s_num_adc_words * sizeof(word_t) + PeakDescriptorData::s_expected_bytes };
-  
+  static constexpr std::size_t s_expected_bytes{ sizeof(detdataformats::DAQHeader) + sizeof(Header) +
+                                                 s_num_adc_words * sizeof(word_t) +
+                                                 PeakDescriptorData::s_expected_bytes };
+
   /**
    * @brief Get the ith ADC value in the frame
    *
@@ -261,12 +262,14 @@ struct DAPHNEFrame
   /// @brief Get the 64-bit timestamp of the frame
   uint64_t get_timestamp() const { return daq_header.get_timestamp(); }
 
-  void set_timestamp(uint64_t ts) {
+  void set_timestamp(uint64_t ts)
+  {
     daq_header.timestamp_1 = ts;
     daq_header.timestamp_2 = ts >> 32;
   }
-  
-  bool operator<(const DAPHNEFrame& other) const {
+
+  bool operator<(const DAPHNEFrame& other) const
+  {
 
     if (this->get_timestamp() != other.get_timestamp()) {
       return this->get_timestamp() < other.get_timestamp();
@@ -284,8 +287,8 @@ struct DAPHNEFrame
 static_assert(std::endian::native == std::endian::little,
               "The DAPHNEFrame bitfield layout assumes little-endian architecture");
 
-  static_assert(AdaptableFrameConcept<DAPHNEFrame>, "DAPHNEFrame does not satisfy the AdaptableFrameConcept");
-  
+static_assert(AdaptableFrameConcept<DAPHNEFrame>, "DAPHNEFrame does not satisfy the AdaptableFrameConcept");
+
 } // namespace dunedaq::fddetdataformats
 
 #include "detail/DAPHNEFrame.hxx"
