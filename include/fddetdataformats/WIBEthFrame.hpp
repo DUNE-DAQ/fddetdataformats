@@ -52,8 +52,8 @@ struct WIBEthFrame
 
   struct WIBEthHeader
   {
-    static constexpr std::size_t s_expected_bytes {8 + 8}; // 8 bytes for the bitfield section, 8 for the extra_data
-      
+    static constexpr std::size_t s_expected_bytes{ 8 + 8 }; // 8 bytes for the bitfield section, 8 for the extra_data
+
     word_t colddata_timestamp_0 : 15;
     word_t pad_0 : 1;
     word_t colddata_timestamp_1 : 15;
@@ -74,9 +74,8 @@ struct WIBEthFrame
   };
   static_assert(sizeof(WIBEthHeader) == WIBEthHeader::s_expected_bytes);
 
-  static constexpr size_t s_expected_bytes { sizeof(detdataformats::DAQEthHeader) +
-    WIBEthHeader::s_expected_bytes +
-    s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t) };
+  static constexpr size_t s_expected_bytes{ sizeof(detdataformats::DAQEthHeader) + WIBEthHeader::s_expected_bytes +
+                                            s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t) };
 
   /**
    * @brief Get the i_channel-th ADC value in the i_sample-th time sample
@@ -102,21 +101,18 @@ struct WIBEthFrame
   /// @brief Set the channel identifier of the frame
   void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
 
-  bool operator<(const WIBEthFrame& other) const {
-    return this->get_timestamp() < other.get_timestamp();
-  }
+  bool operator<(const WIBEthFrame& other) const { return this->get_timestamp() < other.get_timestamp(); }
 
   detdataformats::DAQEthHeader daq_header;
   WIBEthHeader header;
   word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
-
 };
 
 static_assert(std::endian::native == std::endian::little,
               "The WIBEthFrame bitfield layout assumes little-endian architecture");
 
-  static_assert(AdaptableFrameConcept<WIBEthFrame>, "WIBEthFrame does not satisfy the AdaptableFrameConcept");
-  
+static_assert(AdaptableFrameConcept<WIBEthFrame>, "WIBEthFrame does not satisfy the AdaptableFrameConcept");
+
 } // namespace dunedaq::fddetdataformats
 
 #include "detail/WIBEthFrame.hxx"

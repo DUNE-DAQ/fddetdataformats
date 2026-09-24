@@ -21,7 +21,7 @@ DAPHNEEthStreamFrame::set_channel(const int i_channel, const uint8_t new_channel
   }
 
   header.channel_words[i_channel].channel = // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-    new_channel_val; 
+    new_channel_val;
 }
 
 inline uint16_t
@@ -35,7 +35,7 @@ DAPHNEEthStreamFrame::get_adc(int i_adc, int i_channel) const
 
 inline void
 DAPHNEEthStreamFrame::set_adc(int i_adc, int i_channel, uint16_t val)
-{ 
+{
   dunedaq::fddetdataformats::
     set_adc_2d_as_1d<word_t, s_num_adc_words, s_bits_per_adc, s_adcs_per_channel, s_num_channels>(
       i_adc, i_channel, val, adc_words);

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(fddetdataformats VERSION 3.0.0)
+project(fddetdataformats VERSION 3.0.1)
 
 find_package(daq-cmake REQUIRED)
 
@@ -14,15 +14,15 @@ find_package(logging REQUIRED)
 
 ##############################################################################
 
-daq_add_library( LINK_LIBRARIES detdataformats::detdataformats) 
+daq_add_library( LINK_LIBRARIES detdataformats::detdataformats)
 
 ##############################################################################
 
-daq_add_python_bindings(*.cpp ) 
+daq_add_python_bindings(*.cpp )
 
 ##############################################################################
 
-daq_add_unit_test(WIBEthFrame_test LINK_LIBRARIES fddetdataformats logging::logging) 
+daq_add_unit_test(WIBEthFrame_test LINK_LIBRARIES fddetdataformats logging::logging)
 daq_add_unit_test(TDEEthFrame_test LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(DAPHNEFrame_test LINK_LIBRARIES fddetdataformats)
 daq_add_unit_test(DAPHNEStreamFrame_test LINK_LIBRARIES fddetdataformats)

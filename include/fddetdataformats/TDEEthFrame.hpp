@@ -53,7 +53,7 @@ struct TDEEthFrame
 
   struct TDEEthHeader
   {
-    static constexpr size_t s_expected_bytes { 8 + 8 }; // bitfields + TAItime
+    static constexpr size_t s_expected_bytes{ 8 + 8 }; // bitfields + TAItime
 
     uint64_t reserved : 26;
     uint64_t tde_errors : 16;
@@ -64,9 +64,9 @@ struct TDEEthFrame
   };
   static_assert(sizeof(TDEEthHeader) == TDEEthHeader::s_expected_bytes);
 
-  static constexpr size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + TDEEthHeader::s_expected_bytes + s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t);
+  static constexpr size_t s_expected_bytes = sizeof(detdataformats::DAQEthHeader) + TDEEthHeader::s_expected_bytes +
+                                             s_time_samples_per_frame * s_num_adc_words_per_ts * sizeof(word_t);
 
-  
   /**
    * @brief Get the i_channel-th ADC value in the i_sample-th time sample
    *
@@ -91,19 +91,17 @@ struct TDEEthFrame
   /// @brief Set the channel identifier of the frame
   void set_channel(const uint8_t new_channel) { header.channel = new_channel; }
 
-  bool operator<(const TDEEthFrame& other) const {
-    return this->get_timestamp() < other.get_timestamp();
-  }
-  
+  bool operator<(const TDEEthFrame& other) const { return this->get_timestamp() < other.get_timestamp(); }
+
   detdataformats::DAQEthHeader daq_header;
   TDEEthHeader header;
   word_t adc_words[s_time_samples_per_frame][s_num_adc_words_per_ts]; // NOLINT
 };
 
-  static_assert(std::endian::native == std::endian::little,
+static_assert(std::endian::native == std::endian::little,
               "The TDEEthFrame bitfield layout assumes little-endian architecture");
 
-  static_assert(AdaptableFrameConcept<TDEEthFrame>, "TDEEthFrame does not satisfy the AdaptableFrameConcept");
+static_assert(AdaptableFrameConcept<TDEEthFrame>, "TDEEthFrame does not satisfy the AdaptableFrameConcept");
 
 } // namespace dunedaq::fddetdataformats
 

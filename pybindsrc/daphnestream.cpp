@@ -38,9 +38,8 @@ register_daphnestream(py::module& m)
       "channel_3",
       [](DAPHNEStreamFrame::Header& self) -> uint32_t { return self.channel_3; },
       [](DAPHNEStreamFrame::Header& self, uint32_t channel_3) { self.channel_3 = channel_3; })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return sizeof(DAPHNEStreamFrame::Header);
-    });
+    .def_property_readonly_static("s_expected_bytes",
+                                  [](py::object /*self*/) { return sizeof(DAPHNEStreamFrame::Header); });
 
   py::class_<DAPHNEStreamFrame>(m, "DAPHNEStreamFrame", py::buffer_protocol())
     .def(py::init())
@@ -66,27 +65,20 @@ register_daphnestream(py::module& m)
     .def("get_adc", &DAPHNEStreamFrame::get_adc)
     .def("set_adc", &DAPHNEStreamFrame::set_adc)
     .def("__lt__", [](const DAPHNEStreamFrame& lhs, const DAPHNEStreamFrame& rhs) { return lhs < rhs; })
-    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
-      return DAPHNEStreamFrame::s_bits_per_adc;
-    })
-    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) {
-      return DAPHNEStreamFrame::s_bits_per_word;
-    })
-    .def_property_readonly_static("s_channels_per_frame", [](py::object /*self*/) {
-      return DAPHNEStreamFrame::s_channels_per_frame;
-    })
-    .def_property_readonly_static("s_adcs_per_channel", [](py::object /*self*/) {
-      return DAPHNEStreamFrame::s_adcs_per_channel;
-    })
-    .def_property_readonly_static("s_daphnes_per_frame", [](py::object /*self*/) {
-      return DAPHNEStreamFrame::s_daphnes_per_frame;
-    })
-    .def_property_readonly_static("s_num_adc_words", [](py::object /*self*/) {
-      return DAPHNEStreamFrame::s_num_adc_words;
-    })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return DAPHNEStreamFrame::s_expected_bytes;
-    })
+    .def_property_readonly_static("s_bits_per_adc",
+                                  [](py::object /*self*/) { return DAPHNEStreamFrame::s_bits_per_adc; })
+    .def_property_readonly_static("s_bits_per_word",
+                                  [](py::object /*self*/) { return DAPHNEStreamFrame::s_bits_per_word; })
+    .def_property_readonly_static("s_channels_per_frame",
+                                  [](py::object /*self*/) { return DAPHNEStreamFrame::s_channels_per_frame; })
+    .def_property_readonly_static("s_adcs_per_channel",
+                                  [](py::object /*self*/) { return DAPHNEStreamFrame::s_adcs_per_channel; })
+    .def_property_readonly_static("s_daphnes_per_frame",
+                                  [](py::object /*self*/) { return DAPHNEStreamFrame::s_daphnes_per_frame; })
+    .def_property_readonly_static("s_num_adc_words",
+                                  [](py::object /*self*/) { return DAPHNEStreamFrame::s_num_adc_words; })
+    .def_property_readonly_static("s_expected_bytes",
+                                  [](py::object /*self*/) { return DAPHNEStreamFrame::s_expected_bytes; })
     .def("get_channel0", &DAPHNEStreamFrame::get_channel0)
     .def("get_channel1", &DAPHNEStreamFrame::get_channel1)
     .def("get_channel2", &DAPHNEStreamFrame::get_channel2)

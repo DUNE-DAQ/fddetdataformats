@@ -86,9 +86,8 @@ register_wibeth(py::module& m)
       "extra_data",
       [](WIBEthFrame::WIBEthHeader& self) -> uint64_t { return self.extra_data; },
       [](WIBEthFrame::WIBEthHeader& self, uint64_t extra_data) { self.extra_data = extra_data; })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return WIBEthFrame::WIBEthHeader::s_expected_bytes;
-    });
+    .def_property_readonly_static("s_expected_bytes",
+                                  [](py::object /*self*/) { return WIBEthFrame::WIBEthHeader::s_expected_bytes; });
 
   py::class_<WIBEthFrame>(m, "WIBEthFrame", py::buffer_protocol())
     .def(py::init())
@@ -124,30 +123,18 @@ register_wibeth(py::module& m)
     .def("get_channel", &WIBEthFrame::get_channel)
     .def("set_channel", &WIBEthFrame::set_channel)
     .def("__lt__", [](const WIBEthFrame& lhs, const WIBEthFrame& rhs) { return lhs < rhs; })
-    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) {
-      return WIBEthFrame::s_bits_per_adc;
-    })
-    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) {
-      return WIBEthFrame::s_bits_per_word;
-    })
-    .def_property_readonly_static("s_time_samples_per_frame", [](py::object /*self*/) {
-      return WIBEthFrame::s_time_samples_per_frame;
-    })
-    .def_property_readonly_static("s_channels_per_half_femb", [](py::object /*self*/) {
-      return WIBEthFrame::s_channels_per_half_femb;
-    })
-    .def_property_readonly_static("s_half_fembs_per_frame", [](py::object /*self*/) {
-      return WIBEthFrame::s_half_fembs_per_frame;
-    })
-    .def_property_readonly_static("s_num_channels", [](py::object /*self*/) {
-      return WIBEthFrame::s_num_channels;
-    })
-    .def_property_readonly_static("s_num_adc_words_per_ts", [](py::object /*self*/) {
-      return WIBEthFrame::s_num_adc_words_per_ts;
-    })
-    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) {
-      return WIBEthFrame::s_expected_bytes;
-    })
+    .def_property_readonly_static("s_bits_per_adc", [](py::object /*self*/) { return WIBEthFrame::s_bits_per_adc; })
+    .def_property_readonly_static("s_bits_per_word", [](py::object /*self*/) { return WIBEthFrame::s_bits_per_word; })
+    .def_property_readonly_static("s_time_samples_per_frame",
+                                  [](py::object /*self*/) { return WIBEthFrame::s_time_samples_per_frame; })
+    .def_property_readonly_static("s_channels_per_half_femb",
+                                  [](py::object /*self*/) { return WIBEthFrame::s_channels_per_half_femb; })
+    .def_property_readonly_static("s_half_fembs_per_frame",
+                                  [](py::object /*self*/) { return WIBEthFrame::s_half_fembs_per_frame; })
+    .def_property_readonly_static("s_num_channels", [](py::object /*self*/) { return WIBEthFrame::s_num_channels; })
+    .def_property_readonly_static("s_num_adc_words_per_ts",
+                                  [](py::object /*self*/) { return WIBEthFrame::s_num_adc_words_per_ts; })
+    .def_property_readonly_static("s_expected_bytes", [](py::object /*self*/) { return WIBEthFrame::s_expected_bytes; })
     .def_static("sizeof", []() { return sizeof(WIBEthFrame); })
     .def("get_bytes", [](WIBEthFrame* fr) -> py::bytes {
       return py::bytes(reinterpret_cast<char*>(fr), sizeof(WIBEthFrame)); // NOLINT reinterpret_cast
