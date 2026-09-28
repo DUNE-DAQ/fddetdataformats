@@ -61,13 +61,13 @@ concept HasNoCompilerPadding = requires {
 template<typename T>
 concept HasGetTimestamp = requires(const T ct) {
   { ct.get_timestamp() } -> std::same_as<uint64_t>; // NOLINT(build/unsigned)
-};
+}; // NOLINT(readability/braces)
 
 template<typename T>
 concept HasSetTimestamp = requires(T t, uint64_t ts) // NOLINT(build/unsigned)
 {
   { t.set_timestamp(ts) } -> std::same_as<void>;
-};
+}; // NOLINT(readability/braces)
 
 // TODO: John Freeman (jcfree@fnal.gov), Jun-17-2026
 
