@@ -26,28 +26,24 @@ register_daphneeth(py::module& m)
     //   [](DAPHNEEthFrame::Header& self, uint32_t w0) {self.w0 = w0;}
     //   )      
     .def_property("w1",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w1;},
-      [](DAPHNEEthFrame::Header& self, uint32_t w1) {self.w1 = w1;}
+      [](DAPHNEEthFrame::Header& self) -> uint64_t {return self.get_descriptor_word(0);},
+      [](DAPHNEEthFrame::Header& self, uint64_t w1) {self.set_descriptor_word(0, w1);}
       )
     .def_property("w2",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w2;},
-      [](DAPHNEEthFrame::Header& self, uint32_t w2) {self.w2 = w2;}
+      [](DAPHNEEthFrame::Header& self) -> uint64_t {return self.get_descriptor_word(1);},
+      [](DAPHNEEthFrame::Header& self, uint64_t w2) {self.set_descriptor_word(1, w2);}
       )
     .def_property("w3",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w3;},
-      [](DAPHNEEthFrame::Header& self, uint32_t w3) {self.w3 = w3;}
+      [](DAPHNEEthFrame::Header& self) -> uint64_t {return self.get_descriptor_word(2);},
+      [](DAPHNEEthFrame::Header& self, uint64_t w3) {self.set_descriptor_word(2, w3);}
       )
     .def_property("w4",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w4;},
-      [](DAPHNEEthFrame::Header& self, uint32_t w4) {self.w4 = w4;}
+      [](DAPHNEEthFrame::Header& self) -> uint64_t {return self.get_descriptor_word(3);},
+      [](DAPHNEEthFrame::Header& self, uint64_t w4) {self.set_descriptor_word(3, w4);}
       )
     .def_property("w5",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w5;},
-      [](DAPHNEEthFrame::Header& self, uint32_t w5) {self.w5 = w5;}
-      )
-    .def_property("w6",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w6;},
-      [](DAPHNEEthFrame::Header& self, uint32_t w6) {self.w6 = w6;}
+      [](DAPHNEEthFrame::Header& self) -> uint64_t {return self.get_descriptor_word(4);},
+      [](DAPHNEEthFrame::Header& self, uint64_t w5) {self.set_descriptor_word(4, w5);}
       )
     .def_property("channel",
       [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.channel;},
@@ -68,6 +64,22 @@ register_daphneeth(py::module& m)
     .def_property("baseline",
       [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.baseline;},
       [](DAPHNEEthFrame::Header& self, uint32_t baseline) {self.baseline = baseline;}
+      )
+    .def_property("calibration_tag",
+      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.calibration_tag;},
+      [](DAPHNEEthFrame::Header& self, uint32_t value) {self.calibration_tag = value;}
+      )
+    .def_property("descriptor_overflow",
+      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.descriptor_overflow;},
+      [](DAPHNEEthFrame::Header& self, uint32_t value) {self.descriptor_overflow = value;}
+      )
+    .def_property("fragment_descriptor",
+      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.fragment_descriptor;},
+      [](DAPHNEEthFrame::Header& self, uint32_t value) {self.fragment_descriptor = value;}
+      )
+    .def_property("continuation",
+      [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.continuation;},
+      [](DAPHNEEthFrame::Header& self, uint32_t value) {self.continuation = value;}
       )
     ;
 

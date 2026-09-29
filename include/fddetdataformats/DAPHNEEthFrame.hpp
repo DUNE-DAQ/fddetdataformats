@@ -1,7 +1,7 @@
 /**
  * @file DAPHNEEthFrame.hpp
  *
- * Contains declaration of DAPHNEEthFrame, a class for accessing raw WIB eth frames, as used in ProtoDUNE-SP-II
+ * Contains declaration of DAPHNEEthFrame, a class for accessing raw DAPHNE Ethernet frames.
  * 
  * The canonical definition of the DAPHNE format is given in EDMS document 2088726: 
  * https://edms.cern.ch/document/2088726
@@ -18,18 +18,17 @@
 
 #include <algorithm> // For std::min
 #include <cassert>   // For assert()
+#include <cstddef>
 #include <cstdint>   // For uint32_t etc
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <stdexcept> // For std::out_of_range
 
 namespace dunedaq::fddetdataformats {
 
 /**
- *  @brief Class for accessing raw WIB eth frames, as used in ProtoDUNE-II
- *
- *  The canonical definition of the WIB format is given in EDMS document 2088713:
- *  https://edms.cern.ch/document/2088726
+ *  @brief Class for accessing raw DAPHNE Ethernet frames.
  */
 class DAPHNEEthFrame
 {
@@ -42,32 +41,83 @@ public:
   typedef uint64_t word_t; // NOLINT
 
   // Dataframe format version
-  static constexpr uint8_t version = 1;
+  static constexpr uint8_t version = 4;
 
   static constexpr int s_bits_per_adc = 14;
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);
-  static constexpr int s_num_adcs = 1024;
+  static constexpr int s_num_adcs = 256;
   static constexpr int s_num_adc_words = s_num_adcs * s_bits_per_adc / s_bits_per_word;
+  static constexpr int s_max_peaks = 5;
+
+  struct PeakDescriptor
+  {
+    word_t adc_integral : 22;
+    word_t adc_peak : 14;
+    word_t duration_minus_one : 8;
+    word_t time_peak : 8;
+    word_t sample_start : 8;
+    word_t found : 1;
+    word_t reserved : 3;
+
+    uint16_t get_duration() const { return found ? duration_minus_one + 1 : 0; }
+  };
+  static_assert(sizeof(PeakDescriptor) == sizeof(word_t));
+
+  struct PeakDescriptorData
+  {
+    PeakDescriptor peaks[s_max_peaks]; // NOLINT
+
+    uint16_t get_sample_start(int idx) const
+    {
+      if (idx < 0 || idx >= s_max_peaks) throw std::out_of_range("Peak index out of range");
+      return peaks[idx].sample_start;
+    }
+
+    void set_sample_start(int idx, uint16_t value)
+    {
+      if (idx < 0 || idx >= s_max_peaks) throw std::out_of_range("Peak index out of range");
+      if (value >= s_num_adcs) throw std::out_of_range("Peak start out of range");
+      peaks[idx].sample_start = value;
+    }
+  };
+  static_assert(sizeof(PeakDescriptorData) == 5 * sizeof(word_t));
 
   struct Header
-  {	  
-    // word_t w0;
+  {
     word_t trig_sample : 14;
     word_t rsv_0       : 2;
     word_t threshold   : 14;
     word_t rsv_1       : 2;
     word_t baseline    : 14;
-    word_t rsv_2       : 6;
+    word_t calibration_tag : 2;
+    word_t rsv_2       : 1;
+    word_t descriptor_overflow : 1;
+    word_t fragment_descriptor : 1;
+    word_t continuation : 1;
     word_t version     : 4;
     word_t channel     : 8;
 
-    word_t w1;
-    word_t w2;
-    word_t w3;
-    word_t w4;
-    word_t w5;
-    word_t w6;
+    PeakDescriptorData peaks_data;
+
+    word_t get_descriptor_word(int idx) const
+    {
+      if (idx < 0 || idx >= s_max_peaks)
+        throw std::out_of_range("Descriptor word index out of range");
+      word_t value;
+      std::memcpy(&value, reinterpret_cast<const uint8_t*>(&peaks_data) + idx * sizeof(word_t), sizeof(value));
+      return value;
+    }
+
+    void set_descriptor_word(int idx, word_t value)
+    {
+      if (idx < 0 || idx >= s_max_peaks)
+        throw std::out_of_range("Descriptor word index out of range");
+      std::memcpy(reinterpret_cast<uint8_t*>(&peaks_data) + idx * sizeof(word_t), &value, sizeof(value));
+    }
   };
+  static_assert(sizeof(Header) == 6 * sizeof(word_t));
+  static constexpr std::size_t s_expected_bytes =
+    sizeof(detdataformats::DAQEthHeader) + sizeof(Header) + s_num_adc_words * sizeof(word_t);
 
   // ===============================================================
   // Data members
@@ -85,7 +135,7 @@ public:
   *
   * The ADC words are 14 bits long, stored packed in the data structure. The order is:
   *
-  * - 1024 adc values from one daphne channel
+  * - 256 ADC values from one DAPHNE channel
   */
 uint16_t
 get_adc(int i) const // NOLINT
@@ -128,13 +178,14 @@ set_adc(int i, uint16_t val) // NOLINT
   int first_bit_position = (s_bits_per_adc * i) % s_bits_per_word;
   // How many bits of our desired ADC are located in the `word_index`th word
   int bits_in_first_word = std::min(s_bits_per_adc, s_bits_per_word - first_bit_position);
-  uint32_t mask = (1 << (first_bit_position)) - 1;
-  adc_words[word_index] = ((val << first_bit_position) & ~mask) | (adc_words[word_index] & mask);
+  word_t mask = ((word_t{ 1 } << bits_in_first_word) - 1) << first_bit_position;
+  adc_words[word_index] = (adc_words[word_index] & ~mask) | (static_cast<word_t>(val) << first_bit_position);
   // If we didn't put the full 14 bits in this word, we need to put the rest in the next word
   if (bits_in_first_word < s_bits_per_adc) {
     assert(word_index + 1 < s_num_adc_words);
-    mask = (1 << (s_bits_per_adc - bits_in_first_word)) - 1;
-    adc_words[word_index + 1] = ((val >> bits_in_first_word) & mask) | (adc_words[word_index + 1] & ~mask);
+    mask = (word_t{ 1 } << (s_bits_per_adc - bits_in_first_word)) - 1;
+    adc_words[word_index + 1] =
+      (adc_words[word_index + 1] & ~mask) | (static_cast<word_t>(val) >> bits_in_first_word);
   }
 }
 
@@ -166,7 +217,14 @@ set_adc(int i, uint16_t val) // NOLINT
     header.channel = new_channel;
   }
 
+  const PeakDescriptorData& get_peaks_data() const { return header.peaks_data; }
+  PeakDescriptorData& get_peaks_data() { return header.peaks_data; }
+
 };
+
+static_assert(sizeof(DAPHNEEthFrame) == DAPHNEEthFrame::s_expected_bytes);
+static_assert(sizeof(DAPHNEEthFrame) == 512);
+static_assert(offsetof(DAPHNEEthFrame, adc_words) == 64);
 
 } // namespace dunedaq::fddetdataformats
 
