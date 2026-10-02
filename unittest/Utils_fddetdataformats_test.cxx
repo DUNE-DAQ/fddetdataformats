@@ -70,9 +70,9 @@ BOOST_AUTO_TEST_CASE(Utils_fddetdataformats_ADCOperation_BasicChecks)
   // First, test get_adc_2d if the ADC representation aligns with the C++ type
   for (int i_r = 0; i_r < nrows; ++i_r) {
     for (int i_c = 0; i_c < ncols; ++i_c) {
-      BOOST_REQUIRE_EQUAL(myarr[i_r][i_c],
-                          (dunedaq::fddetdataformats::get_adc_2d<wordtype_t, nrows, ncols, bits_per_word>(
-                            i_r, i_c, myarr))); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+      BOOST_REQUIRE_EQUAL(
+        myarr[i_r][i_c], // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        (dunedaq::fddetdataformats::get_adc_2d<wordtype_t, nrows, ncols, bits_per_word>(i_r, i_c, myarr)));
     }
   }
 
@@ -89,9 +89,9 @@ BOOST_AUTO_TEST_CASE(Utils_fddetdataformats_ADCOperation_BasicChecks)
 
   for (int i_r = 0; i_r < nrows; ++i_r) {
     for (int i_c = 0; i_c < ncols; ++i_c) {
-      BOOST_REQUIRE_EQUAL(inputarr[i_r][i_c],
-                          (dunedaq::fddetdataformats::get_adc_2d<wordtype_t, nrows, ncols, bits_per_word>(
-                            i_r, i_c, myarr))); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+      BOOST_REQUIRE_EQUAL(
+        inputarr[i_r][i_c], // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        (dunedaq::fddetdataformats::get_adc_2d<wordtype_t, nrows, ncols, bits_per_word>(i_r, i_c, myarr)));
     }
   }
 
@@ -104,8 +104,8 @@ BOOST_AUTO_TEST_CASE(Utils_fddetdataformats_ADCOperation_BasicChecks)
   constexpr int nsamples = nrows;
   constexpr int nchannels = bits_per_word * ncols / bits_per_adc;
 
+  // NOLINTNEXTLINE(modernize-avoid-c-arrays)
   constexpr wordtype_t inputarr2[nsamples][nchannels] = {
-    // NOLINT(modernize-avoid-c-arrays)
     { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
     { 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48 }
   };
