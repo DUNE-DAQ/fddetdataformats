@@ -23,6 +23,7 @@
 #include <cassert>   // For assert()
 #include <cstdint>   // For uint32_t etc
 #include <cstdio>
+#include <cstring>
 #include <cstdlib>
 #include <limits>
 #include <stdexcept> // For std::out_of_range
@@ -44,33 +45,82 @@ struct DAPHNEEthFrame
   using word_t = uint64_t;
 
   // Dataframe format version
-  static constexpr uint8_t version = 1;
+  static constexpr uint8_t version = 4;
 
   static constexpr int s_bits_per_adc = 14;
   static constexpr int s_bits_per_word = 8 * sizeof(word_t);
-  static constexpr int s_num_adcs = 1024;
+  static constexpr int s_num_adcs = 256;
   static constexpr int s_num_adc_words = s_num_adcs * s_bits_per_adc / s_bits_per_word;
+
+  static constexpr int s_max_peaks = 5;
+
+  struct PeakDescriptor
+  {
+    word_t adc_integral : 22;
+    word_t adc_peak : 14;
+    word_t duration_minus_one : 8;
+    word_t time_peak : 8;
+    word_t sample_start : 8;
+    word_t found : 1;
+    word_t reserved : 3;
+
+    uint16_t get_duration() const { return found ? duration_minus_one + 1 : 0; }
+  };
+  static_assert(sizeof(PeakDescriptor) == sizeof(word_t));
+
+  struct PeakDescriptorData
+  {
+    PeakDescriptor peaks[s_max_peaks]; // NOLINT
+
+    uint16_t get_sample_start(int idx) const
+    {
+      if (idx < 0 || idx >= s_max_peaks) throw std::out_of_range("Peak index out of range");
+      return peaks[idx].sample_start;
+    }
+
+    void set_sample_start(int idx, uint16_t value)
+    {
+      if (idx < 0 || idx >= s_max_peaks) throw std::out_of_range("Peak index out of range");
+      if (value >= s_num_adcs) throw std::out_of_range("Peak start out of range");
+      peaks[idx].sample_start = value;
+    }
+  };
+  static_assert(sizeof(PeakDescriptorData) == 5 * sizeof(word_t));
 
   struct Header
   {
-    static constexpr size_t s_expected_bytes{ 7 * sizeof(word_t) };
+    static constexpr size_t s_expected_bytes{6 * sizeof(word_t)};
 
-    // The following bitfields constitute what could be considered "word_t w0;"
     word_t trigger_sample_value : 14;
-    word_t rsv_0 : 2;
-    word_t threshold : 14;
-    word_t rsv_1 : 2;
-    word_t baseline : 14;
-    word_t rsv_2 : 6;
-    word_t version : 4;
-    word_t channel : 8;
+    word_t rsv_0       : 2;
+    word_t threshold   : 14;
+    word_t rsv_1       : 2;
+    word_t baseline    : 14;
+    word_t calibration_tag : 2;
+    word_t rsv_2       : 1;
+    word_t descriptor_overflow : 1;
+    word_t fragment_descriptor : 1;
+    word_t continuation : 1;
+    word_t version     : 4;
+    word_t channel     : 8;
 
-    word_t w1;
-    word_t w2;
-    word_t w3;
-    word_t w4;
-    word_t w5;
-    word_t w6;
+    PeakDescriptorData peaks_data;
+
+    word_t get_descriptor_word(int idx) const
+    {
+      if (idx < 0 || idx >= s_max_peaks)
+        throw std::out_of_range("Descriptor word index out of range");
+      word_t value;
+      std::memcpy(&value, reinterpret_cast<const uint8_t*>(&peaks_data) + idx * sizeof(word_t), sizeof(value));
+      return value;
+    }
+
+    void set_descriptor_word(int idx, word_t value)
+    {
+      if (idx < 0 || idx >= s_max_peaks)
+        throw std::out_of_range("Descriptor word index out of range");
+      std::memcpy(reinterpret_cast<uint8_t*>(&peaks_data) + idx * sizeof(word_t), &value, sizeof(value));
+    }
   };
   static_assert(sizeof(Header) == Header::s_expected_bytes);
 
@@ -82,7 +132,7 @@ struct DAPHNEEthFrame
    *
    * The ADC words are 14 bits long, stored packed in the data structure. The order is:
    *
-   * - 1024 adc values from one daphne channel
+   * - 256 adc values from one daphne channel
    */
   uint16_t get_adc(int i) const; // NOLINT
 
@@ -94,6 +144,9 @@ struct DAPHNEEthFrame
 
   /// @brief Set the starting 64-bit timestamp of the frame
   void set_timestamp(const uint64_t new_timestamp) { daq_header.timestamp = new_timestamp; }
+
+  const PeakDescriptorData& get_peaks_data() const { return header.peaks_data; }
+  PeakDescriptorData& get_peaks_data() { return header.peaks_data; }
 
   /// @brief Get the channel identifier of the frame
   uint8_t get_channel() const { return header.channel; }

@@ -22,34 +22,21 @@ register_daphneeth(py::module& m)
 {
 
   py::class_<DAPHNEEthFrame::Header>(m, "DAPHNEEthHeader")
-    // .def_property("w0",
-    //   [](DAPHNEEthFrame::Header& self) -> uint32_t {return self.w0;},
-    //   [](DAPHNEEthFrame::Header& self, uint32_t w0) {self.w0 = w0;}
-    //   )
-    .def_property(
-      "w1",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w1; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w1) { self.w1 = w1; })
-    .def_property(
-      "w2",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w2; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w2) { self.w2 = w2; })
-    .def_property(
-      "w3",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w3; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w3) { self.w3 = w3; })
-    .def_property(
-      "w4",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w4; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w4) { self.w4 = w4; })
-    .def_property(
-      "w5",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w5; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w5) { self.w5 = w5; })
-    .def_property(
-      "w6",
-      [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.w6; },
-      [](DAPHNEEthFrame::Header& self, uint32_t w6) { self.w6 = w6; })
+    .def_property("w1",
+      [](DAPHNEEthFrame::Header& h) { return h.get_descriptor_word(0); },
+      [](DAPHNEEthFrame::Header& h, uint64_t v) { h.set_descriptor_word(0, v); })
+    .def_property("w2",
+      [](DAPHNEEthFrame::Header& h) { return h.get_descriptor_word(1); },
+      [](DAPHNEEthFrame::Header& h, uint64_t v) { h.set_descriptor_word(1, v); })
+    .def_property("w3",
+      [](DAPHNEEthFrame::Header& h) { return h.get_descriptor_word(2); },
+      [](DAPHNEEthFrame::Header& h, uint64_t v) { h.set_descriptor_word(2, v); })
+    .def_property("w4",
+      [](DAPHNEEthFrame::Header& h) { return h.get_descriptor_word(3); },
+      [](DAPHNEEthFrame::Header& h, uint64_t v) { h.set_descriptor_word(3, v); })
+    .def_property("w5",
+      [](DAPHNEEthFrame::Header& h) { return h.get_descriptor_word(4); },
+      [](DAPHNEEthFrame::Header& h, uint64_t v) { h.set_descriptor_word(4, v); })
     .def_property(
       "channel",
       [](DAPHNEEthFrame::Header& self) -> uint32_t { return self.channel; },
